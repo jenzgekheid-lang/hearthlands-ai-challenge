@@ -1,6 +1,6 @@
 // ChatGPT GPT-6 — Game version: 195
-// Map-aware economic planner: scores legal sites from terrain/resources, uses ore signs and event diagnostics,
-// expands only when useful, protects carrier throughput, and commits a concentrated army only at a clear advantage.
+// Map-aware planner: scores legal sites, uses stockpiles to keep carriers moving, and skips blocked build goals.
+// Keeps the same army targets and combat policy while improving economy recovery across asymmetric starts.
 function think(view){
  const E=view.economy;
  if(!E||view.over)return [];
@@ -87,7 +87,7 @@ function think(view){
  memory.storeSlots=memory.storeSlots||{};
  for(const b of town.filter(q=>q.type==='store')){
   if(!memory.storeSlots[b.id]){
-   const sets=[['plank','stone','log','grain'],['coal','ironore','iron','gold'],['sword','spear','bow','bread']];
+   const sets=[['log','plank','stone','grain'],['fish','water','flour','bread'],['coal','ironore','iron','gold'],['sword','spear','bow','meat']];
    const idx=Math.min(sets.length-1,Object.keys(memory.storeSlots).length);
    for(let k=0;k<4;k++)out.push(['storeSlot',{b:b.id,k,it:sets[idx][k]}]);
    memory.storeSlots[b.id]=true;
@@ -102,11 +102,10 @@ function think(view){
   const q=E.unsearched[0];out.push(['sendUnit',{u:g.id,tx:q.x,ty:q.y}]);
  }
  // Carrier throughput: if goods are accumulating while carriers are idle, move clearing work upward.
- const waiting=(E.loose&&Object.values(E.loose).reduce((a,b)=>a+b,0))||0;
+ const loose=(E.loose&&Object.values(E.loose).reduce((a,b)=>a+b,0))||0;
+ const outputGoods=town.reduce((a,b)=>a+Object.values(b.outputs||{}).reduce((x,y)=>x+(y||0),0),0);
+ const waiting=loose+outputGoods;
  const idleCarriers=(E.idle&&E.idle.carrier)||0;
- if(waiting>18&&idleCarriers>5&&view.t>=(memory.clearOrderAt||0)){
-  out.push(['workOrder',{k:'clear',d:-1}]);memory.clearOrderAt=view.t+180;
- }
  // Army settings: garrisons get priority, but preserve a small mobile reserve.
  if(!memory.armySetup){
   out.push(['armyTarget',{kind:'sword',set:14}],['armyTarget',{kind:'spear',set:10}],
@@ -119,6 +118,8 @@ function think(view){
  add(n('wood')<1,'wood');
  add(n('quarry')<1,'quarry');
  add(n('saw')<1,'saw');
+ // Early storage gives carriers somewhere to take full production piles.
+ add(n('store')<1,'store');
  add(n('wood')<2,'wood');
  add(n('forest')<1,'forest');
  add(n('fisher')<1,'fisher');
@@ -126,6 +127,12 @@ function think(view){
  add(n('farm')<1,'farm');
  add(n('mill')<1&&n('farm')>0,'mill');
  add(n('bakery')<1&&n('mill')>0,'bakery');
+ // Add a first home before the ore chain so a blocked deposit cannot prevent population growth.
+ const houses=n('house')+n('house2')+n('house3');
+ add(houses<5&&(E.population||0)>=(E.beds||0)-5,'house');
+ // Expand storage only when output/loose goods and idle carriers show a real transport backlog.
+ add(n('store')<2&&waiting>18&&idleCarriers>5,'store');
+ add(n('store')<3&&waiting>45&&idleCarriers>8,'store');
  add(n('quarry')<2&&s('stone')<24,'quarry');
  add(n('wood')<3&&s('log')<30,'wood');
  add(n('farm')<2&&n('mill')>0,'farm');
@@ -138,9 +145,7 @@ function think(view){
  add(n('coalmine')<2&&n('weaponsmith')>0&&s('coal')<12&&ore('coal').length>0,'coalmine');
  add(n('goldmine')<1&&ore('goldore').length>0&&n('smelter')>0,'goldmine');
  add(n('goldsmelter')<1&&n('goldmine')>0&&n('coalmine')>0,'goldsmelter');
- // Houses: add beds only when population is close to capacity; cap at five small houses.
- const houses=n('house')+n('house2')+n('house3');
- add(houses<5&&(E.population||0)>=(E.beds||0)-5,'house');
+ // Additional homes are considered above, before the ore chain.
  // Secure the starting ten soldiers immediately; this first post is the key to claiming room to expand.
  const guards=n('guard'),towers=n('tower');
  if(guards<1&&!pending('guard'))wants.unshift('guard');
@@ -149,16 +154,24 @@ function think(view){
  else if(guards<4&&soldiers.length>=18&&emptyMil===0&&view.t>600)add(true,'guard');
  else if(towers<1&&soldiers.length>=28&&guards>=2&&emptyMil===0)add(true,'tower');
  // Don't keep placing military buildings while recruitment is behind.
- const militaryWant=wants.includes('guard')||wants.includes('tower');
- const selected=wants.find(t=>t!=='guard'&&t!=='tower')||null;
  let chosen=null;
- if(sites<2&&s('plank')>=2){
-  // If a useful military site is needed, place it only when its position extends the border.
-  const type=(wants[0]==='guard'||(militaryWant&&sites===0))?'guard':selected;
+ if(sites<2&&s('plank')>=2&&wants.length){
+  // Keep the opening guard first. Otherwise rotate through build goals: a deposit or
+  // footprint with no legal site must not freeze every later goal (notably houses/stores).
+  let type;
+  if(wants[0]==='guard')type='guard';
+  else{
+   const candidates=wants.filter(t=>t!=='guard'&&t!=='tower');
+   const idx=(memory.wantCursor||0)%Math.max(1,candidates.length);
+   type=candidates[idx];
+   memory.wantCursor=(idx+1)%Math.max(1,candidates.length);
+  }
   if(type){
    chosen=bestSite(type);
-   if(chosen)out.push(['place',{type,x:chosen.x,y:chosen.y}]);
-   else if(!hasMap){
+   if(chosen){
+    out.push(['place',{type,x:chosen.x,y:chosen.y}]);
+    memory.wantCursor=0;
+   }else if(!hasMap){
     out.push(['ask',{spots:[type]}]);
     const a=(E.spots||{})[type];if(a&&a.length)out.push(['place',{type,x:a[0].x,y:a[0].y}]);
    }
