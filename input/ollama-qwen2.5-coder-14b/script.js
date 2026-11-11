@@ -1,6 +1,6 @@
 // AI script: Hearthlands AI
 // Model: ChatGPT
-// Game version: 188
+// Game version: 195
 // Plan: Build a strong economy first, then train soldiers and expand. Attack when stronger than the opponent.
 
 function think(view) {
@@ -99,6 +99,27 @@ function think(view) {
         }]);
       }
     }
+  }
+
+  // Expand and defend
+  const idleDiggers = E.units.filter(u => u.role === 'digger' && !u.busy);
+  if (idleDiggers.length > 0) {
+    const unexplored = view.map.unsearched.filter(tile => tile.owner === view.me);
+    if (unexplored.length > 0) {
+      const { x, y } = unexplored[0];
+      out.push(['sendUnit', { u: idleDiggers[0].id, tx: x, ty: y }]);
+    }
+  }
+
+  // Improve resource management
+  const excessPlank = Math.max(0, stockCount('plank') - 30);
+  if (excessPlank > 0) {
+    out.push(['storeSlot', { b: E.town.find(b => b.type === 'store').id, k: 'plank', it: 'plank' }]);
+  }
+
+  const excessStone = Math.max(0, stockCount('stone') - 30);
+  if (excessStone > 0) {
+    out.push(['storeSlot', { b: E.town.find(b => b.type === 'store').id, k: 'stone', it: 'stone' }]);
   }
 
   return out;
