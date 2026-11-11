@@ -1,9 +1,18 @@
 {
   "round": 0,
-  "history": [],
-  "pending": {
-    "round": 0,
-    "change": "start: the kit's builder example",
-    "sha": "0a49767cfb8ca2ae9e3c8315e864b80ef3d7582a"
+  "history": [
+    {
+      "round": 0,
+      "sha": "0a49767",
+      "change": "start: the kit's builder example",
+      "result": "won 0, lost 1, undecided 7; after an hour on average 31.8 buildings, 12.9 soldiers, 3448 land tiles",
+      "score": 116,
+      "kept": true
+    }
+  ],
+  "best": {
+    "score": 116,
+    "sha": "0a49767",
+    "round": 0
   }
 }
