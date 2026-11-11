@@ -38,6 +38,7 @@ jobs:
               }
             }
             names = [...new Set(names)];
+            if (!process.env.TOKEN) throw new Error('the secret ARENA_START is missing in this repository');
             const r = await fetch('https://api.github.com/repos/jenzgekheid-lang/Hearthlands/actions/workflows/arena.yml/dispatches', {
               method: 'POST', headers: { Authorization: `Bearer ${process.env.TOKEN}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
               body: JSON.stringify({ ref: 'main', inputs: { sha: context.sha, names: names.join(' ') } }) });
