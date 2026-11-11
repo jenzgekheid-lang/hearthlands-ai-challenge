@@ -122,5 +122,14 @@ function think(view) {
     out.push(['storeSlot', { b: E.town.find(b => b.type === 'store').id, k: 'stone', it: 'stone' }]);
   }
 
+  // Scout enemy positions
+  const scout = E.units.find(u => u.role === 'scout' && !u.busy);
+  if (scout) {
+    const enemyBuilding = view.enemy.buildings.find(b => b.type !== 'hq' && b.manned);
+    if (enemyBuilding) {
+      out.push(['sendUnit', { u: scout.id, tx: enemyBuilding.x, ty: enemyBuilding.y }]);
+    }
+  }
+
   return out;
 }
