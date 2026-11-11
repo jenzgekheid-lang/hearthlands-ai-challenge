@@ -38,5 +38,10 @@
     "score": 130,
     "sha": "7571a7b",
     "round": 3
+  },
+  "pending": {
+    "round": 4,
+    "change": "The script needs to prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup, which will help in maintaining a stronger defense a",
+    "sha": ""
   }
 }
