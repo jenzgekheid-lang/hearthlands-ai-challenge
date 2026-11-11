@@ -2,9 +2,9 @@
 
 Game version 195. Written for: chatgpt not stated.
 
-- chatgpt: hearthlands-ai-challenge, commit c01fbc1
+- chatgpt: hearthlands-ai-challenge, commit 15d503d
 
-Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 33 s.
+Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 38 s.
 
 Each game ends with the script's own game log: what it may know (its own side, and what happened to it or what it saw). Times are game min:sec.
 
@@ -20,15 +20,15 @@ Each row: buildings / military / land tiles / soldiers / people at the minute sh
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 17/0/1024/10/20 | 31/6/3159/10/50 |
-| 30 | 17/0/1024/10/20 | 64/9/5307/14/106 |
-| 45 | 17/0/1024/10/20 | 72/17/10874/48/92 |
-| 60 | 17/0/1024/10/20 | 80/23/15357/71/89 |
+| 15 | 17/0/1013/10/40 | 31/6/3159/10/50 |
+| 30 | 17/0/1013/10/40 | 64/9/5307/14/106 |
+| 45 | 17/0/1013/10/40 | 72/17/10874/48/92 |
+| 60 | 17/0/1013/10/40 | 80/23/15357/71/89 |
 | first | - - - - - - | 8 8 22 23 28 35 |
 
 Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 13 14 23 34 48 58 67 71).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -36,39 +36,39 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 24 | 8 | 16 | 6 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 80 | 1024 | 2832 |
-| 30 | 24 | 8 | 16 | 6 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 80 | 1024 | 2832 |
-| 45 | 24 | 8 | 16 | 6 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 80 | 1024 | 2832 |
-| 60 | 24 | 8 | 16 | 6 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 80 | 1024 | 2832 |
+| 15 | 32 | 16 | 16 | 6 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1013 | 1808 |
+| 30 | 32 | 16 | 16 | 6 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1013 | 1809 |
+| 45 | 32 | 16 | 16 | 6 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1013 | 1809 |
+| 60 | 32 | 16 | 16 | 6 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1013 | 1809 |
 
-At the end: buildings (built+sites) wood 4, quarry 2, forest 2, farm 2, hq 1, saw 1, waterhut 1, mill 1, bakery 1, house 1, look 1.
-People: worker 13, soldier 10, carrier 3, digger 2, builder 2; beds 10. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, forest 2, farm 2, hq 1, store 1, quarry 1, saw 1, waterhut 1, mill 1, bakery 1.
+People: carrier 25, worker 11, soldier 10, digger 2, builder 2; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: log 52, stone 49, grain 46, plank 32, water 22, flour 22, bread 8.
-Goods consumed in the game: stone 51, plank 48, log 32, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1.
+Goods produced in the game: log 70, grain 54, stone 46, plank 42, water 22, flour 22, bread 8.
+Goods consumed in the game: plank 50, stone 48, log 42, grain 22, water 8, flour 8, axe 2, shovel 2, scythe 2, pick 1, saw 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (224 building-min): Log pile full, waiting for carriers 46%, Needs a worker with an axe 46%, Felling a tree 5%, Bringing a log to the pile 2%, Waiting for a free settler 1%
-- quarry (114 building-min): Stone pile full, waiting for carriers 85%, Cutting stone 7%, Bringing stone to the pile 4%, Waiting for a free settler 3%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Output pile full, waiting for carriers 88%, Sawing planks 7%, Waiting for logs 4%, Stacking outside 1%, Worker picking up a saw 0%
-- forest (112 building-min): No free ground to plant in range inside your border 79%, Planting a sapling 12%, Waiting for a free settler 8%, Worker picking up a shovel 0%, Idle 0%
-- waterhut (58 building-min): Water pile full, waiting for carriers 83%, Waiting for a free settler 11%, Fetching water 3%, Bringing water to the pile 3%, Idle 0%
-- farm (109 building-min): Grain pile full, waiting for carriers 86%, Waiting for a free settler 6%, Sowing a field 3%, Harvesting grain 2%, Bringing grain to the pile 1%
-- mill (57 building-min): Output pile full, waiting for carriers 85%, Waiting for a free settler 9%, Waiting for grain 2%, Grinding flour 2%, Stacking outside 1%
-- bakery (56 building-min): Output pile full, waiting for carriers 84%, Waiting for a free settler 8%, Waiting for flour 4%, Baking bread 3%, Waiting for flour and water 0%
-- house (52 building-min): Idle 100%
-- look (50 building-min): Scout on watch 100%, Working 0%
+- store (60 building-min): Idle 100%
+- house (174 building-min): Idle 100%
+- wood (165 building-min): Log pile full, waiting for carriers 58%, Needs a worker with an axe 31%, Felling a tree 8%, Bringing a log to the pile 2%, Worker picking up an axe 0%
+- quarry (58 building-min): Stone pile full, waiting for carriers 80%, Cutting stone 13%, Bringing stone to the pile 6%, Worker picking up a pickaxe 0%, Working 0%
+- saw (56 building-min): Output pile full, waiting for carriers 88%, Sawing planks 9%, Stacking outside 2%, Worker picking up a saw 0%, Fetching from the pile 0%
+- forest (107 building-min): No free ground to plant in range inside your border 82%, Planting a sapling 18%, Worker picking up a shovel 0%, Idle 0%, Working 0%
+- waterhut (55 building-min): Water pile full, waiting for carriers 96%, Fetching water 2%, Bringing water to the pile 1%, Working 0%
+- farm (104 building-min): Grain pile full, waiting for carriers 92%, Sowing a field 4%, Harvesting grain 3%, Bringing grain to the pile 1%, Worker picking up a scythe 0%
+- mill (53 building-min): Output pile full, waiting for carriers 94%, Waiting for grain 3%, Grinding flour 2%, Stacking outside 1%, Fetching from the pile 0%
+- bakery (52 building-min): Output pile full, waiting for carriers 96%, Baking bread 3%, Stacking outside 0%, Waiting for flour 0%, Working 0%
 
-Building sites, time per state (site-min): Waiting for materials 7, Builders at work 4, Leveling the ground 3, Waiting for a digger 2, Waiting for a builder 2.
+Building sites, time per state (site-min): Builders at work 4, Leveling the ground 3, Waiting for a builder 2, Waiting for a digger 1.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:27, quarry 0:04→0:44, saw 0:28→1:07, wood 0:46→1:22, forest 1:08→1:43, waterhut 1:22→2:03, farm 1:44→2:57, mill 2:04→3:20, bakery 2:58→4:14, quarry 3:20→5:00, wood 4:14→5:33, forest 5:00→5:55, farm 5:34→7:36, house 5:56→8:30, wood 7:38→8:50, look 8:34→9:35.
+Build order (placed at min:sec, finished at): store 0:02→0:25, house 0:26→0:52, wood 0:52→1:14, house 1:16→1:48, quarry 1:50→2:17, house 2:18→2:53, saw 2:54→3:34, wood 3:34→4:09, forest 4:10→4:45, waterhut 4:46→5:27, farm 5:28→6:17, mill 6:18→6:57, bakery 6:58→7:50, forest 7:50→8:23, wood 8:24→9:12, farm 9:14→10:10.
 
-Orders given: place 16, armyTarget 3, armyReserve 1, armyList 1. None refused.
+Orders given: place 16, storeSlot 4, armyTarget 3, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: carrier -> worker 9, new carrier 6, new worker 4.
+People changing jobs: new carrier 30, carrier -> worker 11.
 
-People's orders (1187 in all, 1173 done): worker rest forest 107, worker rest farm 107, worker gather farm 105, worker gather forest 105, worker rest wood 54, worker gather wood 52, worker rest quarry 51, worker gather quarry 49, carrier haul log wood -> saw 36, worker rest saw 33, worker toCraft saw 32, worker craft saw 32, carrier haul grain farm -> mill 30, worker rest waterhut 23. None failed.
+People's orders (1461 in all, 1449 done): worker rest forest 152, worker gather forest 150, worker rest farm 112, worker gather farm 110, worker rest wood 72, worker gather wood 70, worker rest quarry 47, worker gather quarry 46, carrier haul log wood -> store 45, worker rest saw 43, worker toCraft saw 42, worker craft saw 42, carrier haul log store -> saw 41, carrier haul stone quarry -> store 36. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
@@ -77,15 +77,15 @@ Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders r
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 20/0/1028/10/30 | 31/6/2858/10/50 |
-| 30 | 20/0/1028/10/30 | 66/12/5628/25/95 |
-| 45 | 20/0/1028/10/30 | 78/19/10519/60/100 |
-| 60 | 20/0/1028/10/30 | 87/27/16482/82/98 |
-| first | - - - - - - | 11 12 13 16 27 35 |
+| 15 | 18/0/1019/10/40 | 31/6/2862/10/50 |
+| 30 | 18/0/1019/10/40 | 65/11/6565/20/90 |
+| 45 | 18/0/1019/10/40 | 73/17/10579/55/95 |
+| 60 | 18/0/1019/10/40 | 82/22/15199/72/118 |
+| first | - - - - - - | 11 12 13 15 25 28 |
 
-Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 15 25 45 54 60 66 73 82).
+Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 11 19 20 46 50 55 60 68 72).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -93,40 +93,40 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 21 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 85 | 1028 | 3070 |
-| 30 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 88 | 1028 | 3070 |
-| 45 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 88 | 1028 | 3070 |
-| 60 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 88 | 1028 | 3070 |
+| 15 | 29 | 16 | 16 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 24 | 77 | 1019 | 1810 |
+| 30 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 24 | 80 | 1019 | 1810 |
+| 45 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 24 | 80 | 1019 | 1810 |
+| 60 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 24 | 80 | 1019 | 1810 |
 
-At the end: buildings (built+sites) wood 3, forest 3, quarry 2, fisher 2, farm 2, house 2, hq 1, saw 1, waterhut 1, mill 1, bakery 1, look 1.
-People: worker 14, carrier 12, soldier 10, digger 2, builder 2; beds 20. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, forest 2, farm 2, hq 1, store 1, quarry 1, saw 1, fisher 1, waterhut 1, mill 1, bakery 1.
+People: carrier 24, worker 12, soldier 10, digger 2, builder 2; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: log 62, stone 55, grain 46, plank 42, water 22, flour 22, fish 8, bread 8.
-Goods consumed in the game: plank 58, stone 57, log 42, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1, rod 1.
+Goods produced in the game: log 73, grain 54, stone 48, plank 45, water 22, flour 22, fish 8, bread 8.
+Goods consumed in the game: plank 53, stone 50, log 45, grain 22, water 8, flour 8, axe 2, shovel 2, scythe 2, pick 1, saw 1, rod 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (173 building-min): Log pile full, waiting for carriers 54%, Needs a worker with an axe 29%, Felling a tree 8%, No grown trees in range inside your border 4%, Bringing a log to the pile 3%
-- quarry (114 building-min): Stone pile full, waiting for carriers 85%, Cutting stone 8%, Bringing stone to the pile 4%, Waiting for a free settler 3%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Output pile full, waiting for carriers 79%, Waiting for logs 10%, Sawing planks 9%, Stacking outside 2%, Worker picking up a saw 0%
-- forest (162 building-min): No free ground to plant in range inside your border 55%, Needs a worker with a shovel 30%, Planting a sapling 8%, Waiting for a free settler 6%, Worker picking up a shovel 0%
-- fisher (110 building-min): Needs a worker with a fishing rod 46%, Fish pile full, waiting for carriers 46%, Waiting for a free settler 7%, Bringing a fish to the pile 0%, Fishing 0%
-- waterhut (57 building-min): Water pile full, waiting for carriers 84%, Waiting for a free settler 11%, Bringing water to the pile 3%, Fetching water 2%, Idle 0%
-- farm (109 building-min): Grain pile full, waiting for carriers 87%, Waiting for a free settler 7%, Sowing a field 3%, Harvesting grain 2%, Bringing grain to the pile 1%
-- mill (57 building-min): Output pile full, waiting for carriers 84%, Waiting for a free settler 10%, Waiting for grain 2%, Grinding flour 2%, Stacking outside 1%
-- bakery (56 building-min): Output pile full, waiting for carriers 82%, Waiting for a free settler 9%, Waiting for flour 6%, Baking bread 3%, Stacking outside 0%
-- house (99 building-min): Idle 100%
-- look (47 building-min): Scout on watch 100%, Scout on the way 0%, Working 0%
+- store (60 building-min): Idle 100%
+- house (174 building-min): Idle 100%
+- wood (165 building-min): Log pile full, waiting for carriers 54%, Needs a worker with an axe 31%, Felling a tree 10%, Bringing a log to the pile 4%, No grown trees in range inside your border 1%
+- quarry (58 building-min): Stone pile full, waiting for carriers 79%, Cutting stone 14%, Bringing stone to the pile 7%, Worker picking up a pickaxe 0%, Working 0%
+- saw (56 building-min): Output pile full, waiting for carriers 87%, Sawing planks 10%, Stacking outside 2%, Worker picking up a saw 0%, Fetching from the pile 0%
+- forest (105 building-min): No free ground to plant in range inside your border 84%, Planting a sapling 15%, Worker picking up a shovel 0%, Idle 0%, Working 0%
+- fisher (54 building-min): Fish pile full, waiting for carriers 98%, Bringing a fish to the pile 1%, Fishing 1%, Worker picking up a fishing rod 0%
+- waterhut (54 building-min): Water pile full, waiting for carriers 95%, Bringing water to the pile 3%, Fetching water 2%, Working 0%
+- farm (101 building-min): Grain pile full, waiting for carriers 91%, Sowing a field 5%, Harvesting grain 3%, Bringing grain to the pile 1%, Worker picking up a scythe 1%
+- mill (52 building-min): Output pile full, waiting for carriers 94%, Waiting for grain 3%, Grinding flour 2%, Stacking outside 1%, Fetching from the pile 0%
+- bakery (51 building-min): Output pile full, waiting for carriers 96%, Baking bread 4%, Stacking outside 0%, Waiting for flour and water 0%, Waiting for water 0%
 
-Building sites, time per state (site-min): Waiting for materials 5, Builders at work 5, Leveling the ground 4, Waiting for a digger 3, Waiting for a builder 2.
+Building sites, time per state (site-min): Leveling the ground 4, Builders at work 4, Waiting for a digger 2, Waiting for a builder 1.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:21, quarry 0:04→0:39, saw 0:22→0:59, wood 0:40→1:14, forest 1:00→1:26, fisher 1:16→1:54, waterhut 1:26→2:32, farm 1:56→3:10, mill 2:34→3:28, bakery 3:10→4:10, quarry 4:26→5:03, wood 4:46→5:26, forest 5:04→5:50, farm 5:28→7:32, fisher 5:50→8:12, house 8:12→8:49, forest 8:14→10:34, house 11:40→12:21, look 12:10→12:47.
+Build order (placed at min:sec, finished at): store 0:02→0:24, house 0:24→0:57, wood 0:58→1:19, house 1:20→1:56, quarry 1:58→2:29, house 2:30→3:07, saw 3:08→3:37, wood 3:38→4:08, forest 4:10→4:41, fisher 4:42→5:35, waterhut 5:36→6:22, farm 6:22→7:34, mill 7:34→8:22, bakery 8:22→9:11, wood 9:12→9:43, forest 9:44→10:11, farm 10:12→11:32.
 
-Orders given: place 19, armyTarget 3, armyReserve 1, armyList 1. None refused.
+Orders given: place 17, storeSlot 4, armyTarget 3, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: new carrier 16, carrier -> worker 10, new worker 4.
+People changing jobs: new carrier 30, carrier -> worker 12.
 
-People's orders (1318 in all, 1303 done): worker rest forest 120, worker gather forest 118, worker rest farm 104, worker gather farm 102, worker rest wood 64, worker gather wood 62, worker rest quarry 57, worker gather quarry 55, carrier haul log wood -> saw 46, worker rest saw 43, worker toCraft saw 42, worker craft saw 42, carrier haul grain farm -> mill 30, worker rest waterhut 23. None failed.
+People's orders (1511 in all, 1498 done): worker rest forest 148, worker gather forest 146, worker rest farm 122, worker gather farm 120, worker rest wood 75, worker gather wood 73, worker rest quarry 49, worker gather quarry 48, worker rest saw 46, worker toCraft saw 45, worker craft saw 45, carrier haul stone quarry -> store 39, carrier haul log wood -> store 34, carrier haul log store -> saw 30. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
@@ -135,15 +135,15 @@ Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders r
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 20/0/1025/10/30 | 31/6/2477/10/50 |
-| 30 | 20/0/1025/10/30 | 56/11/5034/20/70 |
-| 45 | 20/0/1025/10/30 | 75/16/7857/51/99 |
-| 60 | 20/0/1025/10/30 | 84/24/14140/71/99 |
-| first | - - - - - - | 10 11 15 16 24 46 |
+| 15 | 19/0/1039/10/40 | 33/6/2488/10/50 |
+| 30 | 19/0/1039/10/40 | 55/8/3970/14/76 |
+| 45 | 19/0/1039/10/40 | 72/16/9421/43/97 |
+| 60 | 19/0/1039/10/40 | 81/24/15239/76/84 |
+| first | - - - - - - | 10 11 14 15 24 38 |
 
-Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 12 20 29 47 51 61 66 71).
+Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 11 14 18 32 43 56 70 76).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -151,40 +151,40 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 88 | 1025 | 2562 |
-| 30 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 88 | 1025 | 2562 |
-| 45 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 88 | 1025 | 2562 |
-| 60 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 12 | 88 | 1025 | 2562 |
+| 15 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 88 | 1039 | 1822 |
+| 30 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 88 | 1039 | 1823 |
+| 45 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 88 | 1039 | 1823 |
+| 60 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 88 | 1039 | 1823 |
 
-At the end: buildings (built+sites) wood 4, quarry 2, forest 2, fisher 2, farm 2, house 2, hq 1, saw 1, waterhut 1, mill 1, bakery 1, look 1.
-People: worker 14, carrier 12, soldier 10, digger 2, builder 2; beds 20. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, quarry 2, forest 2, farm 2, hq 1, store 1, saw 1, fisher 1, mill 1, waterhut 1, bakery 1.
+People: carrier 23, worker 13, soldier 10, digger 2, builder 2; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: log 61, stone 56, grain 46, plank 41, water 22, flour 22, fish 8, bread 8.
-Goods consumed in the game: stone 58, plank 57, log 41, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1, rod 1.
+Goods produced in the game: log 75, stone 59, grain 54, plank 47, flour 22, water 22, fish 8, bread 8.
+Goods consumed in the game: plank 55, stone 53, log 47, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1, rod 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (222 building-min): Needs a worker with an axe 45%, Log pile full, waiting for carriers 45%, Felling a tree 6%, Bringing a log to the pile 2%, Waiting for a free settler 2%
-- quarry (113 building-min): Stone pile full, waiting for carriers 87%, Cutting stone 7%, Bringing stone to the pile 3%, Waiting for a free settler 3%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Output pile full, waiting for carriers 81%, Sawing planks 9%, Waiting for logs 8%, Stacking outside 2%, Fetching from the pile 0%
-- forest (112 building-min): No free ground to plant in range inside your border 83%, Waiting for a free settler 8%, Planting a sapling 8%, Worker picking up a shovel 0%, Idle 0%
-- fisher (108 building-min): Fish pile full, waiting for carriers 47%, Needs a worker with a fishing rod 46%, Waiting for a free settler 7%, Fishing 0%, Worker picking up a fishing rod 0%
-- waterhut (57 building-min): Water pile full, waiting for carriers 79%, Waiting for a free settler 10%, Bringing water to the pile 5%, Fetching water 5%, Worker on the way 0%
-- farm (108 building-min): Grain pile full, waiting for carriers 88%, Waiting for a free settler 5%, Sowing a field 3%, Harvesting grain 2%, Bringing grain to the pile 1%
-- mill (56 building-min): Output pile full, waiting for carriers 85%, Waiting for a free settler 8%, Waiting for grain 3%, Grinding flour 2%, Stacking outside 1%
-- bakery (55 building-min): Output pile full, waiting for carriers 85%, Waiting for a free settler 7%, Baking bread 3%, Waiting for flour 3%, Waiting for flour and water 1%
-- house (100 building-min): Idle 100%
-- look (50 building-min): Scout on watch 100%, Idle 0%, Scout on the way 0%, Working 0%
+- store (60 building-min): Idle 100%
+- house (174 building-min): Idle 100%
+- wood (165 building-min): Log pile full, waiting for carriers 57%, Needs a worker with an axe 31%, Felling a tree 9%, Bringing a log to the pile 3%, Worker picking up an axe 0%
+- quarry (107 building-min): Stone pile full, waiting for carriers 90%, Cutting stone 8%, Bringing stone to the pile 2%, Worker picking up a pickaxe 0%, Working 0%
+- saw (56 building-min): Output pile full, waiting for carriers 87%, Sawing planks 11%, Stacking outside 2%, Fetching from the pile 0%, Worker picking up a saw 0%
+- forest (105 building-min): No free ground to plant in range inside your border 85%, Planting a sapling 15%, Worker picking up a shovel 0%, Idle 0%, Working 0%
+- fisher (55 building-min): Fish pile full, waiting for carriers 98%, Fishing 1%, Worker picking up a fishing rod 0%, Bringing a fish to the pile 0%, Working 0%
+- farm (102 building-min): Grain pile full, waiting for carriers 91%, Sowing a field 4%, Harvesting grain 3%, Bringing grain to the pile 1%, Worker picking up a scythe 0%
+- mill (53 building-min): Output pile full, waiting for carriers 95%, Grinding flour 2%, Waiting for grain 1%, Stacking outside 1%, Fetching from the pile 0%
+- waterhut (52 building-min): Water pile full, waiting for carriers 95%, Bringing water to the pile 3%, Fetching water 2%, Idle 0%, Working 0%
+- bakery (51 building-min): Output pile full, waiting for carriers 96%, Baking bread 4%, Stacking outside 0%, Waiting for water 0%, Waiting for flour and water 0%
 
-Building sites, time per state (site-min): Waiting for materials 5, Builders at work 5, Leveling the ground 4, Waiting for a digger 3, Waiting for a builder 2.
+Building sites, time per state (site-min): Builders at work 4, Leveling the ground 4, Waiting for a builder 2, Waiting for a digger 2.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:31, quarry 0:04→0:50, saw 0:32→1:10, wood 0:50→1:26, forest 1:12→1:46, fisher 1:26→2:15, waterhut 1:48→2:51, farm 2:16→3:58, mill 2:52→4:25, bakery 3:58→5:09, quarry 5:18→5:53, wood 5:28→6:19, forest 5:56→6:34, farm 6:24→8:14, house 6:42→8:47, wood 8:52→9:19, look 8:54→9:40, fisher 9:30→10:14, house 9:58→10:45.
+Build order (placed at min:sec, finished at): store 0:02→0:26, house 0:28→0:59, wood 1:00→1:28, house 1:28→2:07, quarry 2:08→2:46, house 2:46→3:16, saw 3:16→3:54, wood 3:54→4:13, forest 4:14→4:38, fisher 4:38→5:23, farm 5:24→6:29, mill 6:30→7:08, waterhut 7:10→8:13, bakery 8:14→9:06, wood 9:08→9:42, quarry 9:42→10:25, forest 10:26→10:53, farm 10:54→11:52.
 
-Orders given: place 19, armyTarget 3, armyReserve 1, armyList 1. None refused.
+Orders given: place 18, storeSlot 4, armyTarget 3, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: new carrier 17, carrier -> worker 11, new worker 3.
+People changing jobs: new carrier 30, carrier -> worker 13.
 
-People's orders (1230 in all, 1215 done): worker rest farm 102, worker gather farm 100, worker rest forest 77, worker gather forest 75, worker rest wood 63, worker gather wood 61, worker rest quarry 58, worker gather quarry 56, carrier haul log wood -> saw 45, worker rest saw 42, worker toCraft saw 41, worker craft saw 41, carrier haul grain farm -> mill 30, worker rest mill 23. None failed.
+People's orders (1489 in all, 1475 done): worker rest farm 120, worker rest forest 118, worker gather farm 118, worker gather forest 116, worker rest wood 77, worker gather wood 75, worker rest quarry 61, worker gather quarry 59, worker rest saw 48, worker toCraft saw 47, worker craft saw 47, carrier haul log wood -> store 45, carrier haul log store -> saw 41, carrier haul grain farm -> mill 30. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
@@ -193,15 +193,15 @@ Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders r
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 15/0/1012/10/10 | 31/6/2640/10/50 |
-| 30 | 15/0/1012/10/10 | 53/6/3374/10/70 |
-| 45 | 15/0/1012/10/10 | 68/13/8630/36/104 |
-| 60 | 15/0/1012/10/10 | 76/20/13954/62/98 |
-| first | - - - - - - | 10 11 13 15 36 41 |
+| 15 | 19/0/1029/10/40 | 31/6/2648/10/50 |
+| 30 | 19/0/1029/10/40 | 51/6/3276/10/60 |
+| 45 | 19/0/1029/10/40 | 66/12/7799/41/89 |
+| 60 | 19/0/1029/10/40 | 74/20/14000/65/85 |
+| first | - - - - - - | 10 11 16 17 41 43 |
 
-Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 10 12 21 36 46 54 62).
+Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 10 10 19 41 52 61 65).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -209,40 +209,40 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 0 | 2 | 11 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 8 | 1012 | 1808 |
-| 30 | 0 | 2 | 11 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 8 | 1012 | 1808 |
-| 45 | 0 | 2 | 11 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 8 | 1012 | 1808 |
-| 60 | 0 | 2 | 11 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 8 | 1012 | 1808 |
+| 15 | 24 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 80 | 1029 | 1815 |
+| 30 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 88 | 1029 | 1815 |
+| 45 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 88 | 1029 | 1815 |
+| 60 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 88 | 1029 | 1815 |
 
-At the end: buildings (built+sites) wood 3, quarry 2, forest 2, farm 2, hq 1, saw 1, fisher 1, waterhut 1, mill 1, bakery 1, house 0+1.
-People: soldier 10, worker 3, digger 2, builder 2, carrier 2, geologist 1; beds 0. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, quarry 2, forest 2, farm 2, hq 1, store 1, saw 1, fisher 1, waterhut 1, mill 1, bakery 1.
+People: carrier 22, worker 13, soldier 10, digger 2, builder 2, geologist 1; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: stone 37, plank 22, log 18.
-Goods consumed in the game: plank 44, stone 44, log 22, pick 2, axe 1, saw 1.
+Goods produced in the game: log 75, stone 59, grain 54, plank 47, water 22, flour 22, fish 8, bread 8.
+Goods consumed in the game: plank 55, stone 53, log 47, grain 22, water 8, flour 8, pick 3, axe 2, shovel 2, scythe 2, saw 1, rod 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (172 building-min): Waiting for a free settler 65%, No grown trees in range inside your border 31%, Felling a tree 2%, Bringing a log to the pile 1%, Log pile full, waiting for carriers 0%
-- quarry (114 building-min): Waiting for a free settler 48%, Stone pile full, waiting for carriers 46%, Cutting stone 5%, Bringing stone to the pile 2%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Waiting for logs 94%, Sawing planks 5%, Stacking outside 1%, Worker picking up a saw 0%, Fetching from the pile 0%
-- forest (112 building-min): Waiting for a free settler 100%, Idle 0%
-- fisher (58 building-min): Waiting for a free settler 100%, Idle 0%
-- waterhut (57 building-min): Waiting for a free settler 100%, Idle 0%
-- farm (108 building-min): Waiting for a free settler 100%, Idle 0%
-- mill (56 building-min): Waiting for a free settler 100%
-- bakery (55 building-min): Waiting for a free settler 100%, Idle 0%
+- store (60 building-min): Idle 100%
+- house (174 building-min): Idle 100%
+- wood (164 building-min): Log pile full, waiting for carriers 54%, Needs a worker with an axe 31%, Felling a tree 9%, Bringing a log to the pile 3%, No grown trees in range inside your border 3%
+- quarry (107 building-min): Stone pile full, waiting for carriers 89%, Cutting stone 8%, Bringing stone to the pile 3%, Worker picking up a pickaxe 0%, Working 0%
+- saw (56 building-min): Output pile full, waiting for carriers 86%, Sawing planks 11%, Stacking outside 2%, Waiting for logs 1%, Fetching from the pile 0%
+- forest (104 building-min): No free ground to plant in range inside your border 83%, Planting a sapling 17%, Worker picking up a shovel 0%, Working 0%, Idle 0%
+- fisher (55 building-min): Fish pile full, waiting for carriers 98%, Fishing 1%, Bringing a fish to the pile 1%, Worker picking up a fishing rod 0%, Idle 0%
+- waterhut (54 building-min): Water pile full, waiting for carriers 89%, Bringing water to the pile 6%, Fetching water 5%, Idle 0%, Working 0%
+- farm (101 building-min): Grain pile full, waiting for carriers 91%, Sowing a field 4%, Harvesting grain 3%, Bringing grain to the pile 1%, Worker picking up a scythe 0%
+- mill (52 building-min): Output pile full, waiting for carriers 94%, Waiting for grain 2%, Grinding flour 2%, Stacking outside 1%, Fetching from the pile 0%
+- bakery (51 building-min): Output pile full, waiting for carriers 96%, Baking bread 4%, Stacking outside 0%, Waiting for flour and water 0%, Waiting for water 0%
 
-Building sites, time per state (site-min): Waiting for materials 56, Builders at work 4, Leveling the ground 3, Waiting for a digger 2, Waiting for a builder 1.
+Building sites, time per state (site-min): Builders at work 4, Leveling the ground 4, Waiting for a digger 2, Waiting for a builder 2.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:41, quarry 0:04→0:59, saw 0:42→1:19, wood 1:00→1:34, forest 1:20→1:46, fisher 1:34→2:08, waterhut 1:48→2:43, farm 2:08→3:33, mill 2:44→3:56, bakery 3:34→4:50, quarry 4:56→5:30, wood 4:58→5:55, forest 5:30→6:36, farm 6:44→8:51, house 6:46→never.
+Build order (placed at min:sec, finished at): store 0:02→0:27, house 0:28→0:57, wood 0:58→1:39, house 1:40→2:10, quarry 2:12→2:49, house 2:50→3:21, saw 3:22→3:54, wood 3:54→4:20, forest 4:20→4:50, fisher 4:50→5:21, waterhut 5:22→6:16, farm 6:18→7:31, mill 7:32→8:11, bakery 8:12→8:49, wood 8:50→9:39, quarry 9:40→10:22, forest 10:22→10:50, farm 10:50→11:48.
 
-Orders given: place 15, armyTarget 3, profession 1, armyReserve 1, armyList 1. None refused.
+Orders given: place 18, storeSlot 4, armyTarget 3, profession 1, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: carrier -> worker 3.
+People changing jobs: new carrier 30, carrier -> worker 13.
 
-People's orders (400 in all, 396 done): worker rest quarry 38, worker gather quarry 37, worker rest saw 23, worker toCraft saw 22, worker craft saw 22, builder build farm 22, worker rest wood 19, worker gather wood 18, carrier haul log wood -> saw 18, carrier haul stone quarry -> farm 12, builder build waterhut 10, builder build wood 8, digger dig wood 6, builder build forest 6. None failed.
-
-Warnings: site-stuck 5. Last: 39:40 site-stuck: Small house site has not moved for 30 min (Waiting for materials) | 49:50 site-stuck: Small house site has not moved for 41 min (Waiting for materials) | 60:00 site-stuck: Small house site has not moved for 51 min (Waiting for materials)
+People's orders (1570 in all, 1556 done): worker rest forest 158, worker gather forest 156, worker rest farm 125, worker gather farm 123, worker rest wood 77, worker gather wood 75, worker rest quarry 61, worker gather quarry 59, worker rest saw 48, worker toCraft saw 47, worker craft saw 47, carrier haul stone quarry -> store 35, carrier haul log wood -> saw 33, carrier haul grain farm -> mill 30. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
@@ -251,15 +251,15 @@ Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders r
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 18/0/1041/10/20 | 31/6/2822/10/50 |
-| 30 | 18/0/1041/10/20 | 54/6/3654/10/70 |
-| 45 | 18/0/1041/10/20 | 67/11/7696/45/95 |
-| 60 | 18/0/1041/10/20 | 73/17/12142/65/95 |
-| first | - - - - - - | 9 10 23 24 33 36 |
+| 15 | 16/0/1019/10/40 | 33/6/2844/10/50 |
+| 30 | 16/0/1019/10/40 | 64/11/5616/22/78 |
+| 45 | 16/0/1019/10/40 | 73/17/10287/56/94 |
+| 60 | 16/0/1019/10/40 | 81/24/15604/75/95 |
+| first | - - - - - - | 9 10 13 14 23 36 |
 
-Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 10 12 22 45 55 60 65).
+Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 12 22 43 49 56 66 70 75).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -267,40 +267,40 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 22 | 8 | 16 | 14 | 8 | 0 | 14 | 21 | 11 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 83 | 1041 | 2424 |
-| 30 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 88 | 1041 | 2424 |
-| 45 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 88 | 1041 | 2424 |
-| 60 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 88 | 1041 | 2424 |
+| 15 | 29 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 26 | 69 | 1019 | 1808 |
+| 30 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 26 | 72 | 1019 | 1808 |
+| 45 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 26 | 72 | 1019 | 1808 |
+| 60 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 26 | 72 | 1019 | 1808 |
 
-At the end: buildings (built+sites) wood 3, forest 3, quarry 2, farm 2, hq 1, saw 1, fisher 1, waterhut 1, mill 1, bakery 1, house 1, look 1.
-People: worker 14, soldier 10, digger 2, builder 2, carrier 2; beds 10. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, hq 1, store 1, quarry 1, saw 1, forest 1, fisher 1, waterhut 1, farm 1, mill 1, bakery 1.
+People: carrier 26, soldier 10, worker 10, digger 2, builder 2; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: log 56, stone 50, grain 46, plank 36, water 22, flour 22, fish 8, bread 8.
-Goods consumed in the game: plank 52, stone 52, log 36, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1, rod 1.
+Goods produced in the game: log 64, grain 46, stone 41, plank 36, water 22, flour 22, fish 8, bread 8.
+Goods consumed in the game: plank 44, stone 43, log 36, grain 22, water 8, flour 8, axe 2, pick 1, saw 1, shovel 1, rod 1, scythe 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (172 building-min): Log pile full, waiting for carriers 53%, Waiting for a free settler 31%, Felling a tree 7%, No grown trees in range inside your border 5%, Bringing a log to the pile 3%
-- quarry (114 building-min): Stone pile full, waiting for carriers 86%, Cutting stone 7%, Bringing stone to the pile 4%, Waiting for a free settler 3%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Output pile full, waiting for carriers 82%, Waiting for logs 8%, Sawing planks 8%, Stacking outside 2%, Worker picking up a saw 0%
-- forest (163 building-min): No free ground to plant in range inside your border 54%, Waiting for a free settler 37%, Planting a sapling 8%, Needs a worker with a shovel 1%, Worker picking up a shovel 0%
-- fisher (58 building-min): Fish pile full, waiting for carriers 87%, Waiting for a free settler 11%, Bringing a fish to the pile 1%, Fishing 1%, Worker picking up a fishing rod 0%
-- waterhut (57 building-min): Water pile full, waiting for carriers 86%, Waiting for a free settler 11%, Fetching water 2%, Bringing water to the pile 1%, Worker on the way 0%
-- farm (108 building-min): Grain pile full, waiting for carriers 88%, Waiting for a free settler 5%, Sowing a field 3%, Harvesting grain 2%, Bringing grain to the pile 1%
-- mill (56 building-min): Output pile full, waiting for carriers 85%, Waiting for a free settler 9%, Grinding flour 2%, Waiting for grain 2%, Stacking outside 1%
-- bakery (55 building-min): Output pile full, waiting for carriers 82%, Waiting for a free settler 8%, Waiting for flour 6%, Baking bread 3%, Waiting for flour and water 1%
-- house (51 building-min): Idle 100%
-- look (50 building-min): Scout on watch 99%, Idle 0%, Scout on the way 0%, Working 0%
+- store (60 building-min): Idle 100%
+- house (174 building-min): Idle 100%
+- wood (165 building-min): Log pile full, waiting for carriers 54%, Needs a worker with an axe 31%, Felling a tree 9%, No grown trees in range inside your border 3%, Bringing a log to the pile 3%
+- quarry (58 building-min): Stone pile full, waiting for carriers 85%, Cutting stone 11%, Bringing stone to the pile 4%, Worker picking up a pickaxe 0%, Idle 0%
+- saw (56 building-min): Output pile full, waiting for carriers 90%, Sawing planks 8%, Stacking outside 2%, Worker picking up a saw 0%, Fetching from the pile 0%
+- forest (55 building-min): No free ground to plant in range inside your border 78%, Planting a sapling 21%, Worker picking up a shovel 0%, Working 0%
+- fisher (55 building-min): Fish pile full, waiting for carriers 99%, Fishing 1%, Worker picking up a fishing rod 1%, Bringing a fish to the pile 0%
+- waterhut (54 building-min): Water pile full, waiting for carriers 94%, Bringing water to the pile 3%, Fetching water 3%, Working 0%
+- farm (53 building-min): Grain pile full, waiting for carriers 87%, Sowing a field 7%, Harvesting grain 4%, Bringing grain to the pile 2%, Worker picking up a scythe 0%
+- mill (52 building-min): Output pile full, waiting for carriers 94%, Grinding flour 3%, Waiting for grain 2%, Stacking outside 1%, Fetching from the pile 0%
+- bakery (51 building-min): Output pile full, waiting for carriers 95%, Baking bread 4%, Waiting for flour and water 0%, Stacking outside 0%, Fetching from the pile 0%
 
-Building sites, time per state (site-min): Builders at work 4, Waiting for materials 4, Leveling the ground 4, Waiting for a digger 2, Waiting for a builder 2.
+Building sites, time per state (site-min): Builders at work 4, Leveling the ground 3, Waiting for a builder 1, Waiting for a digger 1.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:31, quarry 0:04→0:48, saw 0:32→1:10, wood 0:50→1:22, forest 1:10→1:46, fisher 1:22→2:05, waterhut 1:48→2:31, farm 2:06→3:46, mill 2:32→3:38, bakery 3:38→4:38, quarry 4:50→5:22, wood 4:52→6:05, forest 5:22→6:22, farm 6:18→7:58, house 7:14→8:42, forest 7:58→8:54, look 8:44→9:45.
+Build order (placed at min:sec, finished at): store 0:02→0:25, house 0:26→0:52, wood 0:52→1:24, house 1:24→1:58, quarry 1:58→2:21, house 2:22→2:53, saw 2:54→3:33, wood 3:34→4:00, forest 4:02→4:45, fisher 4:46→5:29, waterhut 5:30→6:05, farm 6:06→7:13, mill 7:14→7:51, bakery 7:52→8:46, wood 8:48→9:35.
 
-Orders given: place 17, armyTarget 3, armyReserve 1, armyList 1. None refused.
+Orders given: place 15, storeSlot 4, armyTarget 3, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: carrier -> worker 9, new worker 5, new carrier 5.
+People changing jobs: new carrier 30, carrier -> worker 10.
 
-People's orders (1219 in all, 1204 done): worker rest forest 107, worker gather forest 105, worker rest farm 101, worker gather farm 99, worker rest wood 58, worker gather wood 56, worker rest quarry 52, worker gather quarry 50, carrier haul log wood -> saw 40, worker rest saw 37, worker toCraft saw 36, worker craft saw 36, carrier haul grain farm -> mill 30, worker rest waterhut 23. None failed.
+People's orders (1249 in all, 1238 done): worker rest farm 99, worker gather farm 98, worker rest forest 96, worker gather forest 95, worker rest wood 66, worker gather wood 64, carrier haul log wood -> store 42, worker rest quarry 42, worker gather quarry 41, carrier haul log store -> saw 38, worker rest saw 37, worker toCraft saw 36, worker craft saw 36, carrier haul grain farm -> mill 30. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
@@ -309,15 +309,15 @@ Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders r
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 19/0/1042/10/30 | 32/6/2893/10/50 |
-| 30 | 19/0/1042/10/30 | 60/9/5893/25/85 |
-| 45 | 19/0/1042/10/30 | 73/17/12535/61/89 |
-| 60 | 19/0/1042/10/30 | 81/24/17863/79/91 |
-| first | - - - - - - | 7 8 9 11 28 33 |
+| 15 | 18/0/1026/10/40 | 34/6/2922/10/60 |
+| 30 | 18/0/1026/10/40 | 68/14/6978/29/91 |
+| 45 | 18/0/1026/10/40 | 77/20/12449/61/99 |
+| 60 | 18/0/1026/10/40 | 85/27/17487/81/99 |
+| first | - - - - - - | 7 8 9 12 21 33 |
 
-Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 25 48 54 61 67 75 79).
+Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 15 17 29 40 50 61 69 76 81).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -325,40 +325,40 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 11 | 87 | 1042 | 2678 |
-| 30 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 11 | 88 | 1042 | 2678 |
-| 45 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 11 | 88 | 1042 | 2678 |
-| 60 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 11 | 88 | 1042 | 2678 |
+| 15 | 31 | 16 | 14 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 68 | 1026 | 1809 |
+| 30 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 72 | 1026 | 1809 |
+| 45 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 72 | 1026 | 1809 |
+| 60 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 72 | 1026 | 1809 |
 
-At the end: buildings (built+sites) wood 3, quarry 2, forest 2, fisher 2, farm 2, house 2, hq 1, saw 1, waterhut 1, mill 1, bakery 1, look 1.
-People: worker 14, carrier 11, soldier 10, digger 2, builder 2, geologist 1; beds 20. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, quarry 2, forest 2, hq 1, store 1, saw 1, fisher 1, waterhut 1, farm 1, mill 1, bakery 1.
+People: carrier 23, worker 12, soldier 10, digger 2, builder 2, geologist 1; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: log 59, stone 54, grain 46, plank 39, water 22, flour 22, fish 8, bread 8.
-Goods consumed in the game: stone 56, plank 55, log 39, grain 22, water 8, flour 8, pick 3, axe 2, shovel 2, scythe 2, saw 1, rod 1.
+Goods produced in the game: log 69, grain 46, stone 45, plank 41, water 22, flour 22, fish 8, bread 8.
+Goods consumed in the game: plank 49, stone 47, log 41, grain 22, water 8, flour 8, pick 3, axe 2, shovel 2, saw 1, rod 1, scythe 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (172 building-min): Log pile full, waiting for carriers 53%, Needs a worker with an axe 28%, Waiting for a free settler 8%, Felling a tree 8%, Bringing a log to the pile 3%
-- quarry (114 building-min): Stone pile full, waiting for carriers 85%, Cutting stone 8%, Waiting for a free settler 4%, Bringing stone to the pile 3%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Output pile full, waiting for carriers 80%, Waiting for logs 9%, Sawing planks 8%, Stacking outside 2%, Fetching from the pile 0%
-- forest (112 building-min): No free ground to plant in range inside your border 83%, Waiting for a free settler 9%, Planting a sapling 7%, Worker picking up a shovel 0%, Idle 0%
-- fisher (109 building-min): Fish pile full, waiting for carriers 46%, Needs a worker with a fishing rod 45%, Waiting for a free settler 9%, Fishing 0%, Bringing a fish to the pile 0%
-- waterhut (57 building-min): Water pile full, waiting for carriers 83%, Waiting for a free settler 11%, Bringing water to the pile 3%, Fetching water 3%, Worker on the way 0%
-- farm (109 building-min): Grain pile full, waiting for carriers 86%, Waiting for a free settler 7%, Sowing a field 3%, Harvesting grain 2%, Bringing grain to the pile 1%
-- mill (56 building-min): Output pile full, waiting for carriers 83%, Waiting for a free settler 10%, Waiting for grain 4%, Grinding flour 2%, Stacking outside 1%
-- bakery (56 building-min): Output pile full, waiting for carriers 83%, Waiting for a free settler 9%, Waiting for flour 4%, Baking bread 3%, Waiting for flour and water 1%
-- house (100 building-min): Idle 100%
-- look (50 building-min): Scout on watch 97%, Waiting for a free settler 3%, Scout on the way 0%, Idle 0%, Working 0%
+- store (60 building-min): Idle 100%
+- house (174 building-min): Idle 100%
+- wood (163 building-min): Log pile full, waiting for carriers 56%, Needs a worker with an axe 30%, Felling a tree 9%, Bringing a log to the pile 4%, No grown trees in range inside your border 1%
+- quarry (106 building-min): No stone in range inside your border 44%, Stone pile full, waiting for carriers 42%, Cutting stone 8%, Bringing stone to the pile 5%, Worker picking up a pickaxe 0%
+- saw (56 building-min): Output pile full, waiting for carriers 88%, Sawing planks 9%, Stacking outside 2%, Worker picking up a saw 0%, Fetching from the pile 0%
+- forest (100 building-min): No free ground to plant in range inside your border 86%, Planting a sapling 14%, Worker picking up a shovel 0%, Working 0%, Idle 0%
+- fisher (54 building-min): Fish pile full, waiting for carriers 98%, Fishing 1%, Bringing a fish to the pile 0%, Worker picking up a fishing rod 0%, Idle 0%
+- waterhut (53 building-min): Water pile full, waiting for carriers 97%, Fetching water 2%, Bringing water to the pile 1%, Idle 0%, Working 0%
+- farm (52 building-min): Grain pile full, waiting for carriers 86%, Sowing a field 7%, Harvesting grain 4%, Bringing grain to the pile 2%, Worker picking up a scythe 1%
+- mill (52 building-min): Output pile full, waiting for carriers 94%, Waiting for grain 2%, Grinding flour 2%, Stacking outside 1%, Working 0%
+- bakery (50 building-min): Output pile full, waiting for carriers 95%, Baking bread 4%, Stacking outside 0%, Waiting for water 0%, Idle 0%
 
-Building sites, time per state (site-min): Builders at work 5, Leveling the ground 4, Waiting for a digger 3, Waiting for a builder 2, Waiting for materials 2.
+Building sites, time per state (site-min): Leveling the ground 4, Builders at work 4, Waiting for a digger 2, Waiting for a builder 2, Waiting for materials 1.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:37, quarry 0:04→0:54, saw 0:38→1:14, wood 0:54→1:31, forest 1:14→1:54, fisher 1:32→2:18, waterhut 1:54→2:39, farm 2:20→3:27, mill 2:40→3:49, bakery 3:28→4:27, quarry 4:34→5:10, wood 4:36→5:38, forest 5:12→6:05, farm 5:40→7:44, fisher 7:46→8:44, house 7:48→9:06, look 9:18→9:53, house 10:38→11:23.
+Build order (placed at min:sec, finished at): store 0:02→0:25, house 0:26→0:57, wood 0:58→1:34, house 1:34→2:05, quarry 2:06→2:42, house 2:42→3:24, saw 3:24→4:02, wood 4:02→4:33, forest 4:34→5:05, fisher 5:06→5:59, waterhut 6:00→6:54, farm 6:54→7:38, mill 7:38→8:16, bakery 8:18→9:56, wood 9:58→10:45, quarry 10:46→11:37, forest 14:10→14:49.
 
-Orders given: place 18, armyTarget 3, profession 1, armyReserve 1, armyList 1. None refused.
+Orders given: place 17, storeSlot 4, armyTarget 3, profession 1, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: new carrier 15, carrier -> worker 9, new worker 5.
+People changing jobs: new carrier 30, carrier -> worker 12.
 
-People's orders (1191 in all, 1176 done): worker rest farm 104, worker gather farm 102, worker rest forest 73, worker gather forest 71, worker rest wood 61, worker gather wood 59, worker rest quarry 56, worker gather quarry 54, carrier haul log wood -> saw 43, worker rest saw 40, worker toCraft saw 39, worker craft saw 39, carrier haul grain farm -> mill 30, worker rest mill 23. None failed.
+People's orders (1365 in all, 1352 done): worker rest forest 109, worker gather forest 107, worker rest farm 102, worker gather farm 101, worker rest wood 71, worker gather wood 69, carrier haul log wood -> store 53, carrier haul log store -> saw 49, worker rest quarry 47, worker gather quarry 45, worker rest saw 42, worker toCraft saw 41, worker craft saw 41, carrier haul grain farm -> mill 30. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
@@ -367,15 +367,15 @@ Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders r
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 18/0/1034/10/20 | 24/6/2773/10/40 |
-| 30 | 18/0/1034/10/20 | 27/6/3175/10/50 |
-| 45 | 18/0/1034/10/20 | 30/6/3594/10/50 |
-| 60 | 18/0/1034/10/20 | 55/13/6915/29/71 |
-| first | - - - - - - | 7 9 51 52 - - |
+| 15 | 17/0/1056/10/40 | 24/6/2773/10/40 |
+| 30 | 17/0/1056/10/40 | 49/6/3737/20/79 |
+| 45 | 17/0/1056/10/40 | 74/18/10198/56/94 |
+| 60 | 17/0/1056/10/40 | 82/24/15669/71/99 |
+| first | - - - - - - | 7 9 20 29 31 39 |
 
-Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 10 10 10 10 10 22 29).
+Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 20 26 40 56 63 67 71).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -383,40 +383,40 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 27 | 8 | 16 | 14 | 7 | 0 | 12 | 23 | 8 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 85 | 1034 | 2881 |
-| 30 | 27 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 88 | 1034 | 2881 |
-| 45 | 27 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 88 | 1034 | 2881 |
-| 60 | 27 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 88 | 1034 | 2881 |
+| 15 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1056 | 1841 |
+| 30 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1056 | 1845 |
+| 45 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1056 | 1845 |
+| 60 | 32 | 16 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 25 | 72 | 1056 | 1845 |
 
-At the end: buildings (built+sites) wood 3, quarry 2, forest 2, fisher 2, farm 2, hq 1, saw 1, waterhut 1, mill 1, bakery 1, house 1, look 1.
-People: worker 14, soldier 10, digger 2, builder 2, carrier 2; beds 10. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, forest 2, hq 1, store 1, quarry 1, saw 1, fisher 1, waterhut 1, farm 1, mill 1, bakery 1.
+People: carrier 25, worker 11, soldier 10, digger 2, builder 2; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: log 59, stone 51, grain 46, plank 36, water 22, flour 22, fish 8, bread 8.
-Goods consumed in the game: stone 53, plank 52, log 36, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1, rod 1.
+Goods produced in the game: log 67, grain 46, stone 42, plank 39, water 22, flour 22, fish 8, bread 8.
+Goods consumed in the game: plank 47, stone 44, log 39, grain 22, water 8, flour 8, axe 2, shovel 2, pick 1, saw 1, rod 1, scythe 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (171 building-min): Log pile full, waiting for carriers 59%, Waiting for a free settler 31%, Felling a tree 8%, Bringing a log to the pile 3%, Needs a worker with an axe 0%
-- quarry (113 building-min): Stone pile full, waiting for carriers 83%, Cutting stone 8%, Bringing stone to the pile 5%, Waiting for a free settler 4%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Output pile full, waiting for carriers 84%, Sawing planks 8%, Waiting for logs 6%, Stacking outside 2%, Worker picking up a saw 0%
-- forest (111 building-min): No free ground to plant in range inside your border 80%, Waiting for a free settler 10%, Planting a sapling 9%, Worker picking up a shovel 0%, Idle 0%
-- fisher (110 building-min): Waiting for a free settler 54%, Fish pile full, waiting for carriers 44%, Needs a worker with a fishing rod 1%, Fishing 0%, Bringing a fish to the pile 0%
-- waterhut (57 building-min): Water pile full, waiting for carriers 80%, Waiting for a free settler 13%, Fetching water 3%, Bringing water to the pile 3%, Worker on the way 0%
-- farm (107 building-min): Grain pile full, waiting for carriers 85%, Waiting for a free settler 7%, Sowing a field 4%, Harvesting grain 2%, Bringing grain to the pile 1%
-- mill (56 building-min): Output pile full, waiting for carriers 83%, Waiting for a free settler 11%, Grinding flour 2%, Waiting for grain 2%, Stacking outside 1%
-- bakery (55 building-min): Output pile full, waiting for carriers 82%, Waiting for a free settler 9%, Waiting for flour 4%, Baking bread 3%, Waiting for flour and water 1%
-- house (50 building-min): Idle 100%
-- look (49 building-min): Scout on watch 100%, Idle 0%, Scout on the way 0%, Working 0%
+- store (60 building-min): Idle 100%
+- house (173 building-min): Idle 100%
+- wood (162 building-min): Log pile full, waiting for carriers 58%, Needs a worker with an axe 30%, Felling a tree 9%, Bringing a log to the pile 3%, Worker picking up an axe 0%
+- quarry (57 building-min): Stone pile full, waiting for carriers 84%, Cutting stone 11%, Bringing stone to the pile 4%, Worker picking up a pickaxe 0%, Idle 0%
+- saw (56 building-min): Output pile full, waiting for carriers 89%, Sawing planks 9%, Stacking outside 2%, Fetching from the pile 0%, Worker picking up a saw 0%
+- forest (103 building-min): No free ground to plant in range inside your border 86%, Planting a sapling 14%, Worker picking up a shovel 1%, Idle 0%, Working 0%
+- fisher (54 building-min): Fish pile full, waiting for carriers 97%, Fishing 1%, Bringing a fish to the pile 1%, Worker picking up a fishing rod 0%, Idle 0%
+- waterhut (53 building-min): Water pile full, waiting for carriers 97%, Fetching water 2%, Bringing water to the pile 1%, Working 0%
+- farm (52 building-min): Grain pile full, waiting for carriers 87%, Sowing a field 6%, Harvesting grain 5%, Bringing grain to the pile 2%, Worker picking up a scythe 0%
+- mill (51 building-min): Output pile full, waiting for carriers 95%, Grinding flour 2%, Stacking outside 1%, Waiting for grain 1%, Fetching from the pile 0%
+- bakery (50 building-min): Output pile full, waiting for carriers 95%, Baking bread 4%, Stacking outside 0%, Waiting for flour and water 0%, Worker on the way 0%
 
-Building sites, time per state (site-min): Waiting for materials 5, Leveling the ground 4, Builders at work 4, Waiting for a digger 3, Waiting for a builder 2.
+Building sites, time per state (site-min): Leveling the ground 5, Builders at work 4, Waiting for a builder 2, Waiting for a digger 2.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:36, quarry 0:04→1:01, saw 0:38→1:22, wood 1:02→1:35, forest 1:24→1:56, fisher 1:36→2:11, waterhut 1:56→2:55, farm 2:12→3:51, mill 2:56→4:19, bakery 3:52→5:21, quarry 4:54→6:23, wood 5:54→7:02, forest 6:24→7:29, fisher 7:04→8:12, farm 8:12→9:25, house 9:36→10:18, look 9:40→11:07.
+Build order (placed at min:sec, finished at): store 0:02→0:26, house 0:28→1:00, wood 1:02→1:37, house 1:38→2:19, quarry 2:20→2:48, house 2:48→3:24, saw 3:26→4:09, wood 4:10→4:42, forest 4:44→5:20, fisher 5:22→6:22, waterhut 6:24→7:13, farm 7:14→8:15, mill 8:16→9:11, bakery 9:12→10:30, wood 10:30→11:20, forest 11:22→12:06.
 
-Orders given: place 17, armyTarget 3, armyReserve 1, armyList 1. None refused.
+Orders given: place 16, storeSlot 4, armyTarget 3, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: carrier -> worker 10, new carrier 6, new worker 4.
+People changing jobs: new carrier 30, carrier -> worker 11.
 
-People's orders (1194 in all, 1179 done): worker rest farm 110, worker gather farm 108, worker rest forest 73, worker gather forest 71, worker rest wood 61, worker gather wood 59, worker rest quarry 53, worker gather quarry 51, carrier haul log wood -> saw 43, worker rest saw 37, worker toCraft saw 36, worker craft saw 36, carrier haul grain farm -> mill 30, worker rest waterhut 23. None failed.
+People's orders (1308 in all, 1296 done): worker rest forest 105, worker gather forest 103, worker rest farm 102, worker gather farm 101, worker rest wood 69, worker gather wood 67, carrier haul log wood -> store 46, worker rest quarry 43, worker gather quarry 42, carrier haul log store -> saw 42, worker rest saw 40, worker toCraft saw 39, worker craft saw 39, carrier haul stone quarry -> store 31. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
@@ -425,15 +425,15 @@ Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders r
 
 | min | chatgpt | original game NPC |
 |---|---|---|
-| 15 | 22/0/1046/10/40 | 25/6/3049/10/40 |
-| 30 | 22/0/1046/10/40 | 54/8/4435/14/76 |
-| 45 | 22/0/1046/10/40 | 68/13/9359/35/95 |
-| 60 | 22/0/1046/10/40 | 76/20/14743/63/87 |
-| first | - - - - - - | 14 15 16 25 29 36 |
+| 15 | 19/0/1036/10/40 | 25/6/3049/10/40 |
+| 30 | 19/0/1036/10/40 | 57/7/3779/13/77 |
+| 45 | 19/0/1036/10/40 | 72/15/9866/42/88 |
+| 60 | 19/0/1036/10/40 | 81/22/14961/68/102 |
+| first | - - - - - - | 14 15 16 25 32 39 |
 
-Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 14 23 23 35 45 60 63).
+Soldiers every 5 min: 10 10 10 10 10 10 10 10 10 10 10 10 (original game NPC: 10 10 10 10 10 13 23 31 42 51 63 68).
 
-First army orders (game min:sec): 0:00 armyTarget spear=12; 0:00 armyTarget bow=12; 0:00 armyTarget sword=8; 0:00 armyReserve.
+First army orders (game min:sec): 0:00 armyTarget sword=12; 0:00 armyTarget spear=12; 0:00 armyTarget bow=16; 0:00 armyReserve.
 
 #### Game log: chatgpt
 
@@ -441,40 +441,40 @@ Every 15 min (stock of the main goods; carriers without a job; goods waiting to 
 
 | min | log | plank | stone | fish | bread | meat | water | grain | flour | coal | ironore | iron | goldore | gold | sword | spear | bow | idle carriers | waiting | land | seen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 88 | 1046 | 3065 |
-| 30 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 88 | 1046 | 3070 |
-| 45 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 88 | 1046 | 3070 |
-| 60 | 24 | 8 | 16 | 14 | 8 | 0 | 14 | 24 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 22 | 88 | 1046 | 3070 |
+| 15 | 26 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 81 | 1036 | 1811 |
+| 30 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 88 | 1036 | 1811 |
+| 45 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 88 | 1036 | 1811 |
+| 60 | 32 | 16 | 24 | 14 | 8 | 0 | 14 | 32 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 23 | 88 | 1036 | 1811 |
 
-At the end: buildings (built+sites) wood 4, forest 3, house 3, quarry 2, farm 2, fisher 2, hq 1, saw 1, mill 1, bakery 1, waterhut 1, look 1.
-People: carrier 22, worker 14, soldier 10, digger 2, builder 2; beds 30. Soldiers: sword 7, bow 3.
+At the end: buildings (built+sites) house 3, wood 3, quarry 2, forest 2, farm 2, hq 1, store 1, saw 1, fisher 1, waterhut 1, mill 1, bakery 1.
+People: carrier 23, worker 13, soldier 10, digger 2, builder 2; beds 30. Soldiers: sword 7, bow 3.
 
-Goods produced in the game: log 67, stone 60, plank 47, grain 46, water 22, flour 22, fish 8, bread 8.
-Goods consumed in the game: plank 63, stone 62, log 47, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1, rod 1.
+Goods produced in the game: log 75, stone 59, grain 54, plank 47, water 22, flour 22, fish 8, bread 8.
+Goods consumed in the game: plank 55, stone 53, log 47, grain 22, water 8, flour 8, axe 2, pick 2, shovel 2, scythe 2, saw 1, rod 1.
 
 What the buildings did (share of their time after being built):
 - hq (60 building-min): Idle 100%
-- wood (223 building-min): Needs a worker with an axe 46%, Log pile full, waiting for carriers 43%, Felling a tree 7%, Bringing a log to the pile 3%, Waiting for a free settler 1%
-- quarry (114 building-min): Stone pile full, waiting for carriers 85%, Cutting stone 8%, Bringing stone to the pile 3%, Waiting for a free settler 3%, Worker picking up a pickaxe 0%
-- saw (59 building-min): Output pile full, waiting for carriers 81%, Sawing planks 10%, Waiting for logs 6%, Stacking outside 2%, Fetching from the pile 0%
-- forest (161 building-min): No free ground to plant in range inside your border 56%, Needs a worker with a shovel 30%, Planting a sapling 9%, Waiting for a free settler 5%, Idle 0%
-- farm (110 building-min): Grain pile full, waiting for carriers 88%, Waiting for a free settler 6%, Sowing a field 3%, Harvesting grain 2%, Bringing grain to the pile 1%
-- fisher (108 building-min): Needs a worker with a fishing rod 47%, Fish pile full, waiting for carriers 47%, Waiting for a free settler 5%, Bringing a fish to the pile 1%, Fishing 0%
-- mill (57 building-min): Output pile full, waiting for carriers 86%, Waiting for a free settler 9%, Grinding flour 2%, Waiting for grain 2%, Stacking outside 1%
-- bakery (56 building-min): Output pile full, waiting for carriers 85%, Waiting for a free settler 8%, Baking bread 3%, Waiting for flour 2%, Waiting for flour and water 1%
-- waterhut (56 building-min): Water pile full, waiting for carriers 89%, Waiting for a free settler 7%, Fetching water 2%, Bringing water to the pile 2%, Worker on the way 0%
-- house (151 building-min): Idle 100%
-- look (48 building-min): Scout on watch 100%, Working 0%
+- store (60 building-min): Idle 100%
+- house (174 building-min): Idle 100%
+- wood (165 building-min): Log pile full, waiting for carriers 54%, Needs a worker with an axe 31%, Felling a tree 11%, Bringing a log to the pile 5%, No grown trees in range inside your border 1%
+- quarry (107 building-min): Stone pile full, waiting for carriers 86%, Cutting stone 9%, Bringing stone to the pile 4%, Worker picking up a pickaxe 0%, Working 0%
+- saw (56 building-min): Output pile full, waiting for carriers 87%, Sawing planks 11%, Stacking outside 2%, Fetching from the pile 0%, Worker picking up a saw 0%
+- forest (104 building-min): No free ground to plant in range inside your border 86%, Planting a sapling 14%, Worker picking up a shovel 0%, Idle 0%
+- fisher (54 building-min): Fish pile full, waiting for carriers 97%, Bringing a fish to the pile 1%, Fishing 1%, Worker picking up a fishing rod 0%, Working 0%
+- waterhut (53 building-min): Water pile full, waiting for carriers 97%, Fetching water 2%, Bringing water to the pile 1%, Working 0%
+- farm (100 building-min): Grain pile full, waiting for carriers 91%, Sowing a field 4%, Harvesting grain 3%, Bringing grain to the pile 1%, Worker picking up a scythe 0%
+- mill (52 building-min): Output pile full, waiting for carriers 93%, Grinding flour 3%, Waiting for grain 3%, Stacking outside 1%, Fetching from the pile 0%
+- bakery (51 building-min): Output pile full, waiting for carriers 95%, Baking bread 4%, Stacking outside 0%, Waiting for flour and water 0%, Waiting for water 0%
 
-Building sites, time per state (site-min): Builders at work 5, Waiting for materials 5, Leveling the ground 4, Waiting for a digger 3, Waiting for a builder 2.
+Building sites, time per state (site-min): Builders at work 4, Leveling the ground 4, Waiting for a digger 2, Waiting for a builder 2.
 
-Build order (placed at min:sec, finished at): wood 0:02→0:28, quarry 0:04→0:45, saw 0:30→1:10, wood 0:46→1:36, forest 1:12→1:56, farm 1:38→2:28, fisher 1:56→2:51, mill 2:28→3:10, bakery 2:52→3:45, waterhut 3:12→4:25, quarry 3:46→5:06, wood 5:16→5:56, forest 5:34→6:12, farm 5:56→7:27, house 6:12→8:01, fisher 8:00→8:47, wood 8:10→9:11, house 8:48→9:48, house 10:18→11:00, forest 10:46→11:18, look 11:16→11:54.
+Build order (placed at min:sec, finished at): store 0:02→0:21, house 0:22→1:01, wood 1:02→1:31, house 1:32→2:09, quarry 2:10→2:34, house 2:34→3:12, saw 3:12→3:38, wood 3:40→4:24, forest 4:26→5:01, fisher 5:02→5:39, waterhut 5:40→6:36, farm 6:36→7:40, mill 7:40→8:13, bakery 8:14→8:59, wood 9:00→9:34, quarry 9:34→10:23, forest 10:24→11:07, farm 11:08→12:12.
 
-Orders given: place 21, armyTarget 3, armyReserve 1, armyList 1. None refused.
+Orders given: place 18, storeSlot 4, armyTarget 3, armyReserve 1, armyList 1. None refused.
 
-People changing jobs: new carrier 27, carrier -> worker 11, new worker 3.
+People changing jobs: new carrier 30, carrier -> worker 13.
 
-People's orders (1342 in all, 1327 done): worker rest forest 110, worker gather forest 108, worker rest farm 102, worker gather farm 100, worker rest wood 69, worker gather wood 67, worker rest quarry 62, worker gather quarry 60, carrier haul log wood -> saw 51, worker rest saw 48, worker toCraft saw 47, worker craft saw 47, carrier haul grain farm -> mill 30, worker rest mill 23. None failed.
+People's orders (1522 in all, 1508 done): worker rest forest 125, worker rest farm 124, worker gather forest 123, worker gather farm 122, worker rest wood 77, worker gather wood 75, worker rest quarry 61, worker gather quarry 59, worker rest saw 48, worker toCraft saw 47, worker craft saw 47, carrier haul log wood -> store 43, carrier haul stone quarry -> store 41, carrier haul log store -> saw 39. None failed.
 
 
 Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
