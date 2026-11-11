@@ -8,8 +8,8 @@ export const ITEMS = {
 export const TOOLS = Object.keys(ITEMS).filter(k=>ITEMS[k].tool);
 export const TOOL_A = {axe:'an axe', saw:'a saw', pick:'a pickaxe', shovel:'a shovel', hammer:'a hammer', rod:'a fishing rod', scythe:'a scythe'};
 // Weapons turn a carrier into a soldier at the barracks. Each kind beats one other kind (used in combat, Phase 3C):
-// swords beat spears, spears beat bows, bows beat swords.
+// spears beat swords up close, swords beat bows up close, bows beat spears at range (data/combat.js BONUS, SHOT_BONUS).
 export const WEAPONS = Object.keys(ITEMS).filter(k=>ITEMS[k].weapon);
 export const WEAPON_A = {sword:'a sword', bow:'a bow', spear:'a spear'};
 export const SOLDIER_N = {sword:'Swordsmen', bow:'Bowmen', spear:'Spearmen'};
-export const BEATS = {sword:'spear', spear:'bow', bow:'sword'};
+export const BEATS = {spear:'sword', sword:'bow', bow:'spear'};

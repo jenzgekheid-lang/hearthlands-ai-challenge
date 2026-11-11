@@ -1,89 +1,14 @@
-> In hearthlands-ai-challenge, send your script in as README.md says (input/<name>/script.js); the
-> sections below about pull requests and running tools/tournament.js yourself are for the private repository.
+# Hearthlands AI script kit
 
-# AI script challenge: Jules against ChatGPT
-
-**For:** Jules and ChatGPT (each writes its own script; don't look at the other's).
-**From:** Jens, 7 Nov 2026 (game version 181).
-
-**New in game version 188 (10 Nov):** the game log. During the game your script gets its own side of it
-(`view.economy.log`) and can write notes into it (`["note", {text}]`). After the games your tournament report ends each
-game with your side of the log: stock every 15 minutes, what every building type spent its time on (working, waiting
-for what, no worker, pile full), the build order with finish times, goods made and used, every order and why one was
-refused, every order your people got and whether it was done or why not, failed paths, people changing jobs, fights, first contact, warnings and your notes. Details in the kit below.
-
-## The task
-
-**New in game version 182 (7 Nov):** your script gets the whole map as far as its fog of war allows (`view.map`),
-`canPlace(type, x, y)`, the orders the game refused and why (`view.refused`), and its army settings. Since 183 enemy buildings show only whether they are manned (`manned`), not who is inside. And the fog is now
-fair in watched games: before 182 every side (scripts and the original game NPC) saw the whole map there, so round 1
-and 2 scripts may count on things they can no longer see. Details in the kit below.
-
-Write one **AI script** that plays a **whole game** of Hearthlands for one player slot: build an economy, train
-soldiers, and beat the other side. Your script will play against the other AI's script, and against the original game
-NPC, on several random maps with both sides swapped. Jens watches the games in the game itself (New map > Watch only,
-each slot filled with "Paste an AI script…").
-
-- Goal: win. The last side with a headquarters or a manned military building wins.
-- Strong economy first, then attack when you are stronger, is a good plan; any plan is allowed.
-- Your script sees only what its side may know (fog of war) and pays the same costs as everyone: no cheating is
-  possible, the game refuses impossible commands.
-
-## What to deliver
-
-- **One JavaScript file**, plain JavaScript, following the rules in the kit below exactly (a `think(view)` function
-  that returns a list of commands; at most 0.3 s per turn; no internet or storage; `memory` is kept between turns).
-- **File name: your AI and your model**, lower case with dashes: `ai-scripts/<ai>-<model>.js`, for example
-  `ai-scripts/claude-opus-5.5.js`, `ai-scripts/chatgpt-gpt-5.js`, `ai-scripts/jules-gemini-2.5-pro.js`. Use the exact
-  model you run on; if you don't know it, say so in the pull request and use `-unknown`. A new model = a new file
-  (the old one stays in the tournament).
-- Open a pull request that adds only that file (if you can't open one, answer with the script only). Don't push to
-  `main` and don't read the other AIs' scripts or branches.
-- Put a short comment at the top: your AI, your model, the game version you wrote and tested it for, and the plan in
-  2-4 lines. The version line must look exactly like `// Game version: 183` (the number is GAME_VERSION in
-  `src/core/version.js` after you merged main). The tournament report shows it next to the version it ran on.
-
-## Rounds: read your report and improve
-
-Claude runs every official round and saves the reports in `ai-scripts/reports/` (`<you>-round<N>.md`): who won, how
-both towns grew, the soldiers every 5 minutes, the first army orders with their game time, turn times, errors and
-refused orders. Read your latest report, find why you lost, improve your script and push it to your pull request.
-
-## Test and improve it yourself (do this before your pull request)
-
-You can play your script against the others on your own machine; no GitHub Actions needed:
-
-```sh
-npm install
-node tools/build.js                                   # once per change of the game (writes tests/build/api.cjs)
-node tools/tournament.js ai-scripts/<you>.js --out report.md
-```
-
-It plays whole games without a screen against the original game NPC and every other script in `ai-scripts/`, on 4
-maps with the sides swapped (about 1 minute per opponent), and reports per game: won/lost, buildings / military /
-land / soldiers / people every 15 game minutes, when the first smelter, smith, weaponsmith, barracks, tower and castle
-stood, the script's turn times and errors, and which orders the game refused. Options: `--vs original,ai-scripts/x.js`,
-`--seeds 1,2,3`, `--min 90`.
-
-Run it, read the report, improve the script, and repeat (a few rounds). Put your last report in the pull request
-description. Change only your own script file; Claude runs the final tournament for the result.
-
-## Where to look for more detail (read only)
-
-- `src/cmd/view.js`: how the view is built (`viewOf`, `econOf`, `rulesView`).
-- `src/ai/container.js`: how a script is called and which commands are allowed (`ALLOWED`).
-- `src/arena/builder.js`: the example full-game script 'AI script: builder' (also printed in the kit below).
-- `src/data/buildings.js`, `src/data/items.js`: buildings, costs, goods.
-- `src/ai/rival.js`, `src/ai/war.js`: the original game NPC you will also play against.
-
-## The AI script kit
-
-This is the same text as the game's Goals > AI script kit (made from `src/arena/brainkit.js`). The "PLAYER'S WISHES"
-at the end are filled in.
+Everything an AI script can see and every order it can give. Send your script in as README.md says
+(input/<name>/script.js). Start it with a short comment: your AI and model, your plan in 2-4 lines, and a line that
+looks exactly like `// Game version: 195` (the game version in your latest report). The files buildings.js and
+items.js next to this one are the game's own data: costs, tools, recipes, what each building does.
 
 ```text
 You are writing an "AI script" for the arena of Hearthlands, a Settlers-like strategy game. An AI script is a short
-JavaScript program that fills one player slot's NPC container and commands that side's soldiers in a small battle. Write ONE script, following these rules exactly.
+JavaScript program that plays one player slot. In an arena battle it commands that side's soldiers; in a full game (IN A
+FULL GAME below) it plays the whole side: the town and the army. Write ONE script, following these rules exactly.
 
 THE SCRIPT
 - Define a function think(view) that returns a list of commands (an array, maybe empty).
@@ -94,11 +19,20 @@ THE SCRIPT
 - Don't wait for anything: compute and return.
 
 THE VIEW (what your side may know; positions in map tiles, x to the east, y to the south)
-{ t: game seconds, me: your side (1 = Gold, 2 = Blue), map: {w, h}, gold: your strength outside your land (0.6-1),
-  soldiers: [ {id, kind: "sword"|"spear"|"bow", hp, maxHp, x, y, order: null or {k: "attack"|"move"|"attack-move", ...},
-               fighting, stance: "aggr"|"hold", defends, held, moving, patrol} ],
-  buildings: [ your buildings: {id, type, owner, x, y, w, h, door: {x, y}, military, troops: ["sword","bow",...]} ],
-  enemy: { soldiers: [ {id, owner, kind, x, y, hurt, hp, maxHp} only the ones you see now ], buildings: [ like yours, but instead of troops only manned: true|false ] },
+{ t: game seconds, step: the game's step counter, me: your side (1 = Gold, 2 = Blue), map: {w, h},
+  gold: your strength outside your land (0.6-1),
+  soldiers: [ only your soldiers OUTSIDE buildings (the ones inside a building are in buildings[].troops; they have no
+               id here and take no orders until they are out):
+              {id, kind: "sword"|"spear"|"bow", hp, maxHp, x, y,
+               order: null, or {k: "attack", b: building id}, or {k: "move"|"attack-move", x, y},
+               fighting, stance: "aggr"|"hold", defends (the id of your building he stepped out of to defend it),
+               held, moving, patrol} ],
+  buildings: [ your buildings: {id, type, owner, x, y, w, h, door: {x, y}, built (false: still a building site), military,
+               troops: ["sword","bow",...] (the soldiers inside, kinds only), taken (true: you captured it)} ],
+  enemy: { soldiers: [ {id, owner, kind, x, y, hurt, hp, maxHp} only the ones you see now ],
+           buildings: [ like yours, but instead of troops only manned: true|false. A building you don't see right now
+                        is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
+                        may be gone, or manned differently, by now ] },
   over: null or {winners},
   rules: (first turn only) the numbers below }
 Soldiers with an order are busy; give orders to the ones whose order is null (and leave "defends" alone).
@@ -130,7 +64,9 @@ HOW BATTLES WORK
 - Kinds: spearmen beat swordsmen up close, swordsmen beat bowmen up close, bowmen beat spearmen at range (bowmen shoot
   from about 10 tiles). Blows of one moment are dealt together.
 - Military buildings shoot with the bowmen inside at enemies within about 14 tiles of their centre.
-- You win when the other side has no soldiers and no military buildings left.
+- An arena battle: you win when the other side has no soldiers and no military buildings left.
+- A full game: a side is out when it has lost its headquarters AND every manned military building; its people are gone
+  at once. The last side left wins. So take or empty every military building, and the headquarters.
 
 THE NUMBERS
 {
@@ -235,11 +171,15 @@ function think(view){
 }
 
 IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
-- think(view) is called every 2 game seconds, every second while your soldiers fight. The view then also has
-  view.economy: { stock: {item: count}, people: {role: count}, idle: {role: count with no task},
+- think(view) is called every 2 game seconds, and every second while your soldiers fight. On those extra fight turns
+  view.armyOnly is true and view.economy.log is undefined: check before you read the log. If think throws an error,
+  that turn gives no orders and the game goes on; the tournament report counts the errors and the turns over 0.3 s.
+- The view then also has
+  view.economy: { stock: {item: count}, people: {role: count} (carrier, worker, digger, builder, geologist, explorer,
+    pioneer; soldiers are not counted here), idle: {role: count with no task},
     homeless (people without a bed: more settlers than beds; carriers lose theirs first), beds, population,
     units: [ {id, role: "explorer"|"geologist"|"pioneer", x, y, busy, moving (still walking), to: {x, y} where sent} ],
-    town: [ your buildings: {id, type, x, y, built, worker, paused, prio,
+    town: [ your buildings, the headquarters ('hq') too: {id, type, x, y, built, worker, paused, prio,
       inputs, outputs (goods lying at the building, each an object {item: count}, never a list: inputs = brought in
       and waiting to be used, outputs = made or stored there and waiting to be carried off; test with
       (b.outputs.plank || 0) > 0), delivered, cost (a site only, {item: count}: goods brought so far, goods needed in all),
@@ -248,7 +188,35 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     land: {tiles, grass, trees, rocks, water, mountain, unsearched}, ore: [ {x, y, ore} ore you have seen signs of ],
     unsearched: [ {x, y, d} mountain on your land no geologist has searched, nearest first ],
     spots: { type: [ {x, y, d, n} ] } answers to last turn's ['ask', {spots: [types]}]: places where that building
-      may stand now, best first (n = trees/rocks/fish water/free grass/known ore in reach, or new land for military) }
+      may stand now, best first (n = trees/rocks/fish water/free grass/known ore in reach, or new land for military).
+      Ask for at most 6 types a turn; you get at most 8 places for each, all on your own land }
+- HOW A TOWN WORKS. The data files buildings.js and items.js that come with this kit (in the AI challenge they lie
+  next to it) give every building's cost, tool, inputs, recipe, range, food and a line on what it does. In short:
+  - Settlers come from houses (house 10, house2 20, house3 50, each with as many beds) and start as carriers. Carriers
+    carry every good and all building materials, and every other job is filled from the idle carriers.
+  - A workplace needs one settler: an idle carrier becomes its worker and, for most workplaces, first fetches the tool it
+    needs (buildings.js: tool). No idle carrier or no spare tool: the workplace stands still. The toolsmith (smith)
+    makes tools from coal and iron.
+  - A building site is levelled by diggers and then built by builders, with planks and stone carried to it.
+  - Mines only work while they get food (buildings.js: foods); ore lies where a geologist found signs of it.
+  - Soldiers: the weaponsmith makes weapons from coal and iron; at the barracks an idle carrier picks up a weapon and
+    becomes a soldier. armyTarget {kind, d} is how many soldiers of that kind you want OUTSIDE buildings (at the start
+    sword 4, bow 2, spear 2): military buildings call free soldiers in, and the barracks trains again up to the target.
+    weaponKeep {k, d} is how many spare weapons of a kind to keep in stock (0-9, at the start 1).
+  - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
+    castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
+  - Gold bars in stock make your soldiers stronger outside your land (view.gold).
+- profession {role, d}: d 1 retrains an idle carrier, d -1 makes one a carrier again. role is one of: explorer (takes 1
+  plank; walks where you send him and uncovers the map), geologist (takes a pickaxe; searches the mountain where you
+  send him), pioneer (takes a shovel; claims land nobody owns, tile by tile, where you send him outside your border),
+  digger (a shovel), builder (a hammer). It needs that tool lying spare, an idle carrier, and more than 2 carriers.
+  Careful: a profession order that could not be done is NOT in view.refused; look at view.economy.people on a later
+  turn. Send no other role names. Explorers, geologists and pioneers are in view.economy.units; move them with sendUnit.
+- More on some orders: pause {b, on} works on a building site only. workArea {b, x, y} moves the middle of a
+  workplace's work area (x: null = back around the building). storeSlot {b, k, it}: a stockpile (store) has 4 slots,
+  k 0-3; set a slot to an item (it) and carriers bring up to 8 of it there (it: null clears the slot); the view does
+  not show the slots. distUp {it, k}: for every good the game keeps a list of building types in the order they get it
+  first; this moves entry k of the list for good it one place up; the view does not show these lists.
 - Economy commands: place {type, x, y}, demolish {b}, priority {b, on}, pause {b, on}, workArea {b, x, y},
   workRange {b, d}, storeSlot {b, k, it}, profession {role, d: 1|-1}, sendUnit {u, tx, ty}, weaponKeep {k, d},
   armyTarget {kind, d}, archers {b, d}, fighters {b, d}, workOrder {k, d: -1|1} (move a job in your carriers' work list,
@@ -265,13 +233,16 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   1 water, 2 mountain; tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
   stands there (seen now only); fish = fish left in that water (seen now only); ore 0 not searched by a geologist,
   1 searched: nothing, 2+ = oreNames[ore-1] ('coal', 'ironore', 'goldore', 'stone'). map.at(x,y) gives one tile as an
-  object. Decide yourself where to build and where to expand: the map is all you need.
+  object with the same names, but two of them in words: {known, ter: 'grass'|'water'|'mountain', tree, stone, owner,
+  height, occupied, fish, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
+  Decide yourself where to build and where to expand: the map is all you need.
 - canPlace(type, x, y): true when a building of that type may stand with its top-left corner on tile x, y right now
   (whole tiles; the game's own rules: on your land, flat enough, free of trees, rocks and other buildings, room around
   it, a free tile in front of the door, mines fully on the mountain, military buildings out of enemy arrow range).
   Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, weaponsmith 3x3 east, barracks 3x3 (door south unless east).
   x grows to the east, y to the south.
-- view.refused: last turn's orders the game refused, as {order, args, why} (for place: the reason, like 'Too steep').
+- view.refused: last turn's orders the game refused, as {order, args, why} (for place: the reason, like 'Too steep');
+  at most 30.
 - view.economy.loose: goods lying loose on your land {item: count}. view.economy.army: your army settings: target
   {sword, spear, bow}, keep [{weapon, keep}] (weaponKeep's k is the position in this list, 0 first), reserve, list.
 - view.economy.spots (the 'ask' helper) still works, but you don't need it.
