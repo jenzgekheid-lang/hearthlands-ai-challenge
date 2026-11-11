@@ -1,5 +1,5 @@
 {
-  "round": 1,
+  "round": 2,
   "history": [
     {
       "round": 0,
@@ -16,16 +16,19 @@
       "result": "not played",
       "score": -1,
       "kept": false
+    },
+    {
+      "round": 2,
+      "sha": "14d9b5b",
+      "change": "The script needs to prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup. This will help in maintaining a stronger defense an",
+      "result": "won 0, lost 1, undecided 7; after an hour on average 31.8 buildings, 12.9 soldiers, 3448 land tiles",
+      "score": 116,
+      "kept": false
     }
   ],
   "best": {
     "score": 116,
     "sha": "0a49767",
     "round": 0
-  },
-  "pending": {
-    "round": 2,
-    "change": "The script needs to prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup. This will help in maintaining a stronger defense an",
-    "sha": "14d9b5bbb000e3ca0e447f61bb9ecf44316e8284"
   }
 }
