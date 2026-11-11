@@ -1,113 +1,87 @@
-// ChatGPT GPT-6 — Hearthlands AI challenge (game version 194, kit read 11 Nov 2026)
-// Economy-first: grow reliable timber, stone and food; establish iron/coal and tools/weapons;
-// keep military buildings staffed, then commit a concentrated army against exposed enemy positions.
-// All decisions use only this player's current view and remembered intentions.
+// ChatGPT GPT-6 — Hearthlands challenge, revised after v195 arena logs (11 Nov 2026)
+// Diagnosis: first script plateaued at 15–22 buildings, 10 soldiers and 1 house; piles stayed full,
+// carriers became idle, and the town never reached metal/barracks. Prioritize storage + population + logistics.
 function think(view) {
-  const E = view.economy;
-  if (!E || view.over) return [];
-  const out = [];
-  const town = E.town || [], stock = E.stock || {}, units = E.units || [], buildings = view.buildings || [];
-  const enemyBuildings = (view.enemy && view.enemy.buildings) || [], enemySoldiers = (view.enemy && view.enemy.soldiers) || [];
-  const n = type => town.filter(b => b.type === type).length, s = item => stock[item] || 0;
-  const hasOre = item => (E.ore || []).some(o => o.ore === item);
-  const siteCount = town.filter(b => !b.built).length, pending = type => town.some(b => b.type === type && !b.built);
-  const ownMil = buildings.filter(b => b.military && b.type !== 'hq' && b.owner === view.me);
-  const emptyMil = ownMil.filter(b => b.built && !(b.troops || []).length);
-  const soldiers = view.soldiers || [], freeSoldiers = soldiers.filter(u => !u.order && !u.defends);
-  const d2 = (a,b) => (a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y);
-  const note = text => out.push(['note',{text:String(text).slice(0,200)}]);
+  const E=view.economy; if(!E||view.over)return [];
+  const out=[], town=E.town||[], stock=E.stock||{}, units=E.units||[];
+  const buildings=view.buildings||[], soldiers=view.soldiers||[];
+  const n=t=>town.filter(b=>b.type===t).length, built=t=>town.filter(b=>b.type===t&&b.built).length;
+  const pending=t=>town.some(b=>b.type===t&&!b.built), s=i=>stock[i]||0;
+  const spots=E.spots||{}, hasOre=k=>(E.ore||[]).some(o=>o.ore===k);
+  const sites=town.filter(b=>!b.built).length, free=soldiers.filter(x=>!x.order&&!x.defends);
+  const enemyB=(view.enemy&&view.enemy.buildings)||[], enemyS=(view.enemy&&view.enemy.soldiers)||[];
+  const ownMil=buildings.filter(b=>b.owner===view.me&&b.military&&b.type!=='hq');
+  const d2=(a,b)=>(a.x-b.x)**2+(a.y-b.y)**2;
+  const add=(c,t)=>{if(c&&!pending(t))plan.push(t)};
+  const plan=[];
 
-  const housingNeeded = (E.population || 0) >= Math.max(1,(E.beds || 0)-3) &&
-    !town.some(b => /^house/.test(b.type) && !b.built && (b.coming || 0) > 0);
-  const wants = [], add = (condition,type) => { if(condition && !pending(type)) wants.push(type); };
-
-  // Core production, then food and housing.
-  add(n('wood') < 1,'wood'); add(n('quarry') < 1,'quarry'); add(n('saw') < 1,'saw');
-  add(n('wood') < 2,'wood'); add(n('forest') < 1,'forest');
-  add(n('fisher') < 1,'fisher'); add(n('waterhut') < 1,'waterhut');
-  add(n('farm') < 1,'farm'); add(n('mill') < 1,'mill'); add(n('bakery') < 1,'bakery');
-  add(n('quarry') < 2,'quarry'); add(n('wood') < 3,'wood'); add(n('forest') < 2,'forest');
-  add(n('farm') < 2 && n('mill') > 0,'farm'); add(n('fisher') < 2 && n('waterhut') > 0,'fisher');
-  add(housingNeeded && n('house') + n('house2') + n('house3') < 4,'house');
-
-  // Explore and unlock metal production.
-  const geos = units.filter(u => u.role === 'geologist');
-  if (!geos.length && E.land && E.land.unsearched > 8 && s('pick') > 0 && view.t > (memory.geoCooldown || 0)) {
-    out.push(['profession',{role:'geologist',d:1}]); memory.geoCooldown = view.t + 90;
+  // First bottleneck: stockpiles. Four configured slots let carriers clear production piles.
+  if(!n('store')&&!pending('store')) plan.push('store');
+  const stores=town.filter(b=>b.type==='store'&&b.built);
+  if(!memory.storeSet) {
+    for(const b of stores) for(let k=0;k<4;k++) out.push(['storeSlot',{b:b.id,k,it:['plank','stone','log','grain'][k]}]);
+    if(stores.length)memory.storeSet=true;
   }
-  for (const g of geos) if (!g.busy && !g.moving && (E.unsearched || []).length) {
-    const spots = E.unsearched, target = spots[(Math.floor(view.t/20)+g.id) % spots.length];
+
+  // Housing comes early and repeatedly: each completed house supplies beds and recruits settlers.
+  const houseCount=n('house')+n('house2')+n('house3');
+  if(houseCount<3&&!pending('house')&&(E.population||0)>=(E.beds||0)-2) plan.push('house');
+
+  // Simple but sustainable production. Do not overbuild food chains before workers/carriers exist.
+  add(n('wood')<1,'wood'); add(n('quarry')<1,'quarry'); add(n('saw')<1,'saw');
+  add(n('wood')<2,'wood'); add(n('forest')<1,'forest');
+  add(n('fisher')<1,'fisher'); add(n('waterhut')<1,'waterhut');
+  add(n('farm')<1,'farm'); add(n('mill')<1,'mill'); add(n('bakery')<1,'bakery');
+  add(n('wood')<3,'wood'); add(n('quarry')<2,'quarry'); add(n('forest')<2,'forest');
+  add(n('farm')<2&&n('mill')>0,'farm'); add(n('fisher')<2&&n('waterhut')>0,'fisher');
+  add(houseCount<3&&(E.population||0)>=(E.beds||0)-2,'house');
+
+  // Mining and military chain; scout/geologist only if the tools exist.
+  if(!units.some(u=>u.role==='geologist')&&E.land&&E.land.unsearched>8&&s('pick')>0&&view.t>(memory.geoAt||0)){
+    out.push(['profession',{role:'geologist',d:1}]);memory.geoAt=view.t+100;
+  }
+  for(const g of units.filter(u=>u.role==='geologist'))if(!g.busy&&!g.moving&&(E.unsearched||[]).length){
+    const arr=E.unsearched, target=arr[(Math.floor(view.t/25)+g.id)%arr.length];
     out.push(['sendUnit',{u:g.id,tx:target.x,ty:target.y}]);
   }
-  add(hasOre('coal') && n('coalmine') < 1,'coalmine');
-  add(hasOre('ironore') && n('ironmine') < 1,'ironmine');
-  add(n('coalmine') > 0 && n('ironmine') > 0 && n('smelter') < 1,'smelter');
-  add(n('smelter') > 0 && n('smith') < 1,'smith');
-  add(n('smelter') > 0 && n('weaponsmith') < 1,'weaponsmith');
-  add(n('weaponsmith') > 0 && n('barracks') < 1,'barracks');
-  add(n('coalmine') > 0 && n('ironmine') > 0 && n('smelter') > 0 && n('goldmine') < 1 && hasOre('goldore'),'goldmine');
-  add(n('goldmine') > 0 && n('goldsmelter') < 1,'goldsmelter');
-  add(n('coalmine') > 0 && n('smelter') > 0 && n('weaponsmith') > 0 && n('barracks') > 0 && n('guard') < 2,'guard');
-  add(n('guard') >= 1 && n('barracks') > 0 && n('tower') < 1,'tower');
-  add(n('tower') > 0 && n('castle') < 1 && (E.population || 0) > 35,'castle');
-  add(n('wood') < 4 && n('saw') > 0,'wood'); add(n('forest') < 3 && n('wood') >= 2,'forest');
-  add(n('quarry') < 3 && n('wood') >= 2,'quarry');
+  add(hasOre('coal')&&n('coalmine')<1,'coalmine');
+  add(hasOre('ironore')&&n('ironmine')<1,'ironmine');
+  add(n('coalmine')&&n('ironmine')&&n('smelter')<1,'smelter');
+  add(n('smelter')&&n('smith')<1,'smith');
+  add(n('smelter')&&n('weaponsmith')<1,'weaponsmith');
+  add(n('weaponsmith')&&n('barracks')<1,'barracks');
+  add(n('barracks')&&n('guard')<2,'guard');
+  add(n('guard')&&n('tower')<1,'tower');
 
-  if (!memory.armyConfigured) {
-    out.push(['armyTarget',{kind:'spear',set:12}],['armyTarget',{kind:'bow',set:12}],
-      ['armyTarget',{kind:'sword',set:8}],['armyReserve',{set:3}],['armyList',{on:true}]);
-    memory.armyConfigured = true;
+  // Armament: actual kit counters are sword>spear, spear>bow, bow>sword.
+  if(!memory.army){
+    out.push(['armyTarget',{kind:'sword',set:12}],['armyTarget',{kind:'spear',set:12}],
+      ['armyTarget',{kind:'bow',set:16}],['armyReserve',{set:2}],['armyList',{on:true}]);
+    memory.army=true;
   }
 
-  // Ask for valid positions; E.spots answers on a later economy turn.
-  const candidates = wants.slice(0,4);
-  if (n('guard') < 2 && n('barracks') > 0 && n('weaponsmith') > 0) candidates.unshift('guard');
-  if (candidates.length) out.push(['ask',{spots:[...new Set(candidates)]}]);
-
-  // Only one new construction per turn; cap the queue so carriers can finish.
-  if (siteCount < 2 && s('plank') >= 2) {
-    let chosen = null;
-    for (const type of wants) {
-      const list = E.spots && E.spots[type];
-      if (list && list.length) { chosen = {type,spot:list[0]}; break; }
+  // Ask for placements for the next priorities, and don't leave multiple unfinished sites.
+  const ask=[...new Set(plan.slice(0,5))]; if(ask.length)out.push(['ask',{spots:ask}]);
+  if(sites<1&&(s('plank')>=2||plan[0]==='store')){
+    for(const t of plan){
+      const l=spots[t]; if(l&&l.length){out.push(['place',{type:t,x:l[0].x,y:l[0].y}]);break;}
     }
-    if (!chosen && n('barracks') > 0 && n('weaponsmith') > 0 && n('guard') < 2) {
-      const list = E.spots && E.spots.guard;
-      if (list && list.length) chosen = {type:'guard',spot:list[0]};
-    }
-    if (chosen) out.push(['place',{type:chosen.type,x:chosen.spot.x,y:chosen.spot.y}]);
   }
 
-  // Prioritize recruitment into empty military buildings.
-  for (const b of ownMil) if (b.built && !(b.troops || []).length && memory.prioMil !== b.id) {
-    out.push(['priority',{b:b.id,on:true}]); memory.prioMil = b.id; break;
+  // Man military buildings before leaving troops in the field.
+  const empty=ownMil.filter(b=>b.built&&!(b.troops||[]).length);
+  if(empty.length&&memory.prio!==empty[0].id){
+    out.push(['priority',{b:empty[0].id,on:true}]);memory.prio=empty[0].id;
   }
-  if (emptyMil.length && memory.prioMil !== emptyMil[0].id) {
-    out.push(['priority',{b:emptyMil[0].id,on:true}]); memory.prioMil = emptyMil[0].id;
-  }
-
-  // Launch a substantial force, preferring visible unmanned enemy military buildings.
-  const attackable = enemyBuildings.filter(b => b.military).sort((a,b) => {
-    const am = a.manned ? 1 : 0, bm = b.manned ? 1 : 0;
-    if (am !== bm) return am-bm;
-    return (a.id||0)-(b.id||0);
-  });
-  const reserve = Math.min(3,freeSoldiers.length), field = freeSoldiers.slice(0,Math.max(0,freeSoldiers.length-reserve));
-  if (field.length >= 8 && attackable.length) {
-    const target = attackable[0];
-    out.push(['attack',{ids:field.map(u=>u.id),b:target.id}]); memory.lastAttack = view.t;
-    note('Committed '+field.length+' available troops against '+(target.type||'enemy military')+'; reserve '+reserve+'.');
-  } else if (field.length >= 8 && enemySoldiers.length) {
-    const foe = enemySoldiers.slice().sort((a,b)=>d2(a,field[0])-d2(b,field[0]))[0];
-    out.push(['march',{ids:field.map(u=>u.id),tx:Math.floor(foe.x),ty:Math.floor(foe.y),form:'wedge',am:true,loose:true}]);
-    memory.lastAttack = view.t;
-  }
-
-  // Scout farther after establishing a residence.
-  if (n('look') < 1 && n('house') > 0 && s('plank') >= 2 && siteCount < 2) {
-    const l = E.spots && E.spots.look;
-    if (l && l.length) out.push(['place',{type:'look',x:l[0].x,y:l[0].y}]);
-    else out.push(['ask',{spots:['look']}]);
+  // Attack enemy military only with a meaningful group; attack-move if no building is visible.
+  const targets=enemyB.filter(b=>b.military).sort((a,b)=>(a.manned?1:0)-(b.manned?1:0));
+  const force=free.slice(0,Math.max(0,free.length-2));
+  if(force.length>=7&&targets.length){
+    out.push(['attack',{ids:force.map(x=>x.id),b:targets[0].id}]);
+    if(view.t-(memory.attackNote||-999)>120){out.push(['note',{text:'Committed '+force.length+' field troops to enemy military.'}]);memory.attackNote=view.t;}
+  }else if(force.length>=7&&enemyS.length){
+    const target=enemyS.slice().sort((a,b)=>d2(a,force[0])-d2(b,force[0]))[0];
+    out.push(['march',{ids:force.map(x=>x.id),tx:Math.floor(target.x),ty:Math.floor(target.y),form:'wedge',am:true,loose:true}]);
   }
   return out.slice(0,50);
 }
