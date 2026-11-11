@@ -141,10 +141,10 @@ function think(view){
  // Houses: add beds only when population is close to capacity; cap at five small houses.
  const houses=n('house')+n('house2')+n('house3');
  add(houses<5&&(E.population||0)>=(E.beds||0)-5,'house');
- // Military expansion is paced by actual army/economy rather than a fixed timer.
+ // Secure the starting ten soldiers immediately; this first post is the key to claiming room to expand.
  const guards=n('guard'),towers=n('tower');
+ if(guards<1&&!pending('guard'))wants.unshift('guard');
  const emptyMil=ownMil.filter(b=>b.built&&!(b.troops||[]).length).length;
- const armyReady=(soldiers.length>=16&&s('sword')+s('spear')+s('bow')<8);
  if(guards<2&&view.t>120)add(true,'guard');
  else if(guards<4&&soldiers.length>=18&&emptyMil===0&&view.t>600)add(true,'guard');
  else if(towers<1&&soldiers.length>=28&&guards>=2&&emptyMil===0)add(true,'tower');
@@ -154,7 +154,7 @@ function think(view){
  let chosen=null;
  if(sites<2&&s('plank')>=2){
   // If a useful military site is needed, place it only when its position extends the border.
-  const type=militaryWant&&sites===0?'guard':selected;
+  const type=(wants[0]==='guard'||(militaryWant&&sites===0))?'guard':selected;
   if(type){
    chosen=bestSite(type);
    if(chosen)out.push(['place',{type,x:chosen.x,y:chosen.y}]);
