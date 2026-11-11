@@ -96,9 +96,9 @@ THE SCRIPT
 THE VIEW (what your side may know; positions in map tiles, x to the east, y to the south)
 { t: game seconds, me: your side (1 = Gold, 2 = Blue), map: {w, h}, gold: your strength outside your land (0.6-1),
   soldiers: [ {id, kind: "sword"|"spear"|"bow", hp, maxHp, x, y, order: null or {k: "attack"|"move"|"attack-move", ...},
-               fighting, stance: "aggr"|"hold", defends, held, moving} ],
+               fighting, stance: "aggr"|"hold", defends, held, moving, patrol} ],
   buildings: [ your buildings: {id, type, owner, x, y, w, h, door: {x, y}, military, troops: ["sword","bow",...]} ],
-  enemy: { soldiers: [ {id, owner, kind, x, y, hurt} ], buildings: [ like yours, but instead of troops only manned: true|false ] },
+  enemy: { soldiers: [ {id, owner, kind, x, y, hurt, hp, maxHp} only the ones you see now ], buildings: [ like yours, but instead of troops only manned: true|false ] },
   over: null or {winners},
   rules: (first turn only) the numbers below }
 Soldiers with an order are busy; give orders to the ones whose order is null (and leave "defends" alone).
@@ -115,6 +115,8 @@ THE COMMANDS (each command is [name, args])
 - ["free", {ids: [...]}]   drop their orders and let go of them (not held, no hold spot)
 - ["release", {ids: [...], stop: true}]   let go of them (not held) but keep their hold spot; stop: true also ends their
   march or attack
+- ["patrol", {ids: [...], on: true|false}]   mark them as on patrol or scouting: while on, a held soldier who ends a
+  plain move does not go into a military building nearby. It stays on until you switch it off (view: patrol)
 - ["sendIn", {ids: [...], b: your military building id}]   go inside as garrison
 - ["group", {ids: [...], g: 1-5, replace: true}]   remember a group (for yourself)
 At most 50 commands per turn. Wrong or impossible commands are refused and counted.
@@ -124,6 +126,7 @@ HOW BATTLES WORK
 - The attacker closest to the door takes a building once nobody defends it. A taken building only gets land no other enemy building still covers.
 - Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier).
 - Soldiers without an order step back out of arrow range; move routes around known arrow range; attack-move fights on the way.
+- A military building calls in the nearest free soldier (no order, not held) standing on your own land; if there is none, the nearest within 20 tiles of its door; otherwise it stays empty, and an empty building can be taken.
 - Kinds: spearmen beat swordsmen up close, swordsmen beat bowmen up close, bowmen beat spearmen at range (bowmen shoot
   from about 10 tiles). Blows of one moment are dealt together.
 - Military buildings shoot with the bowmen inside at enemies within about 14 tiles of their centre.
@@ -201,7 +204,8 @@ THE NUMBERS
   "Defenders step out one per attacker at the door, fighters first; bowmen inside shoot, and come down one at a time when no fighter is left.",
   "The attacker closest to the door takes a building once nobody defends it. A taken building only gets land no other enemy building still covers.",
   "Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier).",
-  "Soldiers without an order step back out of arrow range; move routes around known arrow range; attack-move fights on the way."
+  "Soldiers without an order step back out of arrow range; move routes around known arrow range; attack-move fights on the way.",
+  "A military building calls in the nearest free soldier (no order, not held) standing on your own land; if there is none, the nearest within 20 tiles of its door; otherwise it stays empty, and an empty building can be taken."
  ],
  "commands": {
   "march": "{ids:[...], tx, ty, form:\"block\"|\"line\"|\"wedge\", am:false|true, loose:true}",
@@ -209,6 +213,7 @@ THE NUMBERS
   "stance": "{ids:[...], st:\"aggr\"|\"hold\"}",
   "free": "{ids:[...]}",
   "release": "{ids:[...], stop:true}",
+  "patrol": "{ids:[...], on:true|false}",
   "sendIn": "{ids:[...], b:ownBuildingId}",
   "group": "{ids:[...], g:1-5, replace:true}"
  }

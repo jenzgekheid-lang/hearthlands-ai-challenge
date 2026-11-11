@@ -1,8 +1,8 @@
 {
   "claude-fable-5.2": {
     "date": "2026-11-11",
-    "commit": "5830097",
-    "version": 191,
+    "commit": "84f1fb3",
+    "version": 194,
     "status": "played",
     "won": 0,
     "lost": 0,
