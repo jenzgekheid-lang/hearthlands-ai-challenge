@@ -115,7 +115,7 @@ function think(view){
  }
  // Build plan: one deliberate site at a time; avoid spending materials on a long queue.
  const wants=[];
- const add=(ok,t)=>{if(ok&&!pending(t))wants.push(t);};
+ const add=(ok,t)=>{if(ok&&!pending(t)&&!wants.includes(t))wants.push(t);};
  add(n('wood')<1,'wood');
  add(n('quarry')<1,'quarry');
  add(n('saw')<1,'saw');
