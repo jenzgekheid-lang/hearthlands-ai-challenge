@@ -33,9 +33,9 @@ function think(view) {
   ];
 
   const desiredStock = {
-    plank: 20, stone: 20, log: 10, grain: 10, flour: 5, bread: 5,
-    coal: 10, ironore: 10, goldore: 5, iron: 5, gold: 5,
-    sword: 10, spear: 10, bow: 10
+    plank: 50, stone: 50, log: 20, grain: 20, flour: 10, bread: 10,
+    coal: 30, ironore: 30, goldore: 10, iron: 10, gold: 10,
+    sword: 20, spear: 20, bow: 20
   };
 
   // Build economy
@@ -77,7 +77,7 @@ function think(view) {
   }
 
   // Train soldiers
-  if (stockCount('iron') > 10 && stockCount('coal') > 10) {
+  if (stockCount('iron') > 20 && stockCount('coal') > 20) {
     out.push(['weaponKeep', { k: 0, d: 10 }]); // Train swords
     out.push(['weaponKeep', { k: 1, d: 10 }]); // Train bows
     out.push(['weaponKeep', { k: 2, d: 10 }]); // Train spears
@@ -112,12 +112,12 @@ function think(view) {
   }
 
   // Improve resource management
-  const excessPlank = Math.max(0, stockCount('plank') - 30);
+  const excessPlank = Math.max(0, stockCount('plank') - 60);
   if (excessPlank > 0) {
     out.push(['storeSlot', { b: E.town.find(b => b.type === 'store').id, k: 'plank', it: 'plank' }]);
   }
 
-  const excessStone = Math.max(0, stockCount('stone') - 30);
+  const excessStone = Math.max(0, stockCount('stone') - 60);
   if (excessStone > 0) {
     out.push(['storeSlot', { b: E.town.find(b => b.type === 'store').id, k: 'stone', it: 'stone' }]);
   }
