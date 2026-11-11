@@ -1,20 +1,20 @@
-# ChatGPT GPT-6 — challenge plan, revision after v195 logs
+# ChatGPT challenge — second-run diagnosis and revision (v195)
 
-## What the first tournament run showed
-- Eight games: **0 wins, 0 losses, 8 undecided**. Our side never built military buildings, never recruited beyond its initial 10 soldiers, and never attacked. NPC reached 62–82 soldiers and 13–27 military buildings by minute 60.
-- Script itself was stable (1800 turns/game, ~0 ms average, no errors or refused orders). The failure is strategic/economic, not runtime.
-- Our town plateaued at 15–22 buildings, around 10–14 workers and only 2–22 carriers. In several games a second house was never built; one game had 0 beds and a house site waiting for materials for 51 minutes.
-- Logs show wood/quarry/saw/farm/fisher/waterhut/mill/bakery piles full for roughly 80–90% of building time, while carriers were idle (up to 88). Production was not being transported/consumed. Thus adding producers was counterproductive.
-- Foresters often had no plantable ground inside the border for 55–83% of their time. Repeated forester placement consumed materials without solving lack of space.
-- ArmyTarget only set desired ratios; without a barracks, weapons and a functioning metal chain, it did not create soldiers. Ore/geologist/tool availability also prevented mines from appearing.
+The newest report is still the previous run of commit 15d503d (the commit hash in the report confirms it). It did not execute the later script commit 400f9eb: report header says commit 15d503d. So this is not evidence about that revision yet.
 
-## Revision
-- Added early stockpile (store) and configured four slots for planks, stone, logs and grain, intended to clear output piles and reduce idle carriers.
-- Made housing a higher priority and capped the early house goal at three, so population/carriers can expand.
-- Reduced site backlog to one unfinished site, while continuing to ask for legal placements.
-- Kept core economy but made military progression explicit: ore discovery -> mines -> smelter -> weaponsmith -> barracks -> guards/tower.
-- Adjusted army targets to kit counter cycle: swords beat spears, spears beat bows, bows beat swords; reserve two.
-- Field force attacks only at seven or more free troops; priority fills empty own military buildings.
+## Actual second report findings
+- Still 0 wins, 8 undecided; all eight games ended with ChatGPT at **0 military buildings and exactly 10 soldiers**.
+- Store is present but idle 100% (normal for a stockpile). Its four slots each hold 8; stock reaches plank 16 / stone 16 / log 32 / grain 24–32 and then stops. Store slots are finite buffers, not a general logistics solution.
+- Carriers: 22–26 idle, 68–88 goods waiting. Production piles are full 80–98% of the time. The previous store tweak did not unblock the economy.
+- Foresters are unable to plant inside borders 78–86% of the time; building more forests is wasted.
+- Population is 40, beds 30, but carrier count remains 22–26 and workers 10–13. House growth did not translate into economy expansion.
+- No ore, coal, iron, weapons, or military buildings. One map had a geologist but no revealed ore.
 
-## Expected next run
-Stockpile should improve throughput if slot settings work as documented; housing should stop population freeze. Key success criterion: barracks and military building before minute 30, and soldier count rising above 10. If not, inspect tool availability, construction-material starvation, and house/carrier dynamics before adding production.
+## Revision (commit 0d3d8b9)
+- Stop treating a single store as a throughput fix; add another stockpile only when the first buffer is saturated.
+- Make guard posts an early, periodic expansion objective, rather than waiting for weaponsmith/barracks. Guards can claim territory and house starting troops; territory may unlock mountain and building spots.
+- Geologist is sent to nearest unsearched mountain, not cycling through distant targets.
+- Keep a smaller site queue and early houses, while retaining core production.
+
+## Next test
+This script revision has not yet run. Check whether guard count becomes >0 by minute 10 and whether it expands land; if not, investigate `ask`/`spots`/place conditions. Then verify geologist discovers ore, and whether initial soldiers can garrison guards. The central goal is break the 10-soldier/0-military plateau, not optimize food output.
