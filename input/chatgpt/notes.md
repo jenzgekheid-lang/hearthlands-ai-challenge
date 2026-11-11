@@ -16,15 +16,26 @@ Replaced the previous fixed ask/spots build loop with direct map-aware placement
 - Configure garrison targets, reserve and army ordering once.
 - Attack a visible military building only when the free field force has a substantial numerical advantage over visible enemy soldiers.
 
-## What this does not prove
+## Findings from the 25c990b tournament run
 
-This revision has been committed but has not yet been tested in a new arena run. The previous report (game version 195, tested commit 714a5c1) remains the only tournament evidence: 0 wins, 0 losses, 8 undecided. In that report the best map reached 46 soldiers, but other maps stalled at 10; the NPC outscaled us in economy and military buildings.
+The report tested commit 25c990b (game version 195): 0 wins, 0 losses, 8 undecided. Performance varied sharply by map and side. Several games reached 40–46 soldiers, while others stayed at 6–10.
+
+Two repeatable failure patterns:
+- Output piles at wood, quarry, saw, farms and food buildings were often full while 40+ carriers were idle and dozens of goods were waiting. The script configured stores if present but never actually built any.
+- Some starts stopped expanding after a building goal (especially a mine) had no legal placement. The single selected goal was retried instead of allowing later goals such as a house or store.
+
+## Changes in commit 9559d9d
+
+- Add an early stockpile, configure its four slots for logs, planks, stone and grain, and add further stockpiles only when goods are backing up and carriers are idle.
+- Add the first house before the ore chain, so a blocked mine cannot prevent the housing goal from being considered.
+- Rotate through build goals when a candidate has no legal site, while keeping the opening guard first.
+- Remove the ineffective clear-work-order adjustment; the report did not show it being issued, and the logs do not justify changing the default work list yet.
+- Keep army targets, reserve, combat thresholds and garrison policy unchanged.
 
 ## Next report checks
 
-1. Does the first guard finish immediately and recruit starting soldiers?
-2. Does direct placement avoid bad quarry/wood/farm locations and site stalls?
-3. Does map-aware geology find coal and iron early enough to build the weapons chain?
-4. Do output piles still saturate while carriers are idle? If so, inspect actual carrier task and work-order semantics before changing priorities.
-5. Compare soldiers, military buildings, land and economy at 15/30/45/60 minutes against the NPC on all eight games.
-6. Check that the report's tested commit matches the current script commit before attributing results to this revision.
+1. Confirm the runner tested commit 9559d9d before attributing results to this revision.
+2. Check whether stores are built and configured, and whether output piles stop filling while idle carriers decrease.
+3. Check whether the previously stalled sides now build houses and continue past blocked mine goals.
+4. Compare soldiers, military buildings, land and economy at 15/30/45/60 minutes across all eight games.
+5. Check refused orders, task failures and script timeouts; site scanning should still stay below 0.3 seconds.
