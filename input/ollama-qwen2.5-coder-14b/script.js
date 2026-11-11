@@ -12,6 +12,7 @@ function think(view){
   const ore = k => E.ore.some(o => o.ore === k);
   // what it wants next, in order: [condition, building]
   const want = [
+    [mil < 1, 'guard'], [mil < 2, 'guard'], [mil < 3, 'tower'], [mil < 4, 'tower'], // Prioritize building military structures
     [has('wood') < 1, 'wood'], [has('quarry') < 1, 'quarry'], [has('saw') < 1, 'saw'], [has('wood') < 2, 'wood'],
     [has('forest') < 1, 'forest'], [(E.people.carrier || 0) < 6 && E.population >= E.beds - 4 && !E.town.some(b => !b.built && /house/.test(b.type)), 'house'], // a house only when few carriers are free
     [has('fisher') < 1, 'fisher'], [has('waterhut') < 1, 'waterhut'], [has('farm') < 1, 'farm'], [has('mill') < 1, 'mill'],
@@ -21,7 +22,6 @@ function think(view){
     [has('pigfarm') < 1 && has('farm'), 'pigfarm'], [has('butcher') < 1 && has('pigfarm'), 'butcher'], [has('farm') < 2 && has('mill'), 'farm'],
     [has('weaponsmith') < 1 && has('smelter'), 'weaponsmith'], [has('barracks') < 1 && has('weaponsmith'), 'barracks'],
     [has('coalmine') < 2 && has('smelter'), 'coalmine'], [has('saw') < 2 && has('wood') >= 3, 'saw'],
-    [mil < 3, 'guard'], [mil < 3, 'tower'], // Prioritize building military structures
   ].filter(w => w[0]).map(w => w[1]);
   // a geologist while there is mountain it hasn't searched
   const geos = E.units.filter(u => u.role === 'geologist');
