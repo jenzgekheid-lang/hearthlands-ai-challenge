@@ -1,20 +1,30 @@
-# ChatGPT challenge — second-run diagnosis and revision (v195)
+# ChatGPT GPT-6 — map-aware revision (game version 195)
 
-The newest report is still the previous run of commit 15d503d (the commit hash in the report confirms it). It did not execute the later script commit 400f9eb: report header says commit 15d503d. So this is not evidence about that revision yet.
+## What changed
 
-## Actual second report findings
-- Still 0 wins, 8 undecided; all eight games ended with ChatGPT at **0 military buildings and exactly 10 soldiers**.
-- Store is present but idle 100% (normal for a stockpile). Its four slots each hold 8; stock reaches plank 16 / stone 16 / log 32 / grain 24–32 and then stops. Store slots are finite buffers, not a general logistics solution.
-- Carriers: 22–26 idle, 68–88 goods waiting. Production piles are full 80–98% of the time. The previous store tweak did not unblock the economy.
-- Foresters are unable to plant inside borders 78–86% of the time; building more forests is wasted.
-- Population is 40, beds 30, but carrier count remains 22–26 and workers 10–13. House growth did not translate into economy expansion.
-- No ore, coal, iron, weapons, or military buildings. One map had a geologist but no revealed ore.
+Replaced the previous fixed ask/spots build loop with direct map-aware placement:
+- Scan known, currently visible own territory and call canPlace(type, x, y) before choosing a site.
+- Score candidate sites using relevant map layers: grown trees for woodcutters, stone for quarries, fish for fishers, shore water for water huts, open grass for farms/foresters, and geologist ore signs for mines.
+- Score guard locations for unclaimed territory and distance from existing military buildings.
+- Keep the initial guard post as the first expansion objective; subsequent military buildings depend on army size and garrison availability.
 
-## Revision (commit 0d3d8b9)
-- Stop treating a single store as a throughput fix; add another stockpile only when the first buffer is saturated.
-- Make guard posts an early, periodic expansion objective, rather than waiting for weaponsmith/barracks. Guards can claim territory and house starting troops; territory may unlock mountain and building spots.
-- Geologist is sent to nearest unsearched mountain, not cycling through distant targets.
-- Keep a smaller site queue and early houses, while retaining core production.
+## Economy and army
 
-## Next test
-This script revision has not yet run. Check whether guard count becomes >0 by minute 10 and whether it expands land; if not, investigate `ask`/`spots`/place conditions. Then verify geologist discovers ore, and whether initial soldiers can garrison guards. The central goal is break the 10-soldier/0-military plateau, not optimize food output.
+- Keep the geologist moving to the nearest unsearched mountain tile and only place mines for deposits actually found.
+- Avoid a long construction queue; place one deliberate building at a time while fewer than two sites are active.
+- Give carriers a limited congestion response when loose goods and idle carriers are both high.
+- Configure garrison targets, reserve and army ordering once.
+- Attack a visible military building only when the free field force has a substantial numerical advantage over visible enemy soldiers.
+
+## What this does not prove
+
+This revision has been committed but has not yet been tested in a new arena run. The previous report (game version 195, tested commit 714a5c1) remains the only tournament evidence: 0 wins, 0 losses, 8 undecided. In that report the best map reached 46 soldiers, but other maps stalled at 10; the NPC outscaled us in economy and military buildings.
+
+## Next report checks
+
+1. Does the first guard finish immediately and recruit starting soldiers?
+2. Does direct placement avoid bad quarry/wood/farm locations and site stalls?
+3. Does map-aware geology find coal and iron early enough to build the weapons chain?
+4. Do output piles still saturate while carriers are idle? If so, inspect actual carrier task and work-order semantics before changing priorities.
+5. Compare soldiers, military buildings, land and economy at 15/30/45/60 minutes against the NPC on all eight games.
+6. Check that the report's tested commit matches the current script commit before attributing results to this revision.
