@@ -2,9 +2,9 @@
 
 Game version 195. Written for: ollama-qwen2.5-coder-14b 195.
 
-- ollama-qwen2.5-coder-14b: hearthlands-ai-challenge, commit 0a49767
+- ollama-qwen2.5-coder-14b: hearthlands-ai-challenge, commit 714a5c1
 
-Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 43 s.
+Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 44 s.
 
 Each game ends with the script's own game log: what it may know (its own side, and what happened to it or what it saw). Times are game min:sec.
 

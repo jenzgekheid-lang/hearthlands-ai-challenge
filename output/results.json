@@ -10,16 +10,16 @@
   },
   "chatgpt": {
     "date": "2026-11-11",
-    "commit": "d17c379",
-    "version": null,
-    "status": "refused",
+    "commit": "714a5c1",
+    "version": 195,
+    "status": "played",
     "won": 0,
     "lost": 0,
-    "undecided": 0
+    "undecided": 8
   },
   "ollama-qwen2.5-coder-14b": {
     "date": "2026-11-11",
-    "commit": "0a49767",
+    "commit": "714a5c1",
     "version": 195,
     "status": "played",
     "won": 0,
