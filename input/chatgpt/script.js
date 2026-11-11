@@ -15,10 +15,10 @@ function think(view){
  // Keep stockpile slots on construction inputs; add another stockpile when these stacks saturate.
  if(!n('store'))plan.push('store');
  if(s('plank')>=14&&s('stone')>=14&&n('store')<3&&!pending('store'))plan.push('store');
- if(!memory.slots){
-  for(const b of town.filter(b=>b.type==='store'))for(let k=0;k<4;k++)
-   out.push(['storeSlot',{b:b.id,k,it:['plank','stone','log','grain'][k]]);
-  memory.slots=true;
+ memory.slotIds=memory.slotIds||{};
+ for(const b of town.filter(b=>b.type==='store'))if(!memory.slotIds[b.id]){
+  for(let k=0;k<4;k++)out.push(['storeSlot',{b:b.id,k,it:['plank','stone','log','grain'][k]}]);
+  memory.slotIds[b.id]=true;
  }
  // Build houses early enough to replace workers lost to beds and grow carrier pool.
  if(house<5&&(E.population||0)>=(E.beds||0)-5&&!pending('house'))plan.push('house');
