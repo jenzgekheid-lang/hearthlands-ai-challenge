@@ -38,7 +38,7 @@ jobs:
               }
             }
             names = [...new Set(names)];
-            const gh = github.getOctokit(process.env.TOKEN);
+            const gh = getOctokit(process.env.TOKEN);
             await gh.rest.actions.createWorkflowDispatch({ owner: 'jenzgekheid-lang', repo: 'Hearthlands', workflow_id: 'arena.yml', ref: 'main',
               inputs: { sha: context.sha, names: names.join(' ') } });
             core.info(`arena started for ${names.join(', ') || 'all scripts'} at ${context.sha.slice(0, 7)}`);
