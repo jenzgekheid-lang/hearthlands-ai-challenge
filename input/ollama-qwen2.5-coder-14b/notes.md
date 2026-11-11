@@ -13,3 +13,9 @@ Written by tools/ollama-loop.js: one change per round, kept only when the arena 
 - Change: The script needs to prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup. This will help in maintaining a stronger defense an
 - Result: won 0, lost 1, undecided 7; after an hour on average 31.8 buildings, 12.9 soldiers, 3448 land tiles (score 116)
 - Not better than round 0: the next round starts from the best script again.
+
+## Round 3 (2026-11-11 21:13, commit 7571a7b)
+
+- Change: Prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup, which will help in maintaining a stronger defense and increasing the ch
+- Result: won 0, lost 0, undecided 8; after an hour on average 6.0 buildings, 10.0 soldiers, 2033 land tiles (score 130)
+- Kept: the best so far.

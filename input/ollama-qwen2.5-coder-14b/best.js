@@ -12,6 +12,7 @@ function think(view){
   const ore = k => E.ore.some(o => o.ore === k);
   // what it wants next, in order: [condition, building]
   const want = [
+    [mil < 1, 'guard'], [mil < 2, 'guard'], [mil < 3, 'tower'], [mil < 4, 'tower'], // Prioritize building military structures
     [has('wood') < 1, 'wood'], [has('quarry') < 1, 'quarry'], [has('saw') < 1, 'saw'], [has('wood') < 2, 'wood'],
     [has('forest') < 1, 'forest'], [(E.people.carrier || 0) < 6 && E.population >= E.beds - 4 && !E.town.some(b => !b.built && /house/.test(b.type)), 'house'], // a house only when few carriers are free
     [has('fisher') < 1, 'fisher'], [has('waterhut') < 1, 'waterhut'], [has('farm') < 1, 'farm'], [has('mill') < 1, 'mill'],
