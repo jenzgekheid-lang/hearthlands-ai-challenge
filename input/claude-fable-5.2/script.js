@@ -490,4 +490,4 @@ function army(view, out, M){
     }
     out.push(['march', {ids, tx: Math.floor(f.x), ty: Math.floor(f.y), form: 'block', am: true}]);
   }
-
+}
