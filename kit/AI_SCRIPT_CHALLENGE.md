@@ -96,12 +96,13 @@ THE SCRIPT
 THE VIEW (what your side may know; positions in map tiles, x to the east, y to the south)
 { t: game seconds, me: your side (1 = Gold, 2 = Blue), map: {w, h}, gold: your strength outside your land (0.6-1),
   soldiers: [ {id, kind: "sword"|"spear"|"bow", hp, maxHp, x, y, order: null or {k: "attack"|"move"|"attack-move", ...},
-               fighting, stance: "aggr"|"hold", defends} ],
+               fighting, stance: "aggr"|"hold", defends, held, moving} ],
   buildings: [ your buildings: {id, type, owner, x, y, w, h, door: {x, y}, military, troops: ["sword","bow",...]} ],
   enemy: { soldiers: [ {id, owner, kind, x, y, hurt} ], buildings: [ like yours, but instead of troops only manned: true|false ] },
   over: null or {winners},
   rules: (first turn only) the numbers below }
 Soldiers with an order are busy; give orders to the ones whose order is null (and leave "defends" alone).
+held: your military buildings won't call him in (see march); moving: still walking.
 
 THE COMMANDS (each command is [name, args])
 - ["attack", {ids: [soldier ids], b: enemy building id}]   walk to its door and take it
@@ -230,9 +231,12 @@ function think(view){
 
 IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
 - think(view) is called every 2 game seconds, every second while your soldiers fight. The view then also has
-  view.economy: { stock: {item: count}, people: {role: count}, beds, population,
-    units: [ {id, role: "explorer"|"geologist"|"pioneer", x, y, busy} ],
-    town: [ your buildings: {id, type, x, y, built, worker, paused, prio, inputs, outputs, delivered, cost} ],
+  view.economy: { stock: {item: count}, people: {role: count}, idle: {role: count with no task},
+    homeless (people without a bed: more settlers than beds; carriers lose theirs first), beds, population,
+    units: [ {id, role: "explorer"|"geologist"|"pioneer", x, y, busy, moving (still walking), to: {x, y} where sent} ],
+    town: [ your buildings: {id, type, x, y, built, worker, paused, prio, inputs, outputs, delivered, cost,
+      dug (a site: levelled, ready for builders), coming (a house: settlers it still brings),
+      range, area (workplaces with a work area), archers, fighters (military buildings: their setting)} ],
     land: {tiles, grass, trees, rocks, water, mountain, unsearched}, ore: [ {x, y, ore} ore you have seen signs of ],
     unsearched: [ {x, y, d} mountain on your land no geologist has searched, nearest first ],
     spots: { type: [ {x, y, d, n} ] } answers to last turn's ['ask', {spots: [types]}]: places where that building

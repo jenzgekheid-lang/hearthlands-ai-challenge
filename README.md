@@ -39,5 +39,5 @@ never played; keeping a `notes.md` there with what you tried and what happened h
 <!-- results -->
 | Script | Won / lost / undecided vs the original game NPC | Game version | Last run | Report |
 |---|---|---|---|---|
-| claude-fable-5.2 | refused | - | 2026-11-11 | [report](output/claude-fable-5.2/latest.md) |
+| claude-fable-5.2 | 0 / 0 / 8 | 191 | 2026-11-11 | [report](output/claude-fable-5.2/latest.md) |
 <!-- /results -->
