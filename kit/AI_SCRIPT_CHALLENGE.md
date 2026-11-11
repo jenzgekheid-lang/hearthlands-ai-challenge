@@ -90,7 +90,7 @@ THE SCRIPT
   Also allowed: module.exports = { think(view){...} } or module.exports = function(view){...}.
 - think is called about once per game second with the current view. It must answer within 0.3 seconds.
 - Plain JavaScript only. No internet, no storage, no other scripts: they are switched off. A plain object called
-  memory is kept between turns if you want to remember things (memory.plan = ...).
+  memory is kept between turns if you want to remember things (memory.plan = ...). It is saved with the game and given back after loading when it holds only plain data (numbers, text, true/false, null, arrays, plain objects, Set, Map, typed arrays; at most 256 KB as text); with anything else in it (functions, your own classes) it starts empty after loading.
 - Don't wait for anything: compute and return.
 
 THE VIEW (what your side may know; positions in map tiles, x to the east, y to the south)
