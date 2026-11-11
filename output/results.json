@@ -19,7 +19,7 @@
   },
   "ollama-qwen2.5-coder-14b": {
     "date": "2026-11-11",
-    "commit": "714a5c1",
+    "commit": "14d9b5b",
     "version": 195,
     "status": "played",
     "won": 0,

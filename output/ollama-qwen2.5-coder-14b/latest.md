@@ -2,9 +2,9 @@
 
 Game version 195. Written for: ollama-qwen2.5-coder-14b 195.
 
-- ollama-qwen2.5-coder-14b: hearthlands-ai-challenge, commit 714a5c1
+- ollama-qwen2.5-coder-14b: hearthlands-ai-challenge, commit 14d9b5b
 
-Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 44 s.
+Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 53 s.
 
 Each game ends with the script's own game log: what it may know (its own side, and what happened to it or what it saw). Times are game min:sec.
 
@@ -220,7 +220,7 @@ People's orders (5902 in all, 5861 done): worker rest farm 435, worker gather fa
 Fights and contact: first saw player 2 at 54:00.
 
 
-Script: 1800 turns, 0.0 ms average, worst 1 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.0 ms average, worst 2 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: ollama-qwen2.5-coder-14b (Blue) vs original game NPC: undecided
 
