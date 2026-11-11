@@ -239,7 +239,10 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   view.economy: { stock: {item: count}, people: {role: count}, idle: {role: count with no task},
     homeless (people without a bed: more settlers than beds; carriers lose theirs first), beds, population,
     units: [ {id, role: "explorer"|"geologist"|"pioneer", x, y, busy, moving (still walking), to: {x, y} where sent} ],
-    town: [ your buildings: {id, type, x, y, built, worker, paused, prio, inputs, outputs, delivered, cost,
+    town: [ your buildings: {id, type, x, y, built, worker, paused, prio,
+      inputs, outputs (goods lying at the building, each an object {item: count}, never a list: inputs = brought in
+      and waiting to be used, outputs = made or stored there and waiting to be carried off; test with
+      (b.outputs.plank || 0) > 0), delivered, cost (a site only, {item: count}: goods brought so far, goods needed in all),
       dug (a site: levelled, ready for builders), coming (a house: settlers it still brings),
       range, area (workplaces with a work area), archers, fighters (military buildings: their setting)} ],
     land: {tiles, grass, trees, rocks, water, mountain, unsearched}, ore: [ {x, y, ore} ore you have seen signs of ],
