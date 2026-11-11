@@ -24,11 +24,12 @@ Two repeatable failure patterns:
 - Output piles at wood, quarry, saw, farms and food buildings were often full while 40+ carriers were idle and dozens of goods were waiting. The script configured stores if present but never actually built any.
 - Some starts stopped expanding after a building goal (especially a mine) had no legal placement. The single selected goal was retried instead of allowing later goals such as a house or store.
 
-## Changes in commit 9559d9d
+## Changes in commit b7c4cbc
 
 - Add an early stockpile, configure its four slots for logs, planks, stone and grain, and add further stockpiles only when goods are backing up and carriers are idle.
 - Add the first house before the ore chain, so a blocked mine cannot prevent the housing goal from being considered.
 - Rotate through build goals when a candidate has no legal site, while keeping the opening guard first.
+- Count goods in building output piles as well as loose goods when diagnosing transport backlog; remove the unverified clear-work-order change.
 - Remove the ineffective clear-work-order adjustment; the report did not show it being issued, and the logs do not justify changing the default work list yet.
 - Keep army targets, reserve, combat thresholds and garrison policy unchanged.
 
