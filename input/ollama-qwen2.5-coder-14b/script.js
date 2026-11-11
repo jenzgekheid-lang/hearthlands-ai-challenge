@@ -1,135 +1,39 @@
-// AI script: Hearthlands AI
-// Model: ChatGPT
+// AI script: ollama-qwen2.5-coder-14b
+// Model: qwen2.5-coder:14b (local, Ollama)
 // Game version: 195
-// Plan: Build a strong economy first, then train soldiers and expand. Attack when stronger than the opponent.
-
-function think(view) {
-  const E = view.economy;
-  const out = [];
-
-  // Helper functions
-  const hasBuilding = type => E.town.filter(b => b.type === type).length;
-  const stockCount = item => E.stock[item] || 0;
-  const canPlaceBuilding = (type, x, y) => view.canPlace(type, x, y);
-  const getNearestBuilding = (type, x, y) => {
-    return E.town.filter(b => b.type === type).reduce((nearest, b) => {
-      const distance = Math.hypot(b.x - x, b.y - y);
-      if (!nearest || distance < nearest.distance) {
-        return { building: b, distance };
-      }
-      return nearest;
-    }, null);
-  };
-
-  // Economic planning
-  const economyBuildOrder = [
-    'wood', 'quarry', 'saw', 'forest', 'store',
-    'house', 'house2', 'house3',
-    'fisher', 'waterhut', 'farm', 'mill', 'bakery', 'pigfarm', 'butcher',
-    'coalmine', 'ironmine', 'stonemine', 'goldmine',
-    'goldsmelter', 'smelter', 'smith',
-    'guard', 'tower', 'castle',
-    'weaponsmith', 'barracks'
-  ];
-
-  const desiredStock = {
-    plank: 50, stone: 50, log: 20, grain: 20, flour: 10, bread: 10,
-    coal: 30, ironore: 30, goldore: 10, iron: 10, gold: 10,
-    sword: 20, spear: 20, bow: 20
-  };
-
-  // Build economy
-  for (const type of economyBuildOrder) {
-    if (hasBuilding(type) >= desiredStock[type]) continue;
-
-    const spot = E.spots[type];
-    if (spot && spot.length) {
-      const { x, y } = spot[0];
-      if (canPlaceBuilding(type, x, y)) {
-        out.push(['place', { type, x, y }]);
-        break;
-      }
-    }
-  }
-
-  // Manage population
-  const neededCarriers = Math.max(10, hasBuilding('house') * 10);
-  if (E.people.carrier < neededCarriers && E.population < E.beds) {
-    out.push(['profession', { role: 'carrier', d: 1 }]);
-  }
-
-  // Military planning
-  const desiredMilitary = {
-    guard: 2, tower: 1, castle: 1
-  };
-
-  for (const type of ['guard', 'tower', 'castle']) {
-    if (hasBuilding(type) >= desiredMilitary[type]) continue;
-
-    const spot = E.spots[type];
-    if (spot && spot.length) {
-      const { x, y } = spot[0];
-      if (canPlaceBuilding(type, x, y)) {
-        out.push(['place', { type, x, y }]);
-        break;
-      }
-    }
-  }
-
-  // Train soldiers
-  if (stockCount('iron') > 20 && stockCount('coal') > 20) {
-    out.push(['weaponKeep', { k: 0, d: 10 }]); // Train swords
-    out.push(['weaponKeep', { k: 1, d: 10 }]); // Train bows
-    out.push(['weaponKeep', { k: 2, d: 10 }]); // Train spears
-  }
-
-  // Attack strategy
-  if (E.population > 50 && hasBuilding('castle') >= 1) {
-    const enemyHQ = view.enemy.buildings.find(b => b.type === 'hq');
-    if (enemyHQ) {
-      const idleSoldiers = view.soldiers.filter(s => !s.order);
-      if (idleSoldiers.length > 0) {
-        out.push(['march', {
-          ids: idleSoldiers.map(s => s.id),
-          tx: enemyHQ.x,
-          ty: enemyHQ.y,
-          form: 'block',
-          am: true,
-          loose: true
-        }]);
-      }
-    }
-  }
-
-  // Expand and defend
-  const idleDiggers = E.units.filter(u => u.role === 'digger' && !u.busy);
-  if (idleDiggers.length > 0) {
-    const unexplored = view.map.unsearched.filter(tile => tile.owner === view.me);
-    if (unexplored.length > 0) {
-      const { x, y } = unexplored[0];
-      out.push(['sendUnit', { u: idleDiggers[0].id, tx: x, ty: y }]);
-    }
-  }
-
-  // Improve resource management
-  const excessPlank = Math.max(0, stockCount('plank') - 60);
-  if (excessPlank > 0) {
-    out.push(['storeSlot', { b: E.town.find(b => b.type === 'store').id, k: 'plank', it: 'plank' }]);
-  }
-
-  const excessStone = Math.max(0, stockCount('stone') - 60);
-  if (excessStone > 0) {
-    out.push(['storeSlot', { b: E.town.find(b => b.type === 'store').id, k: 'stone', it: 'stone' }]);
-  }
-
-  // Scout enemy positions
-  const scout = E.units.find(u => u.role === 'scout' && !u.busy);
-  if (scout) {
-    const enemyBuilding = view.enemy.buildings.find(b => b.type !== 'hq' && b.manned);
-    if (enemyBuilding) {
-      out.push(['sendUnit', { u: scout.id, tx: enemyBuilding.x, ty: enemyBuilding.y }]);
-    }
-  }
-
+// Plan: the kit's builder example as a start; improved one change per round.
+// AI script: builder. Builds a town step by step with the economy view (view.economy) and commands.
+function think(view){
+  const E = view.economy, out = [];
+  const has = t => E.town.filter(b => b.type === t).length;          // built or being built
+  const sites = E.town.filter(b => !b.built).length;
+  const st = it => E.stock[it] || 0;
+  const mil = E.town.filter(b => b.type === 'guard' || b.type === 'tower').length;
+  const ore = k => E.ore.some(o => o.ore === k);
+  // what it wants next, in order: [condition, building]
+  const want = [
+    [has('wood') < 1, 'wood'], [has('quarry') < 1, 'quarry'], [has('saw') < 1, 'saw'], [has('wood') < 2, 'wood'],
+    [has('forest') < 1, 'forest'], [(E.people.carrier || 0) < 6 && E.population >= E.beds - 4 && !E.town.some(b => !b.built && /house/.test(b.type)), 'house'], // a house only when few carriers are free
+    [has('fisher') < 1, 'fisher'], [has('waterhut') < 1, 'waterhut'], [has('farm') < 1, 'farm'], [has('mill') < 1, 'mill'],
+    [has('bakery') < 1, 'bakery'], [has('quarry') < 2, 'quarry'], [has('wood') < 3, 'wood'], [has('forest') < 2, 'forest'],
+    [has('coalmine') < 1 && ore('coal'), 'coalmine'], [has('ironmine') < 1 && ore('ironore'), 'ironmine'],
+    [has('smelter') < 1 && has('coalmine') && has('ironmine'), 'smelter'], [has('smith') < 1 && has('smelter'), 'smith'],
+    [has('pigfarm') < 1 && has('farm'), 'pigfarm'], [has('butcher') < 1 && has('pigfarm'), 'butcher'], [has('farm') < 2 && has('mill'), 'farm'],
+    [has('weaponsmith') < 1 && has('smelter'), 'weaponsmith'], [has('barracks') < 1 && has('weaponsmith'), 'barracks'],
+    [has('coalmine') < 2 && has('smelter'), 'coalmine'], [has('saw') < 2 && has('wood') >= 3, 'saw'],
+  ].filter(w => w[0]).map(w => w[1]);
+  // a geologist while there is mountain it hasn't searched
+  const geos = E.units.filter(u => u.role === 'geologist');
+  if (!geos.length && E.land.unsearched > 20 && has('saw') && st('pick') > 0 && !(memory.geoT > view.t)) { out.push(['profession', {role: 'geologist', d: 1}]); memory.geoT = view.t + 60; } // ask once, then wait (a carrier fetches a pickaxe first)
+  for (const g of geos) if (!g.busy && E.unsearched.length) { const s = E.unsearched[(view.t / 2 | 0) % E.unsearched.length]; out.push(['sendUnit', {u: g.id, tx: s.x, ty: s.y}]); }
+  // more land: a guard post or tower at the far edge, when what it wants has no room or every few minutes
+  const noRoom = want.length && E.spots[want[0]] && !E.spots[want[0]].length;
+  const empty = view.buildings.some(b => b.military && b.type !== 'hq' && b.built && !(b.troops && b.troops.length)); // nobody to man it yet
+  const milWanted = (noRoom || mil < Math.floor(view.t / 150)) && !empty && !E.town.some(b => !b.built && (b.type === 'guard' || b.type === 'tower'));
+  const ask = (milWanted ? ['guard'] : []).concat(want.slice(0, 3));
+  out.push(['ask', {spots: ask}]);
+  if (sites >= 3 || st('plank') < 2) return out;                     // don't start too much at once
+  if (milWanted && E.spots.guard && E.spots.guard.length) { const s = E.spots.guard[0]; out.push(['place', {type: 'guard', x: s.x, y: s.y}]); return out; }
+  for (const t of want.slice(0, 3)) { const l = E.spots[t]; if (l && l.length) { out.push(['place', {type: t, x: l[0].x, y: l[0].y}]); break; } }
   return out;
 }
