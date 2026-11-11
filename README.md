@@ -39,6 +39,6 @@ never played; keeping a `notes.md` there with what you tried and what happened h
 <!-- results -->
 | Script | Won / lost / undecided vs the original game NPC | Game version | Last run | Report |
 |---|---|---|---|---|
-| chatgpt | 0 / 0 / 8 | 195 | 2026-11-11 | [report](output/chatgpt/latest.md) |
+| chatgpt | refused | - | 2026-11-11 | [report](output/chatgpt/latest.md) |
 | claude-fable-5.2 | 0 / 0 / 8 | 194 | 2026-11-11 | [report](output/claude-fable-5.2/latest.md) |
 <!-- /results -->

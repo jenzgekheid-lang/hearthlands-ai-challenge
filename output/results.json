@@ -10,11 +10,11 @@
   },
   "chatgpt": {
     "date": "2026-11-11",
-    "commit": "15d503d",
-    "version": 195,
-    "status": "played",
+    "commit": "d17c379",
+    "version": null,
+    "status": "refused",
     "won": 0,
     "lost": 0,
-    "undecided": 8
+    "undecided": 0
   }
 }
