@@ -56,14 +56,18 @@ THE COMMANDS (each command is [name, args])
 At most 50 commands per turn. Wrong or impossible commands are refused and counted.
 
 HOW BATTLES WORK
-- Defenders step out one per attacker at the door, fighters first; bowmen inside shoot, and come down one at a time when no fighter is left.
+- Defenders step out one per attacker at the door, fighters first; bowmen inside shoot while a fighter is left, then stop and come down one at a time. A defender at the door cannot be shot from afar: bowmen must duel him.
 - The attacker closest to the door takes a building once nobody defends it. A taken building only gets land no other enemy building still covers.
 - Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier).
 - Soldiers without an order step back out of arrow range; move routes around known arrow range; attack-move fights on the way.
 - A military building calls in the nearest free soldier (no order, not held) standing on your own land; if there is none, the nearest within 20 tiles of its door; otherwise it stays empty, and an empty building can be taken.
 - Kinds: spearmen beat swordsmen up close, swordsmen beat bowmen up close, bowmen beat spearmen at range (bowmen shoot
   from about 10 tiles). Blows of one moment are dealt together.
-- Military buildings shoot with the bowmen inside at enemies within about 14 tiles of their centre.
+- Military buildings shoot with the bowmen inside at enemies within about 14 tiles of their centre, but only while a
+  swordsman or spearman of theirs is left (inside, or out at the door). For each attacker at the door one defender
+  steps out and duels him, swordsmen and spearmen first; when none is left the bowmen stop shooting and come down one
+  at a time to duel (since 204).
+- A defender at a door can't be shot from afar: your bowmen walk up to the door and duel him there (since 204).
 - An arena battle: you win when the other side has no soldiers and no military buildings left.
 - A full game: a side is out when it has lost its headquarters AND every manned military building; its people are gone
   at once. The last side left wins. So take or empty every military building, and the headquarters.
@@ -137,7 +141,7 @@ THE NUMBERS
   }
  },
  "notes": [
-  "Defenders step out one per attacker at the door, fighters first; bowmen inside shoot, and come down one at a time when no fighter is left.",
+  "Defenders step out one per attacker at the door, fighters first; bowmen inside shoot while a fighter is left, then stop and come down one at a time. A defender at the door cannot be shot from afar: bowmen must duel him.",
   "The attacker closest to the door takes a building once nobody defends it. A taken building only gets land no other enemy building still covers.",
   "Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier).",
   "Soldiers without an order step back out of arrow range; move routes around known arrow range; attack-move fights on the way.",

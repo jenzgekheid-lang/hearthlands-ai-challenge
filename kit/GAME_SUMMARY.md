@@ -23,10 +23,9 @@ The numbers (*generated*):
 | Map size, up to four players | 240 × 240 small tiles |
 | Map size, more than four players | 320 × 320 small tiles |
 | Player slots | 8 |
-| Beds in the headquarters | 11 |
+| Beds in the headquarters | 10 |
 | Swordsmen at the start (plus the guard at the headquarters) | 6 |
 | Bowmen at the start | 3 |
-| Geologist at the start (searches the nearest mountain within 30 tiles once, then waits for orders) | 1 |
 | Seconds between new settlers from a house (game seconds, normal speed) | 1.8 |
 | Game seconds per simulation step | 0.1 |
 <!-- /generated:numbers -->

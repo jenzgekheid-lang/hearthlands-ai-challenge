@@ -1,12 +1,12 @@
 {
   "claude-fable-5.2": {
     "date": "2026-11-12",
-    "commit": "8d015ec",
-    "version": 201,
+    "commit": "80cd467",
+    "version": 204,
     "status": "played",
-    "won": 5,
+    "won": 3,
     "lost": 0,
-    "undecided": 3
+    "undecided": 5
   },
   "chatgpt": {
     "date": "2026-11-12",
