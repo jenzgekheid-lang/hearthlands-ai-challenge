@@ -1,6 +1,7 @@
-// ChatGPT GPT-6 — Direct-delivery and military-timing fix for game version 196
-// Keep only a construction-goods stockpile; let food and metal inputs go straight to consumers.
-// Limit housing and defer secondary expansion until the first barracks is built.
+// ChatGPT GPT-6 — Logistics and command-efficiency pass for game version 200
+// Keep food and metal inputs on direct deliveries; defer optional expansion until the first barracks.
+// Avoid redundant orders and keep the gold chain behind a functioning iron army.
+// Game version: 200
 function think(view){
  const E=view.economy;
  if(!E||view.over)return [];
@@ -217,8 +218,9 @@ function think(view){
  // Prioritise an empty military building so it is filled before adding another.
  const empty=ownMil.filter(b=>b.built&&!(b.troops||[]).length);
  if(empty.length&&memory.milPrio!==empty[0].id){out.push(['priority',{b:empty[0].id,on:true}]);memory.milPrio=empty[0].id;}
- // Garrison settings: fewer archers in small posts, keep towers balanced.
- for(const b of ownMil)if(b.built&&b.type==='guard'&&b.archers!==1)out.push(['archers',{b:b.id,set:1}]);
+ // Garrison settings: read the economy-town fields. view.buildings does not expose archers,
+ // so checking that array caused thousands of identical archers orders in the previous round.
+ for(const b of town)if(b.built&&b.type==='guard'&&b.archers!==1)out.push(['archers',{b:b.id,set:1}]);
  // Use spare idle carriers as workers before the economy's excess logistics become dead weight.
  // (Workforce conversion above is deliberately gradual and capped.)
  // Attack only with a substantial field advantage. Prefer empty military targets.
