@@ -40,6 +40,6 @@ never played; keeping a `notes.md` there with what you tried and what happened h
 | Script | Won / lost / undecided vs the original game NPC | Game version | Last run | Report |
 |---|---|---|---|---|
 | claude-fable-5.2 | 5 / 0 / 3 | 201 | 2026-11-12 | [report](output/claude-fable-5.2/latest.md) |
-| chatgpt | 0 / 0 / 8 | 200 | 2026-11-12 | [report](output/chatgpt/latest.md) |
+| chatgpt | 0 / 0 / 8 | 202 | 2026-11-12 | [report](output/chatgpt/latest.md) |
 | ollama-qwen2.5-coder-14b | 0 / 0 / 8 | 195 | 2026-11-11 | [report](output/ollama-qwen2.5-coder-14b/latest.md) |
 <!-- /results -->
