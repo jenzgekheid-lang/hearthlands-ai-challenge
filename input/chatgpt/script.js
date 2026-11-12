@@ -134,6 +134,7 @@ function runEconomy(v,M,out){
  // Advisor tips are evidence, not orders: combine them with the actual state before acting.
  const allTip=Object.keys(tipKinds).map(k=>k+' '+tip(k)).join(' ');
  const stallTip=hasTip('stall')||/pile full|waiting for carriers|stuck|output/.test(allTip);
+ const outputTip=/pile full|waiting for carriers|output pile|goods.*waiting/.test(allTip);
  const oreTip=hasTip('ore')||/no ore|ore deposit|geologist/.test(allTip);
  const landTip=hasTip('land')||/land.*(grow|expand)|territory/.test(allTip);
  const weaponsTip=hasTip('weapons')||/weapon|weaponsmith|barracks/.test(allTip);
@@ -221,7 +222,7 @@ function runEconomy(v,M,out){
  const maxPosts=soldierN>=25&&carriers>=10?4:soldierN>=17&&carriers>=8?3:soldierN>=11&&carriers>=7?2:1;
  const activeSites=town.some(b=>!b.built&&(MIL[b.type]||b.type==='look'));
  const shouldExpand=ownMil.length<maxPosts&&carriers>=7&&idleC>=2&&soldierN>=8&&
-  (landTip||needsOre||t>1500+ownMil.length*500);
+  built('quarry')>0&&built('wood')>0&&(landTip||needsOre||t>1500+ownMil.length*500);
  if(shouldExpand&&!activeSites&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
  if(ownMil.length>=2&&soldierN>=25&&count('tower')<1&&carriers>=10&&t>2100&&!pending('tower')&&!activeSites)
   goals.unshift('tower');
@@ -280,7 +281,7 @@ function runEconomy(v,M,out){
   const type=st('plank')>=5&&st('stone')>=6?'house2':'house';
   if(place(type))M.houseAt=t+260;
  }
- if(stallTip&&idleC>8&&sites===0){
+ if(outputTip&&sites===0){
   // The goods already exist; pause expansion rather than adding another producer into a transport backlog.
   M.transportHoldUntil=t+180;
  }
