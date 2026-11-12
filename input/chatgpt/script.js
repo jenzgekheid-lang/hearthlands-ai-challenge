@@ -118,7 +118,7 @@ function think(view){
  // Army settings: garrisons get priority, but preserve a small mobile reserve.
  if(!memory.armySetup){
   out.push(['armyTarget',{kind:'sword',set:8}],['armyTarget',{kind:'spear',set:4}],
-   ['armyTarget',{kind:'bow',set:4}],['armyReserve',{set:2}],['armyList',{on:true}],
+   ['armyTarget',{kind:'bow',set:4}],['armyReserve',{set:0}],['armyList',{on:true}],
    ['weaponKeep',{k:0,set:0}],['weaponKeep',{k:1,set:0}],['weaponKeep',{k:2,set:0}]);
   memory.armySetup=true;
  }
