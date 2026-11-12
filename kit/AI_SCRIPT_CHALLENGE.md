@@ -259,7 +259,10 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   side), 'kill' (p whose person fell, other the killer), 'seen' (first sight of another side's land), 'watch' (a warning),
   'note', 'task' (one of your people starts a new order: a person id, s like 'carrier haul log wood -> saw' or 'worker
   gather wood'; b/c building ids or target), 'taskend' (that order ended: a person id, b tenths of a second, s 'done' or
-  'failed: why'). Only what your side may know.
+  'failed: why'), 'tip' (every game minute, each of the advisor's tips for your side that holds now: a the game minute,
+  s 'kind: text', kinds land, ore, weapons, stall, army, settlers, orders, timing; the player sees the same tips under
+  Goals). The current tips are also in view.economy.tips: [{k, text}] (k: the kind; renewed every game minute).
+  Only what your side may know.
 - ["note", {text}]: write your own note into the game log (at most 5 a turn, 200 characters each). After the game the
   tournament report shows your last notes next to what happened, so write down why you did something or why you wait.
 

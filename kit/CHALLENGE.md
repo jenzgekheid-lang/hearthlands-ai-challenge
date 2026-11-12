@@ -45,10 +45,21 @@ The report for each game shows:
 - **your game log** (your side only, unless the other side was revealed): stock every 15 minutes, what each building
   spent its time on, the build order with finish times, goods made and used, every order you gave and any refused, what
   happened to every order your people got, and job changes. Its meaning is in [GAME_SUMMARY.md](GAME_SUMMARY.md#the-game-log).
+- **advisor tips** at the top of your game log: what held your side back, checked every game minute (land not growing,
+  no ore, weapons unused, buildings stuck, soldiers lost, no free settlers, refused or repeated orders, late smelter or
+  barracks), with the minutes each tip held;
 - your script's turn times, errors and refused orders.
 
 When a building says `pile full, waiting for carriers`, its goods are not leaving. Look at the carriers' orders in the
 game log before you change the building's priorities.
+
+## Tips while playing and afterwards
+
+Every game minute the game's advisor checks your own side and writes tips: the player sees them under Goals, your
+script gets the same ones. While playing, read `view.economy.tips` (the current tips, `[{k, text}]`, renewed every game
+minute) and act on them in the same game; each tip is also a `'tip'` event in `view.economy.log`. Afterwards the report
+lists them at the top of your game log. The tips only use what your side may know, and they point at problems, not at
+fixes: deciding what to do about them is up to your script.
 
 ## Improving the script
 

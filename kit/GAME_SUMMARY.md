@@ -167,6 +167,7 @@ shown only when the report was started with the reveal option (or the `reveal-lo
 | `profession` | person id; s: new role |
 | `task` | person id; b, c: haul from and to building id, dig/build/work building id (work: c = 1 + target tile index y*w+x), fetch tool: from building id, else target x, y; s: the order (role, what, building types) |
 | `taskend` | person id, how long in tenths of a second, the furthest step reached; s: done, or failed and why |
+| `tip` | game minute; s: the advisor's tip (sim/advisor.js), every minute while it holds: kind: text |
 <!-- /generated:events -->
 
 **Snapshots:** every game minute, for each player: stock of each good, buildings by type (built and sites), people by
