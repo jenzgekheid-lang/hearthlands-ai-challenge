@@ -120,6 +120,18 @@ function think(view){
    ['weaponKeep',{k:0,set:0}],['weaponKeep',{k:1,set:0}],['weaponKeep',{k:2,set:0}]);
   memory.armySetup=true;
  }
+ // Hammer bootstrap: builders also occupy hammers. Keep at most one builder and only
+ // demote the surplus when no site is active, so one hammer can staff the iron chain.
+ const builders=(E.people&&E.people.builder)||0;
+ if(sites===0&&builders>1&&(built('smelter')>0||built('smith')>0||built('weaponsmith')>0))
+  out.push(['profession',{role:'builder',d:-1}]);
+ // Give the iron chain first claim on workers and deliveries. The smelter must make iron
+ // before the toolsmith can work; the toolsmith must make spare hammers before weaponsmith.
+ const smelter=town.find(b=>b.type==='smelter'&&b.built);
+ const toolsmith=town.find(b=>b.type==='smith'&&b.built);
+ const weaponsmith=town.find(b=>b.type==='weaponsmith'&&b.built);
+ const prodPriority=smelter&&s('iron')<1?smelter:toolsmith&&s('hammer')<1?toolsmith:weaponsmith&&s('hammer')<1?weaponsmith:null;
+ if(prodPriority&&memory.prodPrio!==prodPriority.id){out.push(['priority',{b:prodPriority.id,on:true}]);memory.prodPrio=prodPriority.id;}
  // Build plan: one deliberate site at a time; avoid spending materials on a long queue.
  const wants=[];
  const add=(ok,t)=>{if(ok&&!pending(t)&&!wants.includes(t))wants.push(t);};
@@ -148,9 +160,11 @@ function think(view){
  add(n('coalmine')<1&&ore('coal').length>0,'coalmine');
  add(n('ironmine')<1&&ore('ironore').length>0,'ironmine');
  // Prioritise the toolsmith before the other hammer-dependent buildings.
- add(n('smith')<1&&n('coalmine')&&n('ironmine'),'smith');
  add(n('smelter')<1&&n('coalmine')&&n('ironmine'),'smelter');
- add(n('weaponsmith')<1&&built('smith')>0&&built('smelter')>0,'weaponsmith');
+ // Do not spend the next hammer until the smelter has actually made iron.
+ add(n('smith')<1&&built('smelter')>0&&s('iron')>0,'smith');
+ // Weaponsmiths are a later stage: require evidence of a spare hammer from the tool chain.
+ add(n('weaponsmith')<1&&built('smith')>0&&s('hammer')>0,'weaponsmith');
  add(n('barracks')<1&&built('weaponsmith')>0,'barracks');
  add(n('barracks')<2&&n('weaponsmith')>0&&soldiers.length>=16&&free.length<6,'barracks');
  // Gold improves every soldier outside our territory; add the chain only after iron weapons are underway.
@@ -171,7 +185,7 @@ function think(view){
  else if(towers<1&&soldiers.length>=28&&guards>=2&&emptyMil===0)add(true,'tower');
  // Don't keep placing military buildings while recruitment is behind.
  let chosen=null;
- if(sites<2&&s('plank')>=2&&wants.length){
+ if(sites<1&&s('plank')>=2&&wants.length){
   // Keep the opening guard first. Otherwise rotate through build goals: a deposit or
   // footprint with no legal site must not freeze every later goal (notably houses/stores).
   let type;
@@ -199,7 +213,7 @@ function think(view){
  }
  // Prioritise an empty military building so it is filled before adding another.
  const empty=ownMil.filter(b=>b.built&&!(b.troops||[]).length);
- if(empty.length&&memory.prio!==empty[0].id&&!smith){out.push(['priority',{b:empty[0].id,on:true}]);memory.prio=empty[0].id;}
+ if(empty.length&&memory.milPrio!==empty[0].id){out.push(['priority',{b:empty[0].id,on:true}]);memory.milPrio=empty[0].id;}
  // Garrison settings: fewer archers in small posts, keep towers balanced.
  for(const b of ownMil)if(b.built&&b.type==='guard'&&b.archers!==1)out.push(['archers',{b:b.id,set:1}]);
  // Use spare idle carriers as workers before the economy's excess logistics become dead weight.
