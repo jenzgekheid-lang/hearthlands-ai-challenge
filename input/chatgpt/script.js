@@ -166,6 +166,10 @@ function think(view){
  // Weaponsmiths are a later stage: require evidence of a spare hammer from the tool chain.
  add(n('weaponsmith')<1&&built('smith')>0&&s('hammer')>0,'weaponsmith');
  add(n('barracks')<1&&built('weaponsmith')>0,'barracks');
+ // Iron mines accept meat as well as fish. On maps with poor fishing, a pig chain
+ // prevents the mine from spending most of its life stopped for food.
+ add(n('pigfarm')<1&&built('barracks')>0&&n('ironmine')>0,'pigfarm');
+ add(n('butcher')<1&&built('pigfarm')>0,'butcher');
  add(n('quarry')<2&&s('stone')<24&&built('weaponsmith')>0,'quarry');
  add(n('wood')<3&&s('log')<30&&built('weaponsmith')>0,'wood');
  add(n('farm')<2&&n('mill')>0&&built('weaponsmith')>0,'farm');
@@ -185,7 +189,7 @@ function think(view){
  if(guards<1&&!pending('guard'))wants.unshift('guard');
  const emptyMil=ownMil.filter(b=>b.built&&!(b.troops||[]).length).length;
  if(guards<2&&view.t>120)add(true,'guard');
- else if(guards<4&&soldiers.length>=18&&emptyMil===0&&view.t>600)add(true,'guard');
+ else if(guards<4&&soldiers.length>=2&&emptyMil===0&&view.t>600)add(true,'guard');
  else if(towers<1&&soldiers.length>=28&&guards>=2&&emptyMil===0)add(true,'tower');
  // Don't keep placing military buildings while recruitment is behind.
  let chosen=null;
@@ -218,9 +222,13 @@ function think(view){
  // Prioritise an empty military building so it is filled before adding another.
  const empty=ownMil.filter(b=>b.built&&!(b.troops||[]).length);
  if(empty.length&&memory.milPrio!==empty[0].id){out.push(['priority',{b:empty[0].id,on:true}]);memory.milPrio=empty[0].id;}
- // Garrison settings: read the economy-town fields. view.buildings does not expose archers,
- // so checking that array caused thousands of identical archers orders in the previous round.
- for(const b of town)if(b.built&&b.type==='guard'&&b.archers!==1)out.push(['archers',{b:b.id,set:1}]);
+ // Compact guard garrisons: one permanent swordsman plus one archer is enough to
+ // activate the border. Free the second melee slot so another post can be manned.
+ // Read settings from economy.town; view.buildings does not expose them.
+ for(const b of town)if(b.built&&b.type==='guard'){
+  if(b.fighters!==1)out.push(['fighters',{b:b.id,set:1}]);
+  if(b.archers!==1)out.push(['archers',{b:b.id,set:1}]);
+ }
  // Use spare idle carriers as workers before the economy's excess logistics become dead weight.
  // (Workforce conversion above is deliberately gradual and capped.)
  // Attack only with a substantial field advantage. Prefer empty military targets.
