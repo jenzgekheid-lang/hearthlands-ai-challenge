@@ -232,7 +232,8 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   seen (all other layers 0 there), 1 = seen before (as it was then), 2 = seen now (your own land always). ter 0 grass,
   1 water, 2 mountain; tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
   stands there (seen now only); fish = fish left in that water (seen now only); ore 0 not searched by a geologist,
-  1 searched: nothing, 2+ = oreNames[ore-1] ('coal', 'ironore', 'goldore', 'stone'). map.at(x,y) gives one tile as an
+  1 searched: nothing, 2+ = oreNames[ore-1]. oreNames is a plain list (since 201), the same for every value of ore:
+  ['none', 'coal', 'ironore', 'goldore', 'stone'], so oreNames.indexOf(kind) + 1 gives the ore value. map.at(x,y) gives one tile as an
   object with the same names, but two of them in words: {known, ter: 'grass'|'water'|'mountain', tree, stone, owner,
   height, occupied, fish, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
   Decide yourself where to build and where to expand: the map is all you need.
