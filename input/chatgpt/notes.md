@@ -1,16 +1,17 @@
-# ChatGPT GPT-6 — workforce + military progression (game version 195)
+# ChatGPT GPT-6 — recruitment/tool-chain correction (game version 196)
 
-## Diagnosis from report for commit 85454ed
-Across the eight games, the AI often had 30–44 idle carriers while workplaces and production piles stalled. Several maps never built a barracks, so the starting ten soldiers stayed ten despite having a weaponsmith. The map-aware site scorer itself remained fast (0.1–0.5 ms average, no timeouts, no refused orders).
+## Diagnosis from the version-196 report (tested commit c95c088)
+The script ran cleanly (1,800 turns, no errors/timeouts), but all eight games remained undecided. Army totals plateaued at 6–10 soldiers in several starts; the NPC reached 58–88. In the logs, smelters and weaponsmiths spent 100% of their time needing a worker with a hammer, while barracks waited for weapons. The build plan had omitted the smith/tool chain, so it could not reliably supply hammers. The script also issued one refused workOrder (k=4).
 
-## Revision
-- Gradually convert excess carriers into workers when the worker count is below 24, carrier count remains above 18, and at least 12 carriers are idle. Retry no faster than every 20 game seconds; this preserves a carrier reserve and avoids command spam.
-- Keep the existing deliberate map-aware placement and construction queue.
-- Add gold production only after iron production and barracks progression are in place; gold strengthens soldiers outside owned land.
-- Keep army targets, garrison composition and conservative attack thresholds unchanged.
+## Changes in commit 7cfc312
+- Removed the invalid/refused workOrder attempt.
+- Added a smith before weaponsmith production, so the tool/hammer dependency is no longer skipped.
+- Reduced the excessive outside-building army targets (14 swords / 10 spears / 16 bows) to 8 / 4 / 4, with a 2-soldier reserve.
+- Set weaponKeep for sword, spear and bow to zero so recruitment is not held back by unnecessary stock reservations.
+- Added a second barracks condition when the army is growing but free soldiers are scarce.
 
-## What to verify next
-- Whether worker count rises and idle carriers / production pile saturation fall.
-- Whether barracks now finish on maps with a weaponsmith and legal build space.
-- Whether soldier totals rise beyond ten on all starts with accessible coal/iron.
-- Whether the report's tested commit matches the new script commit before attributing results.
+## What the next report must verify
+- Does smith finish and supply hammers to smelter/weaponsmith?
+- Do weapons and barracks recruit beyond the initial ten?
+- Do the new army targets lead to useful garrisons rather than an oversized free army?
+- Does the latest report explicitly test commit 7cfc312? Until then, this is a code change, not a measured improvement.
