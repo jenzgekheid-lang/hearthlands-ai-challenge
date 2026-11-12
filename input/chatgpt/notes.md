@@ -85,3 +85,42 @@ The new game-version-202 report is clean (1,800 turns/game, no errors/refused or
 - Do Blue starts build a third/fourth guard and increase land?
 - Do they discover coal/iron and start the production chain?
 - Does keeping zero reserve leave the town vulnerable, or does it help expansion enough to justify it?
+
+## Full v204 audit and independent strategy rewrite (script commit cace079)
+
+### What the v204 tournament established
+The previous script was syntactically clean and had no refused orders, but finished 0 wins / 0 losses / 8 undecided. It was still labelled game version 200 while the kit and tournament were at version 204.
+
+The main strategic failures were:
+- **Attacks were impossible under the configured army cap.** The old script required at least 18 free soldiers, while its three army targets summed to only 16 outside soldiers. Garrisoning made the gap larger. It could therefore build an army and still never satisfy its own attack condition.
+- **No proactive enemy scouting.** It waited for enemy buildings or soldiers to become visible. Most Blue starts never saw the opponent in time to act.
+- **Too many troops tied up in each border post.** It set a guard to one fighter plus one archer. The archer did not claim extra land, and version 204 changed door combat so bowmen inside stop shooting once the fighters are gone and must then duel at the door.
+- **Expansion was too passive.** It mostly searched for building sites inside existing land and did not deliberately send an explorer to reveal the enemy or keep expanding toward mountain/rock resources.
+- **The logistics/build sequence was too conservative.** Gold starts could reach the iron chain, but the Blue starts frequently stopped at the opening economy and six soldiers. The old plan delayed housing and had no alternative food chain when mines lacked fish.
+- **The army target was static.** It did not scale the field force with population or account for the soldiers permanently held in military buildings.
+
+### New script design
+Replaced the previous script with an independent 204 strategy:
+- Builds the first house immediately, then adds housing when idle carriers become scarce.
+- Uses map layers and `canPlace` to select legal sites; keeps the number of simultaneous building sites bounded and accounts for materials already owed to them.
+- Starts the quarry/wood/guard/sawmill/fisher economy, sends a geologist to search mountain, and sends an explorer on a map-spanning route to reveal the opponent.
+- Expands with one swordsman per military post and zero garrison archers, preserving the field force.
+- Builds the coal/iron → smelter → toolsmith → weaponsmith → barracks chain as soon as the deposits and tools permit.
+- If mines remain hungry and fish is scarce, adds the grain/water/bread chain and a pig/meat route for the iron mine.
+- Scales army targets from the actual field force plus garrisoned soldiers and available idle carriers; keeps weapon reserves at zero so barracks can recruit as soon as weapons arrive.
+- Defends nearby buildings, attacks known military targets when the force meets a gold-adjusted threshold, and sends a large field army to search likely enemy map corners if no enemy is visible.
+- Removes the impossible 18-free-soldier gate and avoids issuing conflicting orders to soldiers already sent into a garrison or committed to defence.
+
+### Validation and next measurement
+The new file parses in the JavaScript V8 runtime. Mock-view checks exercised an economy turn, an `armyOnly` turn with no economy log, garrison assignment, and a building attack; these checks returned commands without runtime errors. They are interface/smoke tests, **not** a full game simulation.
+
+The next arena report must explicitly test script commit cace079 (or a later ChatGPT script commit). Compare:
+1. Do both sides discover coal and iron, and how early do they place the first mines/smelter/toolsmith/weaponsmith/barracks?
+2. Does the explorer reveal the enemy early enough for attacks before minute 30?
+3. Does the field army grow beyond the first 10–16 soldiers while keeping at least three idle carriers?
+4. Do the posts claim useful new land with one swordsman each, and are they actually staffed?
+5. Do the bread/meat fallback chains prevent mines from stopping for food?
+6. Are attacks launched, accepted, and successful under version-204 door combat?
+7. Check refused orders, path failures, goods waiting, idle carriers, script errors and worst turn time.
+
+Do not make another strategic change until the new report identifies a specific bottleneck.
