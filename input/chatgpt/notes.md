@@ -47,3 +47,27 @@ Await the next report for evidence whether tool production and recruitment actua
 - Does soldier count grow on more than map 777 Gold?
 
 This is a controlled logistics/build-order experiment, not yet a proven improvement. No combat numbers or targeting policy were changed.
+
+## Version-200 report review and follow-up (tested input commit 2b502ca)
+
+The report ran cleanly: 1,800 turns per game, no script errors, no refused orders, but 0 wins in 8 games.
+
+### What the logs establish
+- The previous logistics/build-order change did get the iron chain and barracks running on the Gold starts. Map 31 Gold built its first barracks at 18:06; map 777 Gold at 23:30; map 20261030 Gold at 21:32.
+- The Blue starts did not discover any coal or iron signs by the 50-minute plan check. They stopped at the food economy with 6 soldiers and 2 guards. This is a map/territory-access problem, not a failed build order.
+- Map 777 Gold's iron deposit was worn out for 88% of the ironmine's time; its smelter then waited for ore 69% of the time.
+- Map 20261030 Gold's ironmine was stopped for lack of meat or fish 87% of the time. Its smelter waited for ore 90% and weaponsmith waited for iron 88%.
+- The script issued thousands of repeated archers orders (e.g. 5,441 on map 31 Gold). The setting was read from view.buildings, which does not expose it; the economy-town entries do.
+
+### Follow-up changes
+- Commit 1e03fad reads guard settings from economy.town and removes duplicate early gold-chain triggers.
+- Commit 4986063 sets each small guard to one permanent fighter plus one archer, then allows another guard when at least two outside soldiers are available. This tests whether using fewer soldiers per post can expand the border enough to find mountain deposits on the Blue starts.
+- The same commit adds a pigfarm and butcher after the first barracks when an ironmine exists, supplying meat on maps where fish is scarce.
+- No combat damage or unit stats were changed.
+
+### What the next report must verify
+- Do compact garrisons actually free soldiers and get extra guards built on the ore-starved Blue starts?
+- Do those extra borders expose coal/iron deposits and let the geologist discover them?
+- Does meat production reduce ironmine food starvation on map 20261030?
+- Do repeated archers orders fall from thousands to only the actual setting changes?
+- Does the gold chain remain behind the first barracks, and do we improve on 0/8 wins?
