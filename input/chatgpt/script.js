@@ -83,6 +83,13 @@ function think(view){
   }
   return best;
  };
+ // Logistics: move carrier clearing ahead of surplus so output piles are emptied before
+ // optional hauling/work. This is justified by repeated runs with 30-40 idle carriers
+ // while sawmills, farms and food buildings spent most of their time waiting for carriers.
+ if(!memory.econSetup){
+  out.push(['workOrder',{k:4,d:-1}]); // clear: one step up in the carrier work list
+  memory.econSetup=true;
+ }
  // Keep a compact, useful stockpile configuration. Each store gets a distinct set of goods.
  memory.storeSlots=memory.storeSlots||{};
  for(const b of town.filter(q=>q.type==='store')){
