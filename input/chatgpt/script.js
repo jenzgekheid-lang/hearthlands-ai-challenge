@@ -108,9 +108,13 @@ function runEconomy(v,M,out){
  }
  // The first house is immediate: more settlers are the engine for every later building and soldier.
  const houses=count('house')+count('house2')+count('house3');
- const housePending=town.some(b=>/^house/.test(b.type)&&(!b.built||(b.coming||0)>0));
- if(!housePending&&persons<125&&(houses===0||idleC<=(built('barracks')?8:5))){
-  if(!place(t>480&&st('plank')>=10&&st('stone')>=12?'house3':t>180&&st('plank')>=5&&st('stone')>=6?'house2':'house')){}
+ const housePending=town.some(b=>/^house/.test(b.type)&&!b.built);
+ const population=E.population||persons,beds=E.beds||houses*10,homeless=E.homeless||0;
+ const needHouse=houses===0||homeless>0||(beds>0&&population>=beds-3)||idleC<=3;
+ if(!housePending&&needHouse&&t>=(M.houseAt||0)){
+  const type=t>480&&st('plank')>=10&&st('stone')>=12?'house3':
+   st('plank')>=5&&st('stone')>=6?'house2':'house';
+  if(place(type))M.houseAt=t+240;
  }
  // Keep the opening compact and reach the iron chain early.
  const goals=[];
@@ -135,10 +139,12 @@ function runEconomy(v,M,out){
  // If the map is short of deposits, extend the border toward unowned mountain/rocks instead of waiting.
  const noOre=!oreKnown('coal')||!oreKnown('ironore');
  const needsLand=(noOre&&(E.land.unsearched||0)<5)||(!liveQuarry&&t>150);
- const scheduleMil=milN<Math.min(12,1+Math.floor(t/180));
- if(scheduleMil&&free.length>=2&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
- if(count('guard')>=2&&count('tower')<1&&free.length>=7&&t>900&&!pending('tower'))goals.unshift('tower');
- if(count('guard')<4&&free.length>=3&&needsLand&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
+ // Expand only when a new post can be staffed without consuming the eight-soldier field reserve.
+ const maxPosts=t<600?1:t<1500?2:t<2700?3:4;
+ const canStaffPost=free.length>8&&carriers>5&&idleC>0;
+ if(milN<maxPosts&&canStaffPost&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
+ if(count('guard')>=2&&count('tower')<1&&canStaffPost&&t>900&&!pending('tower'))goals.unshift('tower');
+ if(milN<4&&needsLand&&canStaffPost&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
  // Food for mines: a second fisher is cheaper than letting iron production stop for lack of meals.
  const hungry=town.filter(b=>(b.type==='coalmine'||b.type==='ironmine')&&b.built&&b.worker&&
   !((b.inputs&&b.inputs.fish)||(b.inputs&&b.inputs.bread)||(b.inputs&&b.inputs.meat))).length;
