@@ -157,3 +157,24 @@ Further review of the version-204 planner found two additional structural risks:
 - The old military schedule could plan up to 12 posts, even when it could not staff them. Expansion is now capped at 1, 2, 3 and 4 total military buildings by elapsed-game milestones, and a new post is only considered when there are more than eight free field soldiers, enough carriers, and an idle carrier. The tower/extra-guard branches respect the same cap.
 
 Syntax validation passed after both changes. These are reasoned fixes based on the kit and the previous report; tournament outcomes are still unmeasured.
+
+
+
+## Full adaptive rewrite for the advisor-tip system (script commit 2342ce6)
+
+The script was rewritten as a new strategy rather than incrementally patched. It is labelled game version 206 because the latest kit/tip-system update is explicitly from game version 206; the latest published tournament report is still version 204.
+
+### What changed
+- Reads current `view.economy.tips` every economy turn and classifies land, ore, weapons, stall, settlers, army, orders and timing signals. Tips are treated as evidence and checked against the actual town, stock, units and map before taking action.
+- Rebuilds the economy planner around dependencies and a smaller number of active sites. The opening wood/quarry chain is protected from optional border expansion.
+- Uses known ore signs and unsearched mountain positions to direct geologists; avoids repeatedly sending a unit that is already moving.
+- Chooses building sites from the visible map and `canPlace`, with distinct checks for resources, terrain, ore signs and available territory.
+- Adds housing in response to actual population, beds, homelessness and carrier scarcity. It avoids speculative extra diggers/builders unless there are active sites and enough idle carriers.
+- Responds to output-pile/carrier tips by temporarily holding optional production expansion rather than adding more producers to an existing transport backlog.
+- Keeps one modest garrison per post, reduces the field reserve from eight to three, scales outside-building army targets with time and carrier capacity, and attacks only after a force threshold based on target type, visible defenders and gold strength.
+- Replaces long blind corner scouting with reachable fog-frontier waypoints and releases held march groups when they arrive or time out.
+
+### Validation and limits
+- The complete replacement parses in the JavaScript runtime.
+- Mock-view checks exercised an opening economy turn, an `armyOnly` turn with no economy log, an attack against a visible unmanned guard, and a turn with no economy object. No runtime errors occurred; command counts remained below the 50-command limit.
+- These are syntax/interface smoke tests only. The rewrite has **not** yet been played in the arena, and no win-rate or economic improvement is claimed. The next report must be checked for the exact tested commit and for real examples/holding times of the advisor tips.
