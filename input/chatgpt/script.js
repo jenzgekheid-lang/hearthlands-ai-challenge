@@ -1,5 +1,5 @@
-// ChatGPT GPT-6 — independent strategy rewrite for Hearthlands game version 204.
-// Grow people and logistics early; discover ore and enemy positions; claim land with one swordsman per post.
+// ChatGPT GPT-6 — Hearthlands full-game strategy, revised army control for game version 204.
+// Preserve the economy plan; keep a mobile reserve, scout in releasable groups, and attack when the force is ready.
 // Keep the iron/tool/weapon chain supplied, then train and attack with a real field advantage.
 // Game version: 204
 
