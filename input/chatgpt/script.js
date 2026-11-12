@@ -38,7 +38,7 @@ function runEconomy(v,M,out){
  const oreKnown=k=>(M.ore[k]||[]).length>0||(ok&&oreValue(map,k)>1&&GRID.ore[oreValue(map,k)]>0);
  const ownMil=town.filter(b=>MIL[b.type]),milN=ownMil.length;
  const liveQuarry=town.some(b=>b.type==='quarry'&&b.built&&ok&&area(GRID.sum[0],b.x+1,b.y+1,15)>0);
- const free=(v.soldiers||[]).filter(s=>!s.order&&!s.defends&&!s.fighting);
+ const free=(v.soldiers||[]).filter(s=>!s.order&&!s.defends&&!s.fighting&&!s.held);
  const toolWait={};for(const b of town)if(TOOL[b.type]&&!b.worker)toolWait[TOOL[b.type]]=(toolWait[TOOL[b.type]]||0)+1;
  const freeTool=k=>st(k)-(toolWait[k]||0);
  const find=(type)=>{
@@ -209,61 +209,117 @@ function area(L,cx,cy,r){
 function oreValue(map,k){return map&&map.oreNames?map.oreNames.indexOf(k)+1:0;}
 function runArmy(v,M,out){
  const t=v.t||0,mine=v.soldiers||[],bld=v.buildings||[],enemy=v.enemy||{},foes=enemy.soldiers||[],eb=enemy.buildings||[];
- const E=v.economy,cmd=c=>out.push(c),free=mine.filter(s=>!s.order&&!s.defends&&!s.fighting&&!s.held),used={};
- const available=()=>free.filter(s=>!used[s.id]);
- const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),door=b=>b.door||b;
+ const E=v.economy,cmd=c=>out.push(c),d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),door=b=>b.door||b;
  M.sent=M.sent||{};M.badTarget=M.badTarget||{};
- // Send one swordsman into each empty post; one is enough to claim its border.
- for(const b of bld){
-  if(!MIL[b.type]||b.owner!==v.me||b.built===false||(b.troops||[]).length||(M.sent[b.id]||0)>t)continue;
-  let best=null,score=1e9;
-  for(const s of free){const q=d(s,door(b))+(s.kind==='sword'?0:s.kind==='spear'?10:22);if(q<score){score=q;best=s;}}
-  if(best){cmd(['sendIn',{ids:[best.id],b:b.id}]);used[best.id]=1;M.sent[b.id]=t+25;break;}
+ const free=mine.filter(s=>!s.order&&!s.defends&&!s.fighting&&!s.held);
+ const moving=mine.filter(s=>s.order&&(s.order.k==='move'||s.order.k==='attack-move'));
+ const active=mine.filter(s=>s.order&&s.order.k==='attack');
+ const used={};
+ const available=()=>free.filter(s=>!used[s.id]);
+ const ownMil=bld.filter(b=>b.owner===v.me&&MIL[b.type]&&b.built!==false);
+ // Release completed scouting/defence moves. March orders hold soldiers until explicitly released.
+ const arrived=moving.filter(s=>{
+  const o=s.order||{},p={x:o.x,y:o.y};
+  return Number.isFinite(p.x)&&Number.isFinite(p.y)&&(d(s,p)<5||t>=(M.moveReleaseAt||1e9));
+ });
+ if(arrived.length){
+  cmd(['release',{ids:arrived.map(s=>s.id),stop:true}]);
+  M.moveReleaseAt=t+999999;
  }
- // Meet an enemy force only when it approaches our own buildings.
- if(foes.length&&t>=(M.defendAt||0)){
-  let threat=null,near=99;
-  for(const f of foes)for(const b of bld)if(b.owner===v.me){const q=Math.abs(f.x-b.x)+Math.abs(f.y-b.y);if(q<near){near=q;threat=f;}}
-  if(threat&&near<20&&free.length){
-   const ids=available().filter(s=>d(s,threat)<55).map(s=>s.id);
-   if(ids.length){cmd(['march',{ids,tx:Math.round(threat.x),ty:Math.round(threat.y),form:'line',am:true}]);for(const id of ids)used[id]=1;M.defendAt=t+5;}
+ // An enemy sighting takes priority over the current scouting route.
+ const visibleTargets=eb.filter(b=>(b.military||MIL[b.type]||b.type==='hq')&&
+  !(M.badTarget[b.id]>t)&&!(b.remembered&&Number.isFinite(b.seenAt)&&t-b.seenAt>900));
+ const targets=visibleTargets;
+ if(targets.length&&moving.length){
+  cmd(['release',{ids:moving.map(s=>s.id),stop:true}]);
+  M.moveReleaseAt=t+999999;
+ }
+ // Keep one swordsman in each active post, but never strip the mobile reserve to do it.
+ for(const b of ownMil){
+  if((b.troops||[]).length)continue;
+  if((M.sent[b.id]||0)>t)continue;
+  const candidates=available().slice().sort((a,b)=>
+   (a.kind==='sword'?0:a.kind==='spear'?1:2)-(b.kind==='sword'?0:b.kind==='spear'?1:2));
+  if(candidates.length>8){
+   const s=candidates[0];
+   cmd(['sendIn',{ids:[s.id],b:b.id}]);used[s.id]=1;M.sent[b.id]=t+30;
+   break;
   }
  }
- for(const r of v.refused||[])if(r.order==='attack'&&r.args)M.badTarget[r.args.b]=t+120;
- const targets=eb.filter(b=>(b.military||MIL[b.type]||b.type==='hq')&&!(M.badTarget[b.id]>t));
- if(eb.length){M.enemyAt={x:eb.reduce((a,b)=>a+b.x,0)/eb.length,y:eb.reduce((a,b)=>a+b.y,0)/eb.length};}
- const active=mine.filter(s=>s.order&&s.order.k==='attack'),ready=available();
- if(active.length&&ready.length){
-  const ids=ready.map(s=>s.id),b=targets.find(q=>q.id===active[0].order.b);
-  if(b&&ids.length>=4)cmd(['attack',{ids,b:b.id}]);
+ // Defend buildings only when an enemy is actually close; do not chase distant sightings.
+ let threat=null,threatDist=1e9;
+ for(const f of foes)for(const b of bld)if(b.owner===v.me){
+  const q=Math.abs(f.x-(b.x+b.w/2))+Math.abs(f.y-(b.y+b.h/2));
+  if(q<threatDist){threatDist=q;threat=f;}
  }
- if(!active.length&&ready.length&&targets.length){
-  const cx=ready.reduce((a,s)=>a+s.x,0)/ready.length,cy=ready.reduce((a,s)=>a+s.y,0)/ready.length;
-  const rank={guard:0,tower:6,castle:14,hq:10};let target=null,best=1e9;
-  for(const b of targets){const q=Math.hypot(door(b).x-cx,door(b).y-cy)+(rank[b.type]||0)-(b.manned===false?6:0);if(q<best){best=q;target=b;}}
-  let need=target.manned===false?4:({guard:7,tower:11,castle:16,hq:12}[target.type]||8);
-  for(const f of foes)if(d(f,door(target))<16)need++;
-  const gold=typeof v.gold==='number'?v.gold:.6;need=Math.max(4,Math.ceil(need*(1.45-.75*gold)));
-  if(t>2700)need=Math.max(4,Math.ceil(need*.65));
-  if(ready.length>=need){cmd(['attack',{ids:ready.map(s=>s.id),b:target.id}]);M.attackAt=t;M.attackId=target.id;
-   if(t>=(M.attackNote||0)){out.push(['note',{text:'Attack: '+free.length+' field troops against '+target.type+' '+target.id+'; threshold '+need+', visible targets '+targets.length+'.'}]);M.attackNote=t+60;}
+ if(threat&&threatDist<20&&available().length&&t>=(M.defendAt||0)){
+  const ids=available().filter(s=>d(s,threat)<55).map(s=>s.id);
+  if(ids.length){
+   cmd(['march',{ids,tx:Math.round(threat.x),ty:Math.round(threat.y),form:'line',am:true}]);
+   M.moveReleaseAt=t+90;M.defendAt=t+12;
+   for(const id of ids)used[id]=1;
   }
- }else if(!targets.length&&ready.length>=12&&t>900&&t>=(M.searchAt||0)){
+ }
+ // Reissue reinforcements to a live attack. Do not strand additional idle soldiers.
+ if(active.length){
+  const targetId=active[0].order.b,target=targets.find(b=>b.id===targetId);
+  if(!target){
+   cmd(['release',{ids:active.map(s=>s.id),stop:true}]);
+  }else{
+   const ids=available().map(s=>s.id);
+   if(ids.length)cmd(['attack',{ids,b:target.id}]);
+  }
+ }else if(targets.length){
+  const ready=available();
+  const cx=ready.length?ready.reduce((a,s)=>a+s.x,0)/ready.length:0;
+  const cy=ready.length?ready.reduce((a,s)=>a+s.y,0)/ready.length:0;
+  const rank={guard:0,tower:6,castle:14,hq:10};
+  let target=null,best=1e9;
+  for(const b of targets){
+   const q=(ready.length?Math.hypot(door(b).x-cx,door(b).y-cy):1e6)+(rank[b.type]||0)-(b.manned===false?6:0);
+   if(q<best){best=q;target=b;}
+  }
+  if(target&&ready.length){
+   let need=target.manned===false?4:({guard:7,tower:11,castle:15,hq:12}[target.type]||8);
+   for(const f of foes)if(d(f,door(target))<16)need++;
+   const gold=typeof v.gold==='number'?v.gold:.6;
+   need=Math.max(4,Math.ceil(need*(1.45-.75*gold)));
+   if(t>2700)need=Math.max(4,Math.ceil(need*.9));
+   if(ready.length>=need){
+    cmd(['attack',{ids:ready.map(s=>s.id),b:target.id}]);
+    M.attackAt=t;M.attackId=target.id;
+    if(t>=(M.attackNote||0)){
+     out.push(['note',{text:'Attack: '+ready.length+' field troops against '+target.type+' '+target.id+'; need '+need+'.'}]);
+     M.attackNote=t+60;
+    }
+   }
+  }
+ }else if(!active.length&&available().length>=8&&t>900&&t>=(M.searchAt||0)){
   const map=v.map,w=map&&map.w||240,h=map&&map.h||240;
-  const home=M.home||(bld.find(b=>b.type==='hq'&&b.owner===v.me)||{x:w/2,y:h/2});
-  const pts=[[w-10,10],[w-10,h-10],[10,h-10],[10,10]];
-  const p=pts[(M.searchI||0)%pts.length],cx=ready.reduce((a,s)=>a+s.x,0)/ready.length,cy=ready.reduce((a,s)=>a+s.y,0)/ready.length;
-  if(Math.hypot(p[0]-cx,p[1]-cy)<15)M.searchI=(M.searchI||0)+1;
-  else{cmd(['march',{ids:ready.map(s=>s.id),tx:p[0],ty:p[1],form:'block',am:true}]);M.searchI=(M.searchI||0)+1;}
-  M.searchAt=t+45;
+  const pts=[[w-10,10],[w-10,h-10],[10,h-10],[10,10],[Math.floor(w/2),10],[Math.floor(w/2),h-10]];
+  const p=pts[(M.searchI||0)%pts.length],ready=available();
+  const scouts=ready.slice(0,Math.min(6,ready.length));
+  if(scouts.length>=6){
+   cmd(['march',{ids:scouts.map(s=>s.id),tx:p[0],ty:p[1],form:'block',am:true}]);
+   M.searchI=(M.searchI||0)+1;M.searchAt=t+120;M.moveReleaseAt=t+180;
+  }
  }
- // Keep outside force large enough after border posts take their permanent swordsmen.
+ // Army targets count soldiers OUTSIDE buildings only. Garrison troops are deliberately not added.
  if(E&&!v.armyOnly&&E.town&&E.town.some(b=>b.type==='barracks')&&t>=(M.targetAt||0)){
-  M.targetAt=t+8;const A=E.army||{},idleC=(E.idle&&E.idle.carrier)||0,carriers=(E.people&&E.people.carrier)||0;
-  const garrison=bld.filter(b=>b.owner===v.me&&MIL[b.type]).reduce((n,b)=>n+(b.troops||[]).length,0);
-  const add=Math.max(0,Math.min(12,idleC-3,carriers-6)),total=Math.min(80,mine.length+garrison+add);
-  const want={sword:Math.ceil(total*.45),spear:Math.round(total*.30)};want.bow=Math.max(0,total-want.sword-want.spear);
+  M.targetAt=t+10;
+  const A=E.army||{},idleC=(E.idle&&E.idle.carrier)||0,carriers=(E.people&&E.people.carrier)||0;
+  const current=mine.length;
+  let desired=8;
+  if(t>900)desired=10;
+  if(t>1800)desired=12;
+  if(t>2700)desired=14;
+  if(t>3600)desired=16;
+  if(idleC>=4&&carriers>=8)desired=Math.min(20,desired+2);
+  desired=Math.max(current,Math.min(20,desired));
+  const want={sword:Math.ceil(desired*.45),spear:Math.round(desired*.30)};
+  want.bow=Math.max(0,desired-want.sword-want.spear);
   for(const k of ['sword','spear','bow'])if((A.target||{})[k]!==want[k])cmd(['armyTarget',{kind:k,set:want[k]}]);
   if(Array.isArray(A.keep))for(let i=0;i<3;i++)if(A.keep[i]&&A.keep[i].keep!==0)cmd(['weaponKeep',{k:i,set:0}]);
+  if(A.reserve!==8)cmd(['armyReserve',{set:8}]);
  }
 }
