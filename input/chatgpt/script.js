@@ -136,9 +136,9 @@ function runEconomy(v,M,out){
  const noOre=!oreKnown('coal')||!oreKnown('ironore');
  const needsLand=(noOre&&(E.land.unsearched||0)<5)||(!liveQuarry&&t>150);
  const scheduleMil=milN<Math.min(12,1+Math.floor(t/180));
- if(scheduleMil&&free.length>=2&&!pending('guard'))goals.unshift('guard');
+ if(scheduleMil&&free.length>=2&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
  if(count('guard')>=2&&count('tower')<1&&free.length>=7&&t>900&&!pending('tower'))goals.unshift('tower');
- if(count('guard')<4&&free.length>=3&&needsLand&&!pending('guard'))goals.unshift('guard');
+ if(count('guard')<4&&free.length>=3&&needsLand&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
  // Food for mines: a second fisher is cheaper than letting iron production stop for lack of meals.
  const hungry=town.filter(b=>(b.type==='coalmine'||b.type==='ironmine')&&b.built&&b.worker&&
   !((b.inputs&&b.inputs.fish)||(b.inputs&&b.inputs.bread)||(b.inputs&&b.inputs.meat))).length;
@@ -166,17 +166,6 @@ function runEconomy(v,M,out){
    }
    if(place(ty))break;
   }
- }
- // No spare weapon stock: the barracks should train as soon as weapons arrive.
- if(built('barracks')>0&&t>=(M.armyAt||0)){
-  M.armyAt=t+8;
-  const A=E.army||{},garrison=ownMil.reduce((n,b)=>n+(b.troops||[]).length,0);
-  const allow=Math.max(0,Math.min(12,idleC-3,carriers-6));
-  const target=Math.min(80,(v.soldiers||[]).length+garrison+allow);
-  const want={sword:Math.ceil(target*.45),spear:Math.round(target*.30)};
-  want.bow=Math.max(0,target-want.sword-want.spear);
-  for(const k of ['sword','spear','bow'])if((A.target||{})[k]!==want[k])out.push(['armyTarget',{kind:k,set:want[k]}]);
-  if(Array.isArray(A.keep))for(let i=0;i<3;i++)if(A.keep[i]&&A.keep[i].keep!==0)out.push(['weaponKeep',{k:i,set:0}]);
  }
  // Expand workforce gently once the iron chain is staffed.
  if(built('smelter')&&built('smith')&&built('weaponsmith')&&idleC>5&&carriers>10&&t>600){
