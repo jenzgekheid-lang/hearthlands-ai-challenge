@@ -71,3 +71,17 @@ The report ran cleanly: 1,800 turns per game, no script errors, no refused order
 - Does meat production reduce ironmine food starvation on map 20261030?
 - Do repeated archers orders fall from thousands to only the actual setting changes?
 - Does the gold chain remain behind the first barracks, and do we improve on 0/8 wins?
+
+
+## Version-202 report review and reserve experiment (tested script version 200)
+
+The new game-version-202 report is clean (1,800 turns/game, no errors/refused orders) but still 0/8 wins. Gold starts reach 15–17 soldiers and four guards; Blue starts consistently plateau at 6 soldiers and two guards, with no coal/iron/barracks. Gold 20261030 also reaches gold production. Pigfarm/butcher produce meat, although the ironmine still spends 17% of its time stopped for food on that map.
+
+### Follow-up commit 4d95653
+- Set `armyReserve` from 2 to 0. The Blue plateau is exactly six soldiers/two guard posts; each post is configured for one fighter and one archer (two soldiers), while reserve 2 holds the remaining two soldiers out. This leaves only four assignable soldiers, matching the observed two-post ceiling. Zero reserve should let all six staff a third post and claim more land, potentially exposing coal/iron. This is a hypothesis, not yet verified; it sacrifices the standing field reserve until recruitment grows.
+- No combat stats or target counts changed.
+
+### Next report must verify
+- Do Blue starts build a third/fourth guard and increase land?
+- Do they discover coal/iron and start the production chain?
+- Does keeping zero reserve leave the town vulnerable, or does it help expansion enough to justify it?
