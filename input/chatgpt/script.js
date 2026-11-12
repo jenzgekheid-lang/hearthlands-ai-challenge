@@ -205,7 +205,7 @@ function runEconomy(v,M,out){
   return false;
  };
  const coalHungry=mineFoodShort('coalmine'),ironHungry=mineFoodShort('ironmine');
- const foodTip=hasTip('ore')&&/food|hungr|meal/.test(tip('ore'));
+ const foodTip=/food|hungr|meal|starv/.test(allTip);
  add((coalHungry||foodTip)&&count('farm')<1,'farm');
  add(count('farm')>0&&count('waterhut')<1&&(coalHungry||ironHungry||timingTip),'waterhut');
  add(count('farm')>0&&count('mill')<1&&coalHungry,'mill');
@@ -334,7 +334,7 @@ function findFrontier(map,me,home,sequence){
  let best=null,scoreBest=-1e9,seen=0;
  const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
  const pref=[{x:w-8,y:home.y},{x:home.x,y:h-8},{x:8,y:home.y},{x:home.x,y:8}][sequence%4];
- for(let y=2;y<h-2;y+=2)for(let x=2;x<w-2;x+=2){
+ scan: for(let y=2;y<h-2;y+=2)for(let x=2;x<w-2;x+=2){
   const i=y*w+x;
   if(owner[i]!==me||known[i]!==2)continue;
   let fog=0,neutral=0;
@@ -349,7 +349,7 @@ function findFrontier(map,me,home,sequence){
   const toPref=Math.abs(x-pref.x)+Math.abs(y-pref.y);
   const score=fog*8+neutral*2-Math.abs(dist-38)*0.12-toPref*0.025;
   if(score>scoreBest){scoreBest=score;best={x,y};}
-  if(++seen>50000)break;
+  if(++seen>50000)break scan;
  }
  return best;
 }
