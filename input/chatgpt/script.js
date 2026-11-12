@@ -1,4 +1,4 @@
-// ChatGPT GPT-6 — Game version: 195
+// ChatGPT GPT-6 — Strategy update for game version 196
 // Map-aware planner: scores legal sites, uses stockpiles to keep carriers moving, and skips blocked build goals.
 // Keeps the same army targets and combat policy while improving economy recovery across asymmetric starts.
 function think(view){
@@ -87,7 +87,7 @@ function think(view){
  // optional hauling/work. This is justified by repeated runs with 30-40 idle carriers
  // while sawmills, farms and food buildings spent most of their time waiting for carriers.
  if(!memory.econSetup){
-  out.push(['workOrder',{k:4,d:-1}]); // clear: one step up in the carrier work list
+  // Avoid workOrder: the previous k=4 command was refused by the current kit.
   memory.econSetup=true;
  }
  // Keep a compact, useful stockpile configuration. Each store gets a distinct set of goods.
@@ -122,8 +122,9 @@ function think(view){
  const idleCarriers=(E.idle&&E.idle.carrier)||0;
  // Army settings: garrisons get priority, but preserve a small mobile reserve.
  if(!memory.armySetup){
-  out.push(['armyTarget',{kind:'sword',set:14}],['armyTarget',{kind:'spear',set:10}],
-   ['armyTarget',{kind:'bow',set:16}],['armyReserve',{set:4}],['armyList',{on:true}]);
+  out.push(['armyTarget',{kind:'sword',set:8}],['armyTarget',{kind:'spear',set:4}],
+   ['armyTarget',{kind:'bow',set:4}],['armyReserve',{set:2}],['armyList',{on:true}],
+   ['weaponKeep',{k:'sword',set:0}],['weaponKeep',{k:'spear',set:0}],['weaponKeep',{k:'bow',set:0}]);
   memory.armySetup=true;
  }
  // Build plan: one deliberate site at a time; avoid spending materials on a long queue.
@@ -154,8 +155,12 @@ function think(view){
  add(n('coalmine')<1&&ore('coal').length>0,'coalmine');
  add(n('ironmine')<1&&ore('ironore').length>0,'ironmine');
  add(n('smelter')<1&&n('coalmine')&&n('ironmine'),'smelter');
- add(n('weaponsmith')<1&&n('smelter')>0,'weaponsmith');
+ // The previous plan skipped the smith/tool chain: smelters and weaponsmiths
+ // consequently spent the entire game waiting for hammers.
+ add(n('smith')<1&&n('smelter')>0,'smith');
+ add(n('weaponsmith')<1&&n('smith')>0&&n('smelter')>0,'weaponsmith');
  add(n('barracks')<1&&n('weaponsmith')>0,'barracks');
+ add(n('barracks')<2&&n('weaponsmith')>0&&soldiers.length>=16&&free.length<6,'barracks');
  // Gold improves every soldier outside our territory; add the chain only after iron weapons are underway.
  add(n('goldmine')<1&&ore('goldore').length>0&&n('smelter')>0&&n('barracks')>0,'goldmine');
  add(n('goldsmelter')<1&&n('goldmine')>0&&n('coalmine')>0&&n('barracks')>0,'goldsmelter');
@@ -163,6 +168,7 @@ function think(view){
  add(n('goldmine')<1&&ore('goldore').length>0&&n('smelter')>0,'goldmine');
  add(n('goldsmelter')<1&&n('goldmine')>0&&n('coalmine')>0,'goldsmelter');
  // Additional homes are considered above, before the ore chain.
+ // Secure the starting army and expand garrisons without starving recruitment.
  // Secure the starting ten soldiers immediately; this first post is the key to claiming room to expand.
  const guards=n('guard'),towers=n('tower');
  if(guards<1&&!pending('guard'))wants.unshift('guard');
