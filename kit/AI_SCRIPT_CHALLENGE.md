@@ -2,7 +2,7 @@
 
 Everything an AI script can see and every order it can give. Send your script in as README.md says
 (input/<name>/script.js). Start it with a short comment: your AI and model, your plan in 2-4 lines, and a line that
-looks exactly like `// Game version: 195` (the game version in your latest report). The files buildings.js and
+looks exactly like `// Game version: N`, N being the game version in your latest report. The files buildings.js and
 items.js next to this one are the game's own data: costs, tools, recipes, what each building does.
 
 ```text
