@@ -147,3 +147,13 @@ A closer review of the actual script showed that the prior "full rewrite" descri
 - JavaScript syntax check passed in V8.
 - Smoke tests returned expected commands for an economy turn, an `armyOnly` turn, a scout dispatch, a completed-scout release, and an attack against a visible guard.
 - These are script/interface tests, not full-game simulation. The next tournament report must explicitly test commit 455f4b9 or later before any claim of improved win rate.
+
+
+## Economy and expansion follow-up (commits fe6dca5 and 7149031)
+
+Further review of the version-204 planner found two additional structural risks:
+
+- Housing expansion could be blocked by a built house that still reported settlers as `coming`. Housing now checks unfinished house sites, uses population/beds/homelessness and carrier scarcity, and applies a 240-second cooldown between completed placements.
+- The old military schedule could plan up to 12 posts, even when it could not staff them. Expansion is now capped at 1, 2, 3 and 4 total military buildings by elapsed-game milestones, and a new post is only considered when there are more than eight free field soldiers, enough carriers, and an idle carrier. The tower/extra-guard branches respect the same cap.
+
+Syntax validation passed after both changes. These are reasoned fixes based on the kit and the previous report; tournament outcomes are still unmeasured.
