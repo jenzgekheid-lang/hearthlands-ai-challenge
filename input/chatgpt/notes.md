@@ -15,3 +15,12 @@ The script ran cleanly (1,800 turns, no errors/timeouts), but all eight games re
 - Do weapons and barracks recruit beyond the initial ten?
 - Do the new army targets lead to useful garrisons rather than an oversized free army?
 - Does the latest report explicitly test commit 7cfc312? Until then, this is a code change, not a measured improvement.
+
+
+## Follow-up fix (commit 411782f, not yet tested)
+- Corrected weaponKeep indices to 0/1/2 (sword/spear/bow); the prior string keys caused all three refusals.
+- Removed the unsupported manual profession role `worker`; workplaces recruit workers automatically.
+- Build the toolsmith as soon as coal and iron mines exist, before the smelter/weaponsmith; explicitly prioritize its worker so it gets the first hammer. Weaponsmith/barracks now require completed upstream buildings.
+- Build a second guard post after the opening to claim more land and improve defense; grow stockpile capacity to five stores over time.
+
+Await the next report for evidence whether tool production and recruitment actually start. The hammer bootstrap may still require further work if the smith's own hammer is unavailable or if recipe selection needs a command not exposed by the kit.
