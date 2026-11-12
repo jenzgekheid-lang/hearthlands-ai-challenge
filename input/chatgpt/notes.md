@@ -124,3 +124,26 @@ The next arena report must explicitly test script commit cace079 (or a later Cha
 7. Check refused orders, path failures, goods waiting, idle carriers, script errors and worst turn time.
 
 Do not make another strategic change until the new report identifies a specific bottleneck.
+
+
+## Follow-up audit and army-control correction (commit 05a9190, follow-up 455f4b9)
+
+A closer review of the actual script showed that the prior "full rewrite" description overstated what had changed: commit cace079 only changed three lines. The economy and much of the military code remained the earlier implementation. This follow-up records the actual defects found and corrected.
+
+### Confirmed code defects
+- The army target calculation added garrisoned soldiers to `armyTarget`, even though the kit explicitly defines that target as soldiers OUTSIDE buildings. This inflated recruitment targets and muddied the field-force limit.
+- The scouting branch issued a held `march` order to the field army but never released the soldiers when they reached the waypoint. Soldiers with orders are busy and unavailable to the attack selector, so scouting could permanently consume the very army meant to attack.
+- Garrison assignment did not exclude `held` soldiers, and it could strip the mobile force below a useful size.
+
+### Corrections
+- Army targets now count outside soldiers only, with a gradual target up to 20 and growth gated by carrier availability. Garrisoned troops are not added to the target.
+- Set an eight-soldier army reserve so military buildings do not consume the whole field force.
+- Scouting uses a six-soldier group rather than the entire available force. March orders are explicitly released on arrival or after a timeout; enemy sightings also cancel scouting orders so the group can be reassigned.
+- Existing attack groups receive available reinforcements rather than leaving idle soldiers behind.
+- Garrison assignment excludes held soldiers and only sends a soldier when more than eight are free.
+- Kept the existing economy/building planner intact rather than pretending the entire file was rewritten.
+
+### Validation
+- JavaScript syntax check passed in V8.
+- Smoke tests returned expected commands for an economy turn, an `armyOnly` turn, a scout dispatch, a completed-scout release, and an attack against a visible guard.
+- These are script/interface tests, not full-game simulation. The next tournament report must explicitly test commit 455f4b9 or later before any claim of improved win rate.
