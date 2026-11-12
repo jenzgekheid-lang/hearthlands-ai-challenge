@@ -220,19 +220,17 @@ function runArmy(v,M,out){
  // Release completed scouting/defence moves. March orders hold soldiers until explicitly released.
  const arrived=moving.filter(s=>{
   const o=s.order||{},p={x:o.x,y:o.y};
-  return Number.isFinite(p.x)&&Number.isFinite(p.y)&&(d(s,p)<5||t>=(M.moveReleaseAt||1e9));
+  return Number.isFinite(p.x)&&Number.isFinite(p.y)&&d(s,p)<5;
  });
- if(arrived.length){
-  cmd(['release',{ids:arrived.map(s=>s.id),stop:true}]);
-  M.moveReleaseAt=t+999999;
- }
+ if(arrived.length)cmd(['release',{ids:arrived.map(s=>s.id),stop:true}]);
+ if(moving.length&&t>=(M.moveDeadline||1e9))cmd(['release',{ids:moving.map(s=>s.id),stop:true}]);
  // An enemy sighting takes priority over the current scouting route.
  const visibleTargets=eb.filter(b=>(b.military||MIL[b.type]||b.type==='hq')&&
   !(M.badTarget[b.id]>t)&&!(b.remembered&&Number.isFinite(b.seenAt)&&t-b.seenAt>900));
  const targets=visibleTargets;
  if(targets.length&&moving.length){
   cmd(['release',{ids:moving.map(s=>s.id),stop:true}]);
-  M.moveReleaseAt=t+999999;
+  M.moveDeadline=t+999999;
  }
  // Keep one swordsman in each active post, but never strip the mobile reserve to do it.
  for(const b of ownMil){
@@ -256,7 +254,7 @@ function runArmy(v,M,out){
   const ids=available().filter(s=>d(s,threat)<55).map(s=>s.id);
   if(ids.length){
    cmd(['march',{ids,tx:Math.round(threat.x),ty:Math.round(threat.y),form:'line',am:true}]);
-   M.moveReleaseAt=t+90;M.defendAt=t+12;
+   M.moveDeadline=t+90;M.defendAt=t+12;
    for(const id of ids)used[id]=1;
   }
  }
@@ -301,7 +299,7 @@ function runArmy(v,M,out){
   const scouts=ready.slice(0,Math.min(6,ready.length));
   if(scouts.length>=6){
    cmd(['march',{ids:scouts.map(s=>s.id),tx:p[0],ty:p[1],form:'block',am:true}]);
-   M.searchI=(M.searchI||0)+1;M.searchAt=t+120;M.moveReleaseAt=t+180;
+   M.searchI=(M.searchI||0)+1;M.searchAt=t+120;M.moveDeadline=t+180;
   }
  }
  // Army targets count soldiers OUTSIDE buildings only. Garrison troops are deliberately not added.
