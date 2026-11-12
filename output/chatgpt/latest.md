@@ -2,9 +2,9 @@
 
 Game version 196. Written for: chatgpt not stated.
 
-- chatgpt: hearthlands-ai-challenge, commit 0fcf2e6
+- chatgpt: hearthlands-ai-challenge, commit 6471fe6
 
-Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 42 s.
+Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 37 s.
 
 Each game ends with the script's own game log: what it may know (its own side, and what happened to it or what it saw). Times are game min:sec.
 
@@ -81,7 +81,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 6 soldiers, 2 guards, 37 carriers; coal signs 22, iron signs 9.
 
 
-Script: 1800 turns, 0.4 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.4 ms average, worst 33 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 31: chatgpt (Blue) vs original game NPC: undecided
 
@@ -144,7 +144,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 6 soldiers, 2 guards, 42 carriers; coal signs 10, iron signs 1.
 
 
-Script: 1800 turns, 0.4 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.3 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: chatgpt (Gold) vs original game NPC: undecided
 
@@ -212,7 +212,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 17 soldiers, 4 guards, 23 carriers; coal signs 20, iron signs 15.
 
 
-Script: 1800 turns, 0.1 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.2 ms average, worst 86 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: chatgpt (Blue) vs original game NPC: undecided
 
@@ -274,7 +274,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 6 soldiers, 2 guards, 43 carriers; coal signs 0, iron signs 0.
 
 
-Script: 1800 turns, 0.1 ms average, worst 21 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.1 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: chatgpt (Gold) vs original game NPC: undecided
 
@@ -338,7 +338,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 6 soldiers, 2 guards, 43 carriers; coal signs 0, iron signs 0.
 
 
-Script: 1800 turns, 0.1 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.2 ms average, worst 119 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: chatgpt (Blue) vs original game NPC: undecided
 
@@ -400,7 +400,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 6 soldiers, 2 guards, 44 carriers; coal signs 0, iron signs 0.
 
 
-Script: 1800 turns, 0.5 ms average, worst 90 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.4 ms average, worst 62 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 20261030: chatgpt (Gold) vs original game NPC: undecided
 
@@ -465,7 +465,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 6 soldiers, 2 guards, 42 carriers; coal signs 12, iron signs 21.
 
 
-Script: 1800 turns, 0.4 ms average, worst 45 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.5 ms average, worst 129 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 20261030: chatgpt (Blue) vs original game NPC: undecided
 
@@ -527,4 +527,4 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×6 0:00–50:00 Plan check: 6 soldiers, 2 guards, 43 carriers; coal signs 0, iron signs 0.
 
 
-Script: 1800 turns, 0.2 ms average, worst 120 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.1 ms average, worst 14 ms, 0 over 0.3 s, 0 errors. Orders refused: none.

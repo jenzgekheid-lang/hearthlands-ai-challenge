@@ -2,9 +2,9 @@
 
 Game version 196. Written for: claude-fable-5.2 196.
 
-- claude-fable-5.2: hearthlands-ai-challenge, commit 0fcf2e6
+- claude-fable-5.2: hearthlands-ai-challenge, commit 6471fe6
 
-Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 45 s.
+Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 38 s.
 
 Each game ends with the script's own game log: what it may know (its own side, and what happened to it or what it saw). Times are game min:sec.
 
@@ -70,7 +70,7 @@ Your notes (123 in all; notes that differ only in their numbers are grouped: tim
 - 6:22 defence: 2 soldiers meet 1 enemy soldiers near our buildings
 
 
-Script: 1838 turns, 0.8 ms average, worst 12 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1838 turns, 0.7 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 31: claude-fable-5.2 (Blue) vs original game NPC: undecided
 
@@ -126,7 +126,7 @@ Your notes (122 in all; notes that differ only in their numbers are grouped: tim
 - 7:16 attack: 6 soldiers on guard 105 (empty), needed 4, 6 targets known
 
 
-Script: 1842 turns, 0.8 ms average, worst 20 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1842 turns, 0.7 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: claude-fable-5.2 (Gold) vs original game NPC: undecided
 
@@ -181,7 +181,7 @@ Your notes (123 in all; notes that differ only in their numbers are grouped: tim
 - 14:44 defence: 4 soldiers meet 2 enemy soldiers near our buildings
 
 
-Script: 1825 turns, 0.8 ms average, worst 21 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1825 turns, 0.7 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: claude-fable-5.2 (Blue) vs original game NPC: undecided
 
@@ -244,7 +244,7 @@ Your notes (125 in all; notes that differ only in their numbers are grouped: tim
 - ×2 35:50–37:50 defence: 1 soldiers meet 2 enemy soldiers near our buildings
 
 
-Script: 1842 turns, 0.8 ms average, worst 23 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1842 turns, 0.7 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: claude-fable-5.2 (Gold) vs original game NPC: undecided
 
@@ -299,7 +299,7 @@ Your notes (121 in all; notes that differ only in their numbers are grouped: tim
 - ×20 8:00–27:00 army: outside 2 free 1 attacking 0 | targets 4/2/2 | enemy seen: soldiers 0 buildings 49 military 6 | next guard needs 7 | gold 0.6
 
 
-Script: 1825 turns, 0.8 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1825 turns, 0.7 ms average, worst 13 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: claude-fable-5.2 (Blue) vs original game NPC: undecided
 
@@ -355,7 +355,7 @@ Your notes (122 in all; notes that differ only in their numbers are grouped: tim
 - ×15 8:00–22:00 army: outside 8 free 7 attacking 0 | targets 4/2/2 | enemy seen: soldiers 0 buildings 42 military 6 | next hq needs 12 | gold 0.6
 
 
-Script: 1835 turns, 0.8 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1835 turns, 0.7 ms average, worst 31 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 20261030: claude-fable-5.2 (Gold) vs original game NPC: undecided
 
@@ -409,7 +409,7 @@ Your notes (122 in all; notes that differ only in their numbers are grouped: tim
 - ×47 6:00–53:00 army: outside 4 free 3 attacking 0 | targets 4/2/2 | enemy seen: soldiers 0 buildings 47 military 5 | next guard needs 5 | gold 0.6
 
 
-Script: 1844 turns, 0.8 ms average, worst 12 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1844 turns, 0.6 ms average, worst 11 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 20261030: claude-fable-5.2 (Blue) vs original game NPC: undecided
 
@@ -464,4 +464,4 @@ Your notes (121 in all; notes that differ only in their numbers are grouped: tim
 - ×15 8:00–22:00 army: outside 3 free 2 attacking 0 | targets 4/2/2 | enemy seen: soldiers 0 buildings 32 military 3 | next hq needs 12 | gold 0.6
 
 
-Script: 1821 turns, 0.8 ms average, worst 20 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1821 turns, 0.7 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.

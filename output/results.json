@@ -1,7 +1,7 @@
 {
   "claude-fable-5.2": {
     "date": "2026-11-12",
-    "commit": "0fcf2e6",
+    "commit": "6471fe6",
     "version": 196,
     "status": "played",
     "won": 0,
@@ -10,7 +10,7 @@
   },
   "chatgpt": {
     "date": "2026-11-12",
-    "commit": "0fcf2e6",
+    "commit": "6471fe6",
     "version": 196,
     "status": "played",
     "won": 0,
