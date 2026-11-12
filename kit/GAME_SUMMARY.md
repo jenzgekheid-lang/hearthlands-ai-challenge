@@ -83,8 +83,8 @@ The numbers (*generated*):
 | Lookout tower | `look` | 2 plank, 4 stone | — | — | — | A scout moves in and uncovers the fog 24 tiles around. No territory |
 | Goods on the ground | `pile` | — | — | — | — | — |
 | Rubble | `rubble` | — | — | — | — | — |
-| Guard post | `guard` | 2 plank, 3 stone | — | — | — | Room for 2 fighters (1 swordsman always on guard) and 1 archer. Pushes your border out 14 tiles |
-| Tower | `tower` | 5 plank, 5 stone | — | — | — | Room for 3 fighters (2 swordsmen always on guard) and 3 archers. Pushes your border out 20 tiles |
+| Small tower | `guard` | 2 plank, 3 stone | — | — | — | Room for 2 fighters (1 swordsman always on guard) and 1 archer. Pushes your border out 14 tiles |
+| Big tower | `tower` | 5 plank, 5 stone | — | — | — | Room for 3 fighters (2 swordsmen always on guard) and 3 archers. Pushes your border out 20 tiles |
 | Castle | `castle` | 8 plank, 12 stone | — | — | — | Room for 5 fighters (3 swordsmen always on guard) and 5 archers. Pushes your border out 26 tiles |
 | Weaponsmith | `weaponsmith` | 5 plank, 7 stone | hammer | coal, iron | weapon (from coal, iron) | Coal + iron make swords, bows and spears. Tap it to set what to make |
 | Barracks | `barracks` | 4 plank, 5 stone | — | sword, bow, spear | — | A carrier picks up a weapon here and becomes a soldier. Set how many of each you want |

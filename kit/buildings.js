@@ -35,8 +35,8 @@ export const DEF = {
   // military buildings: `fight` slots for swordsmen/spearmen (they step out to meet attackers; the first `guards` are
   // swordsmen who never leave) and `arch` slots for bowmen (they shoot from inside). cap = fight + arch. The border
   // reaches r tiles once anyone is inside
-  guard: {n:'Guard post', s:3, h:3, cost:{plank:2,stone:3}, r:14, mil:true, cap:3, fight:2, arch:1, guards:1, roof:'#6b6f6a', desc:'Room for 2 fighters (1 swordsman always on guard) and 1 archer. Pushes your border out 14 tiles'},
-  tower: {n:'Tower', s:5, h:4, cost:{plank:5,stone:5}, r:20, mil:true, cap:6, fight:3, arch:3, guards:2, roof:'#5f6460', desc:'Room for 3 fighters (2 swordsmen always on guard) and 3 archers. Pushes your border out 20 tiles'},
+  guard: {n:'Small tower', s:3, h:3, cost:{plank:2,stone:3}, r:14, mil:true, cap:3, fight:2, arch:1, guards:1, roof:'#6b6f6a', desc:'Room for 2 fighters (1 swordsman always on guard) and 1 archer. Pushes your border out 14 tiles'},
+  tower: {n:'Big tower', s:5, h:4, cost:{plank:5,stone:5}, r:20, mil:true, cap:6, fight:3, arch:3, guards:2, roof:'#5f6460', desc:'Room for 3 fighters (2 swordsmen always on guard) and 3 archers. Pushes your border out 20 tiles'},
   castle:{n:'Castle', s:8, h:7, cost:{plank:8,stone:12}, r:26, mil:true, cap:10, fight:5, arch:5, guards:3, roof:'#555a56', desc:'Room for 5 fighters (3 swordsmen always on guard) and 5 archers. Pushes your border out 26 tiles'},
   weaponsmith:{n:'Weaponsmith', s:3, h:3, door:'side', cost:{plank:5,stone:7}, tool:'hammer', inputs:{coal:6,iron:6}, recipe:{in:{coal:1,iron:1}, out:'weapon', time:7.5, verb:'Forging'}, roof:'#5a4a5e', desc:'Coal + iron make swords, bows and spears. Tap it to set what to make'},
   barracks:{n:'Barracks', s:3, h:3, cost:{plank:4,stone:5}, inputs:{sword:4,bow:4,spear:4}, roof:'#7a3a32', desc:'A carrier picks up a weapon here and becomes a soldier. Set how many of each you want'}
@@ -53,3 +53,15 @@ export const LOOK = { wood:[1,.9,1], forest:[.9,.88,1], saw:[1.1,.95,1], fisher:
   weaponsmith:[1.05,.9,1], barracks:[1.1,1,1.05], look:[1,1,1] };
 export const BUILD_GROUPS = [['Basics',['wood','quarry','saw','forest','store']],['Houses',['house','house2','house3']],['Land',['look']],['Food',['fisher','waterhut','farm','mill','bakery','pigfarm','butcher']],['Mining and metal',['stonemine','coalmine','ironmine','smelter','smith','goldmine','goldsmelter']],['Army',['guard','tower','castle','weaponsmith','barracks']]];
 export const BUILD_ORDER = BUILD_GROUPS.flatMap(g=>g[1]);
+// Short texts for the Build tab (Jens, 12 Nov: 'way smaller and simple'). The full desc above stays for the game summary
+// and the AI script kit (tools/summary.js).
+export const SHORT = {
+  wood:'Fells trees for logs', quarry:'Cuts stone', saw:'Logs into planks', forest:'Plants trees', store:'Stores goods',
+  house:'10 settlers', house2:'20 settlers', house3:'50 settlers', look:'Uncovers the fog',
+  fisher:'Catches fish', waterhut:'Gathers water', farm:'Grows grain', mill:'Grain into flour', bakery:'Bakes bread',
+  pigfarm:'Raises pigs', butcher:'Pigs into meat',
+  stonemine:'Mines stone', coalmine:'Mines coal', ironmine:'Mines iron ore', smelter:'Makes iron', smith:'Makes tools',
+  goldmine:'Mines gold ore', goldsmelter:'Makes gold',
+  guard:'Border +14, 3 soldiers', tower:'Border +20, 6 soldiers', castle:'Border +26, 10 soldiers',
+  weaponsmith:'Makes weapons', barracks:'Trains soldiers',
+};

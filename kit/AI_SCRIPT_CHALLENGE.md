@@ -109,7 +109,7 @@ THE NUMBERS
  "heal": 0.05,
  "military": {
   "guard": {
-   "name": "Guard post",
+   "name": "Small tower",
    "w": 3,
    "h": 3,
    "land": 14,
@@ -118,7 +118,7 @@ THE NUMBERS
    "guards": 1
   },
   "tower": {
-   "name": "Tower",
+   "name": "Big tower",
    "w": 5,
    "h": 4,
    "land": 20,
