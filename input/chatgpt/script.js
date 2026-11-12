@@ -147,7 +147,7 @@ function think(view){
  add(houses<5&&(E.population||0)>=(E.beds||0)-5,'house');
  // Expand storage only when output/loose goods and idle carriers show a real transport backlog.
  add(n('store')<2&&waiting>18&&idleCarriers>5,'store');
- add(n('store')<3&&waiting>45&&idleCarriers>8,'store');
+ add(n('store')<5&&view.t>240,'store');
  add(n('quarry')<2&&s('stone')<24,'quarry');
  add(n('wood')<3&&s('log')<30,'wood');
  add(n('farm')<2&&n('mill')>0,'farm');
