@@ -143,8 +143,8 @@ function runEconomy(v,M,out){
  const maxPosts=t<600?1:t<1500?2:t<2700?3:4;
  const canStaffPost=free.length>8&&carriers>5&&idleC>0;
  if(milN<maxPosts&&canStaffPost&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
- if(count('guard')>=2&&count('tower')<1&&canStaffPost&&t>900&&!pending('tower'))goals.unshift('tower');
- if(milN<4&&needsLand&&canStaffPost&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
+ if(milN<maxPosts&&count('guard')>=2&&count('tower')<1&&canStaffPost&&t>900&&!pending('tower'))goals.unshift('tower');
+ if(milN<maxPosts&&needsLand&&canStaffPost&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
  // Food for mines: a second fisher is cheaper than letting iron production stop for lack of meals.
  const hungry=town.filter(b=>(b.type==='coalmine'||b.type==='ironmine')&&b.built&&b.worker&&
   !((b.inputs&&b.inputs.fish)||(b.inputs&&b.inputs.bread)||(b.inputs&&b.inputs.meat))).length;
