@@ -128,7 +128,7 @@ function runEconomy(v,M,out){
  add(count('smith')<1&&built('smelter')>0&&st('iron')>0,'smith');
  add(count('weaponsmith')<1&&built('smith')>0,'weaponsmith');
  add(count('barracks')<1&&built('weaponsmith')>0,'barracks');
- add(count('farm')<1&&count('fisher')>0,'farm');
+ add(count('farm')<1&&(count('fisher')>0||((count('coalmine')+count('ironmine'))>0&&st('fish')<4)),'farm');
  add(count('waterhut')<1&&count('farm')>0,'waterhut');
  add(count('mill')<1&&count('farm')>0,'mill');
  add(count('bakery')<1&&count('mill')>0&&count('waterhut')>0,'bakery');
@@ -147,7 +147,7 @@ function runEconomy(v,M,out){
  add(count('ironmine')<2&&built('weaponsmith')>0&&oreKnown('ironore')&&t>900,'ironmine');
  add(count('wood')<3&&t>600,'wood');
  add(count('quarry')<2&&t>600,'quarry');
- add(count('pigfarm')<1&&built('barracks')>0&&count('ironmine')>0&&hungry>0,'pigfarm');
+ add(count('pigfarm')<1&&count('ironmine')>0&&hungry>0&&count('farm')>0&&count('waterhut')>0,'pigfarm');
  add(count('butcher')<1&&built('pigfarm')>0,'butcher');
  add(count('goldmine')<1&&oreKnown('goldore')&&built('barracks')>0,'goldmine');
  add(count('goldsmelter')<1&&built('goldmine')>0,'goldsmelter');
@@ -192,6 +192,7 @@ function makeGrid(map,w,h,me,t){
     else if(ter===0&&!tr&&!st&&!(map.occupied&&map.occupied[i]))run[4]++;
     if(ter===2&&map.ore&&map.ore[i]<16)ore[map.ore[i]]++;
    }else if(o===0){run[5]++;if(st)run[6]+=st>4?4:st;if(ter===2)run[7]++;}
+   else run[8]++;
    const a=(y+1)*W+x+1,b=y*W+x+1;
    for(let k=0;k<layers;k++)pre[k][a]=pre[k][b]+run[k];
   }
