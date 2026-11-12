@@ -1,6 +1,6 @@
-// ChatGPT GPT-6 — Hammer bootstrap and recruitment fix for game version 196
-// Map-aware planner: scores legal sites, uses stockpiles to keep carriers moving, and skips blocked build goals.
-// Keeps the same army targets and combat policy while improving economy recovery across asymmetric starts.
+// ChatGPT GPT-6 — Direct-delivery and military-timing fix for game version 196
+// Keep only a construction-goods stockpile; let food and metal inputs go straight to consumers.
+// Limit housing and defer secondary expansion until the first barracks is built.
 function think(view){
  const E=view.economy;
  if(!E||view.over)return [];
@@ -90,13 +90,14 @@ function think(view){
   // Avoid workOrder: the previous k=4 command was refused by the current kit.
   memory.econSetup=true;
  }
- // Keep a compact, useful stockpile configuration. Each store gets a distinct set of goods.
+ // Keep one stockpile for durable construction goods. Food and metal inputs should
+ // travel directly to consumers: storing fish first caused fisher -> store -> ironmine
+ // double-hauls while mines and production piles waited for carriers.
  memory.storeSlots=memory.storeSlots||{};
  for(const b of town.filter(q=>q.type==='store')){
   if(!memory.storeSlots[b.id]){
-   const sets=[['log','plank','stone','grain'],['fish','water','flour','bread'],['coal','ironore','iron','gold'],['sword','spear','bow','meat']];
-   const idx=Math.min(sets.length-1,Object.keys(memory.storeSlots).length);
-   for(let k=0;k<4;k++)out.push(['storeSlot',{b:b.id,k,it:sets[idx][k]}]);
+   const goods=Object.keys(memory.storeSlots).length===0?['log','plank','stone','grain']:[null,null,null,null];
+   for(let k=0;k<4;k++)out.push(['storeSlot',{b:b.id,k,it:goods[k]}]);
    memory.storeSlots[b.id]=true;
   }
  }
@@ -149,13 +150,11 @@ function think(view){
  add(n('bakery')<1&&n('mill')>0,'bakery');
  // Add a first home before the ore chain so a blocked deposit cannot prevent population growth.
  const houses=n('house')+n('house2')+n('house3');
- add(houses<5&&(E.population||0)>=(E.beds||0)-5,'house');
- // Expand storage only when output/loose goods and idle carriers show a real transport backlog.
- add(n('store')<2&&waiting>18&&idleCarriers>5,'store');
- add(n('store')<5&&view.t>240,'store');
- add(n('quarry')<2&&s('stone')<24,'quarry');
- add(n('wood')<3&&s('log')<30,'wood');
- add(n('farm')<2&&n('mill')>0,'farm');
+ add(houses<3&&(E.population||0)>=(E.beds||0)-5&&(E.people.carrier||0)<12,'house');
+ // Do not build extra stockpiles just because goods are waiting: the report showed
+ // five passive stores while producers still waited on full output piles.
+ // Extra raw-material capacity comes only after the first barracks is operating.
+
  // Mines only where the geologist has actually found a matching deposit.
  add(n('coalmine')<1&&ore('coal').length>0,'coalmine');
  add(n('ironmine')<1&&ore('ironore').length>0,'ironmine');
@@ -166,6 +165,10 @@ function think(view){
  // Weaponsmiths are a later stage: require evidence of a spare hammer from the tool chain.
  add(n('weaponsmith')<1&&built('smith')>0&&s('hammer')>0,'weaponsmith');
  add(n('barracks')<1&&built('weaponsmith')>0,'barracks');
+ add(n('quarry')<2&&s('stone')<24&&built('weaponsmith')>0,'quarry');
+ add(n('wood')<3&&s('log')<30&&built('weaponsmith')>0,'wood');
+ add(n('farm')<2&&n('mill')>0&&built('weaponsmith')>0,'farm');
+ add(n('store')<2&&waiting>60&&idleCarriers<4&&built('weaponsmith')>0,'store');
  add(n('barracks')<2&&n('weaponsmith')>0&&soldiers.length>=16&&free.length<6,'barracks');
  // Gold improves every soldier outside our territory; add the chain only after iron weapons are underway.
  add(n('goldmine')<1&&ore('goldore').length>0&&n('smelter')>0&&n('barracks')>0,'goldmine');
