@@ -1,4 +1,4 @@
-// ChatGPT GPT-6 — Strategy update for game version 196
+// ChatGPT GPT-6 — Hammer bootstrap and recruitment fix for game version 196
 // Map-aware planner: scores legal sites, uses stockpiles to keep carriers moving, and skips blocked build goals.
 // Keeps the same army targets and combat policy while improving economy recovery across asymmetric starts.
 function think(view){
@@ -108,13 +108,6 @@ function think(view){
  for(const g of geos)if(!g.busy&&!g.moving&&(E.unsearched||[]).length){
   const q=E.unsearched[0];out.push(['sendUnit',{u:g.id,tx:q.x,ty:q.y}]);
  }
- // Workforce: the reports repeatedly show 30-44 idle carriers while staffed buildings
- // wait for free settlers. Convert a bounded number into workers; never drain logistics.
- const workers=(E.people&&E.people.worker)||0, carriers=(E.people&&E.people.carrier)||0;
- const idleC=(E.idle&&E.idle.carrier)||0;
- if(!view.armyOnly&&workers<24&&carriers>18&&idleC>12&&view.t>180&&view.t>=(memory.workerRetry||0)){
-  out.push(['profession',{role:'worker',d:1}]);memory.workerRetry=view.t+20;
- }
  // Carrier throughput: if goods are accumulating while carriers are idle, move clearing work upward.
  const loose=(E.loose&&Object.values(E.loose).reduce((a,b)=>a+b,0))||0;
  const outputGoods=town.reduce((a,b)=>a+Object.values(b.outputs||{}).reduce((x,y)=>x+(y||0),0),0);
@@ -124,7 +117,7 @@ function think(view){
  if(!memory.armySetup){
   out.push(['armyTarget',{kind:'sword',set:8}],['armyTarget',{kind:'spear',set:4}],
    ['armyTarget',{kind:'bow',set:4}],['armyReserve',{set:2}],['armyList',{on:true}],
-   ['weaponKeep',{k:'sword',set:0}],['weaponKeep',{k:'spear',set:0}],['weaponKeep',{k:'bow',set:0}]);
+   ['weaponKeep',{k:0,set:0}],['weaponKeep',{k:1,set:0}],['weaponKeep',{k:2,set:0}]);
   memory.armySetup=true;
  }
  // Build plan: one deliberate site at a time; avoid spending materials on a long queue.
@@ -154,12 +147,11 @@ function think(view){
  // Mines only where the geologist has actually found a matching deposit.
  add(n('coalmine')<1&&ore('coal').length>0,'coalmine');
  add(n('ironmine')<1&&ore('ironore').length>0,'ironmine');
+ // Prioritise the toolsmith before the other hammer-dependent buildings.
+ add(n('smith')<1&&n('coalmine')&&n('ironmine'),'smith');
  add(n('smelter')<1&&n('coalmine')&&n('ironmine'),'smelter');
- // The previous plan skipped the smith/tool chain: smelters and weaponsmiths
- // consequently spent the entire game waiting for hammers.
- add(n('smith')<1&&n('smelter')>0,'smith');
- add(n('weaponsmith')<1&&n('smith')>0&&n('smelter')>0,'weaponsmith');
- add(n('barracks')<1&&n('weaponsmith')>0,'barracks');
+ add(n('weaponsmith')<1&&built('smith')>0&&built('smelter')>0,'weaponsmith');
+ add(n('barracks')<1&&built('weaponsmith')>0,'barracks');
  add(n('barracks')<2&&n('weaponsmith')>0&&soldiers.length>=16&&free.length<6,'barracks');
  // Gold improves every soldier outside our territory; add the chain only after iron weapons are underway.
  add(n('goldmine')<1&&ore('goldore').length>0&&n('smelter')>0&&n('barracks')>0,'goldmine');
@@ -171,6 +163,7 @@ function think(view){
  // Secure the starting army and expand garrisons without starving recruitment.
  // Secure the starting ten soldiers immediately; this first post is the key to claiming room to expand.
  const guards=n('guard'),towers=n('tower');
+ if(guards<2&&view.t>120&&!pending('guard'))wants.unshift('guard');
  if(guards<1&&!pending('guard'))wants.unshift('guard');
  const emptyMil=ownMil.filter(b=>b.built&&!(b.troops||[]).length).length;
  if(guards<2&&view.t>120)add(true,'guard');
@@ -206,7 +199,7 @@ function think(view){
  }
  // Prioritise an empty military building so it is filled before adding another.
  const empty=ownMil.filter(b=>b.built&&!(b.troops||[]).length);
- if(empty.length&&memory.prio!==empty[0].id){out.push(['priority',{b:empty[0].id,on:true}]);memory.prio=empty[0].id;}
+ if(empty.length&&memory.prio!==empty[0].id&&!smith){out.push(['priority',{b:empty[0].id,on:true}]);memory.prio=empty[0].id;}
  // Garrison settings: fewer archers in small posts, keep towers balanced.
  for(const b of ownMil)if(b.built&&b.type==='guard'&&b.archers!==1)out.push(['archers',{b:b.id,set:1}]);
  // Use spare idle carriers as workers before the economy's excess logistics become dead weight.
