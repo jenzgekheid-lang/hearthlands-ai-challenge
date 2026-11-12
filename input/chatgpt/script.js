@@ -37,6 +37,7 @@ function runEconomy(v,M,out){
  if(ok&&(!GRID||GRID.w!==w||GRID.h!==h||t-GRID.t>=6))GRID=makeGrid(map,w,h,me,t);
  const oreKnown=k=>(M.ore[k]||[]).length>0||(ok&&oreValue(map,k)>1&&GRID.ore[oreValue(map,k)]>0);
  const ownMil=town.filter(b=>MIL[b.type]),milN=ownMil.length;
+ const liveQuarry=town.some(b=>b.type==='quarry'&&b.built&&ok&&area(GRID.sum[0],b.x+1,b.y+1,15)>0);
  const free=(v.soldiers||[]).filter(s=>!s.order&&!s.defends&&!s.fighting);
  const toolWait={};for(const b of town)if(TOOL[b.type]&&!b.worker)toolWait[TOOL[b.type]]=(toolWait[TOOL[b.type]]||0)+1;
  const freeTool=k=>st(k)-(toolWait[k]||0);
@@ -133,7 +134,6 @@ function runEconomy(v,M,out){
  add(count('bakery')<1&&count('mill')>0&&count('waterhut')>0,'bakery');
  // If the map is short of deposits, extend the border toward unowned mountain/rocks instead of waiting.
  const noOre=!oreKnown('coal')||!oreKnown('ironore');
- const liveQuarry=town.some(b=>b.type==='quarry'&&b.built&&ok&&area(GRID.sum[0],b.x+1,b.y+1,15)>0);
  const needsLand=(noOre&&(E.land.unsearched||0)<5)||(!liveQuarry&&t>150);
  const scheduleMil=milN<Math.min(12,1+Math.floor(t/180));
  if(scheduleMil&&free.length>=2&&!pending('guard'))goals.unshift('guard');
