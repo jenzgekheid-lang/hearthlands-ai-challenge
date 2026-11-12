@@ -76,12 +76,13 @@ function runEconomy(v,M,out){
   }
   return best;
  };
+ let siteCount=sites;
  const place=(type)=>{
-  if(sites>=4+(t>600?1:0))return false;
-  const c=COST[type]||[0,0],ow=town.filter(b=>!b.built).reduce((a,b)=>{a[0]+=(b.cost&&b.cost.plank)||0;a[1]+=(b.cost&&b.cost.stone)||0;return a;},[0,0]);
+  if(siteCount>=4+(t>600?1:0))return false;
+  const c=COST[type]||[0,0],ow=town.filter(b=>!b.built).reduce((a,b)=>{const need=b.cost||{},got=b.delivered||{};a[0]+=Math.max(0,(need.plank||0)-(got.plank||0));a[1]+=Math.max(0,(need.stone||0)-(got.stone||0));return a;},[0,0]);
   if(st('plank')-ow[0]<c[0]||st('stone')-ow[1]<c[1])return false;
   const p=find(type);if(!p)return false;
-  out.push(['place',{type,x:p.x,y:p.y}]);M.lastPlace[type]=t;return true;
+  out.push(['place',{type,x:p.x,y:p.y}]);siteCount++;M.lastPlace[type]=t;return true;
  };
  // A geologist searches the mountain; an explorer reveals the enemy and distant resources.
  if(!geos.length&&t>20&&carriers>5&&idleC>1&&freeTool('pick')>0&&(E.land.unsearched||0)>0&&t>=(M.geoAt||0)){
@@ -113,7 +114,8 @@ function runEconomy(v,M,out){
  // Keep the opening compact and reach the iron chain early.
  const goals=[];
  const add=(yes,ty)=>{if(yes&&!pending(ty)&&!goals.includes(ty))goals.push(ty);};
- add(count('quarry')<1,'quarry');
+ add(count('quarry')<1||(!liveQuarry&&count('stonemine')<1&&oreKnown('stone')),'quarry');
+ add(!liveQuarry&&oreKnown('stone')&&count('stonemine')<1,'stonemine');
  add(count('wood')<1,'wood');
  add(count('guard')<1,'guard');
  add(count('saw')<1,'saw');
@@ -131,7 +133,8 @@ function runEconomy(v,M,out){
  add(count('bakery')<1&&count('mill')>0&&count('waterhut')>0,'bakery');
  // If the map is short of deposits, extend the border toward unowned mountain/rocks instead of waiting.
  const noOre=!oreKnown('coal')||!oreKnown('ironore');
- const needsLand=(noOre&&(E.land.unsearched||0)<5)||(!count('quarry')&&t>120);
+ const liveQuarry=town.some(b=>b.type==='quarry'&&b.built&&ok&&area(GRID.sum[0],b.x+1,b.y+1,15)>0);
+ const needsLand=(noOre&&(E.land.unsearched||0)<5)||(!liveQuarry&&t>150);
  const scheduleMil=milN<Math.min(12,1+Math.floor(t/180));
  if(scheduleMil&&free.length>=2&&!pending('guard'))goals.unshift('guard');
  if(count('guard')>=2&&count('tower')<1&&free.length>=7&&t>900&&!pending('tower'))goals.unshift('tower');
@@ -149,9 +152,10 @@ function runEconomy(v,M,out){
  add(count('goldmine')<1&&oreKnown('goldore')&&built('barracks')>0,'goldmine');
  add(count('goldsmelter')<1&&built('goldmine')>0,'goldsmelter');
  // Prioritise the production chain and any stonecutter site that unlocks further building.
+ M.prio=M.prio||{};
  for(const ty of ['quarry','smelter','smith','weaponsmith','barracks']){
   const b=town.find(q=>q.type===ty&&q.built);
-  if(b&&!b.prio&&t>0&&M.prio!==b.id){out.push(['priority',{b:b.id,on:true}]);M.prio=b.id;break;}
+  if(b&&!b.prio&&!M.prio[b.id]){out.push(['priority',{b:b.id,on:true}]);M.prio[b.id]=1;break;}
  }
  if(!pending('quarry')&&count('quarry')===0&&goals[0]!=='quarry')goals.unshift('quarry');
  if(sites<4+(t>600?1:0)){
@@ -215,7 +219,8 @@ function area(L,cx,cy,r){
 function oreValue(map,k){return map&&map.oreNames?map.oreNames.indexOf(k)+1:0;}
 function runArmy(v,M,out){
  const t=v.t||0,mine=v.soldiers||[],bld=v.buildings||[],enemy=v.enemy||{},foes=enemy.soldiers||[],eb=enemy.buildings||[];
- const E=v.economy,cmd=c=>out.push(c),free=mine.filter(s=>!s.order&&!s.defends&&!s.fighting&&!s.held);
+ const E=v.economy,cmd=c=>out.push(c),free=mine.filter(s=>!s.order&&!s.defends&&!s.fighting&&!s.held),used={};
+ const available=()=>free.filter(s=>!used[s.id]);
  const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),door=b=>b.door||b;
  M.sent=M.sent||{};M.badTarget=M.badTarget||{};
  // Send one swordsman into each empty post; one is enough to claim its border.
@@ -223,43 +228,43 @@ function runArmy(v,M,out){
   if(!MIL[b.type]||b.owner!==v.me||b.built===false||(b.troops||[]).length||(M.sent[b.id]||0)>t)continue;
   let best=null,score=1e9;
   for(const s of free){const q=d(s,door(b))+(s.kind==='sword'?0:s.kind==='spear'?10:22);if(q<score){score=q;best=s;}}
-  if(best){cmd(['sendIn',{ids:[best.id],b:b.id}]);M.sent[b.id]=t+25;break;}
+  if(best){cmd(['sendIn',{ids:[best.id],b:b.id}]);used[best.id]=1;M.sent[b.id]=t+25;break;}
  }
  // Meet an enemy force only when it approaches our own buildings.
  if(foes.length&&t>=(M.defendAt||0)){
   let threat=null,near=99;
   for(const f of foes)for(const b of bld)if(b.owner===v.me){const q=Math.abs(f.x-b.x)+Math.abs(f.y-b.y);if(q<near){near=q;threat=f;}}
   if(threat&&near<20&&free.length){
-   const ids=free.filter(s=>d(s,threat)<55).map(s=>s.id);
-   if(ids.length){cmd(['march',{ids,tx:Math.round(threat.x),ty:Math.round(threat.y),form:'line',am:true}]);M.defendAt=t+5;}
+   const ids=available().filter(s=>d(s,threat)<55).map(s=>s.id);
+   if(ids.length){cmd(['march',{ids,tx:Math.round(threat.x),ty:Math.round(threat.y),form:'line',am:true}]);for(const id of ids)used[id]=1;M.defendAt=t+5;}
   }
  }
  for(const r of v.refused||[])if(r.order==='attack'&&r.args)M.badTarget[r.args.b]=t+120;
  const targets=eb.filter(b=>(b.military||MIL[b.type]||b.type==='hq')&&!(M.badTarget[b.id]>t));
  if(eb.length){M.enemyAt={x:eb.reduce((a,b)=>a+b.x,0)/eb.length,y:eb.reduce((a,b)=>a+b.y,0)/eb.length};}
- const active=mine.filter(s=>s.order&&s.order.k==='attack');
- if(active.length&&free.length){
-  const ids=free.map(s=>s.id),b=targets.find(q=>q.id===active[0].order.b);
+ const active=mine.filter(s=>s.order&&s.order.k==='attack'),ready=available();
+ if(active.length&&ready.length){
+  const ids=ready.map(s=>s.id),b=targets.find(q=>q.id===active[0].order.b);
   if(b&&ids.length>=4)cmd(['attack',{ids,b:b.id}]);
  }
- if(!active.length&&free.length&&targets.length){
-  const cx=free.reduce((a,s)=>a+s.x,0)/free.length,cy=free.reduce((a,s)=>a+s.y,0)/free.length;
+ if(!active.length&&ready.length&&targets.length){
+  const cx=ready.reduce((a,s)=>a+s.x,0)/ready.length,cy=ready.reduce((a,s)=>a+s.y,0)/ready.length;
   const rank={guard:0,tower:6,castle:14,hq:10};let target=null,best=1e9;
   for(const b of targets){const q=Math.hypot(door(b).x-cx,door(b).y-cy)+(rank[b.type]||0)-(b.manned===false?6:0);if(q<best){best=q;target=b;}}
   let need=target.manned===false?4:({guard:7,tower:11,castle:16,hq:12}[target.type]||8);
   for(const f of foes)if(d(f,door(target))<16)need++;
   const gold=typeof v.gold==='number'?v.gold:.6;need=Math.max(4,Math.ceil(need*(1.45-.75*gold)));
   if(t>2700)need=Math.max(4,Math.ceil(need*.65));
-  if(free.length>=need){cmd(['attack',{ids:free.map(s=>s.id),b:target.id}]);M.attackAt=t;M.attackId=target.id;
+  if(ready.length>=need){cmd(['attack',{ids:ready.map(s=>s.id),b:target.id}]);M.attackAt=t;M.attackId=target.id;
    if(t>=(M.attackNote||0)){out.push(['note',{text:'Attack: '+free.length+' field troops against '+target.type+' '+target.id+'; threshold '+need+', visible targets '+targets.length+'.'}]);M.attackNote=t+60;}
   }
- }else if(!targets.length&&free.length>=12&&t>900&&t>=(M.searchAt||0)){
+ }else if(!targets.length&&ready.length>=12&&t>900&&t>=(M.searchAt||0)){
   const map=v.map,w=map&&map.w||240,h=map&&map.h||240;
   const home=M.home||(bld.find(b=>b.type==='hq'&&b.owner===v.me)||{x:w/2,y:h/2});
   const pts=[[w-10,10],[w-10,h-10],[10,h-10],[10,10]];
-  const p=pts[(M.searchI||0)%pts.length],cx=free.reduce((a,s)=>a+s.x,0)/free.length,cy=free.reduce((a,s)=>a+s.y,0)/free.length;
+  const p=pts[(M.searchI||0)%pts.length],cx=ready.reduce((a,s)=>a+s.x,0)/ready.length,cy=ready.reduce((a,s)=>a+s.y,0)/ready.length;
   if(Math.hypot(p[0]-cx,p[1]-cy)<15)M.searchI=(M.searchI||0)+1;
-  else{cmd(['march',{ids:free.map(s=>s.id),tx:p[0],ty:p[1],form:'block',am:true}]);M.searchI=(M.searchI||0)+1;}
+  else{cmd(['march',{ids:ready.map(s=>s.id),tx:p[0],ty:p[1],form:'block',am:true}]);M.searchI=(M.searchI||0)+1;}
   M.searchAt=t+45;
  }
  // Keep outside force large enough after border posts take their permanent swordsmen.
