@@ -40,3 +40,12 @@ Two repeatable failure patterns:
 3. Check whether the previously stalled sides now build houses and continue past blocked mine goals.
 4. Compare soldiers, military buildings, land and economy at 15/30/45/60 minutes across all eight games.
 5. Check refused orders, task failures and script timeouts; site scanning should still stay below 0.3 seconds.
+
+
+## Carrier work-order experiment (commit ba45b75)
+
+The version 195 report for tested commit 85454ed showed a consistent transport bottleneck: idle carriers (often 29–44) alongside 70–120 goods waiting, and output piles full for large shares of building time. This is now direct evidence to test carrier work-list priority rather than only adding stores.
+
+- Move carrier work-list entry `clear` one position up (`workOrder k=4,d=-1`) once at startup.
+- This is a controlled experiment: no combat, army, building plan, or production targets changed.
+- Next report: verify accepted order / resulting work list effects indirectly via idle carriers, output-pile waiting time, goods waiting, and army growth. If worse, revert this one order.
