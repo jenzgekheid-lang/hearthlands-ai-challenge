@@ -108,6 +108,13 @@ function think(view){
  for(const g of geos)if(!g.busy&&!g.moving&&(E.unsearched||[]).length){
   const q=E.unsearched[0];out.push(['sendUnit',{u:g.id,tx:q.x,ty:q.y}]);
  }
+ // Workforce: the reports repeatedly show 30-44 idle carriers while staffed buildings
+ // wait for free settlers. Convert a bounded number into workers; never drain logistics.
+ const workers=(E.people&&E.people.worker)||0, carriers=(E.people&&E.people.carrier)||0;
+ const idleC=(E.idle&&E.idle.carrier)||0;
+ if(!view.armyOnly&&workers<24&&carriers>18&&idleC>12&&view.t>180&&view.t>=(memory.workerRetry||0)){
+  out.push(['profession',{role:'worker',d:1}]);memory.workerRetry=view.t+20;
+ }
  // Carrier throughput: if goods are accumulating while carriers are idle, move clearing work upward.
  const loose=(E.loose&&Object.values(E.loose).reduce((a,b)=>a+b,0))||0;
  const outputGoods=town.reduce((a,b)=>a+Object.values(b.outputs||{}).reduce((x,y)=>x+(y||0),0),0);
@@ -149,6 +156,9 @@ function think(view){
  add(n('smelter')<1&&n('coalmine')&&n('ironmine'),'smelter');
  add(n('weaponsmith')<1&&n('smelter')>0,'weaponsmith');
  add(n('barracks')<1&&n('weaponsmith')>0,'barracks');
+ // Gold improves every soldier outside our territory; add the chain only after iron weapons are underway.
+ add(n('goldmine')<1&&ore('goldore').length>0&&n('smelter')>0&&n('barracks')>0,'goldmine');
+ add(n('goldsmelter')<1&&n('goldmine')>0&&n('coalmine')>0&&n('barracks')>0,'goldsmelter');
  add(n('coalmine')<2&&n('weaponsmith')>0&&s('coal')<12&&ore('coal').length>0,'coalmine');
  add(n('goldmine')<1&&ore('goldore').length>0&&n('smelter')>0,'goldmine');
  add(n('goldsmelter')<1&&n('goldmine')>0&&n('coalmine')>0,'goldsmelter');
@@ -193,6 +203,8 @@ function think(view){
  if(empty.length&&memory.prio!==empty[0].id){out.push(['priority',{b:empty[0].id,on:true}]);memory.prio=empty[0].id;}
  // Garrison settings: fewer archers in small posts, keep towers balanced.
  for(const b of ownMil)if(b.built&&b.type==='guard'&&b.archers!==1)out.push(['archers',{b:b.id,set:1}]);
+ // Use spare idle carriers as workers before the economy's excess logistics become dead weight.
+ // (Workforce conversion above is deliberately gradual and capped.)
  // Attack only with a substantial field advantage. Prefer empty military targets.
  const targets=enemyB.filter(b=>b.military).sort((a,b)=>(a.manned?1:0)-(b.manned?1:0));
  const target=targets[0]||enemyB.find(b=>b.type==='hq');
