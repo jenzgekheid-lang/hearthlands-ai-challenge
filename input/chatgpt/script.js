@@ -1,7 +1,7 @@
 // ChatGPT GPT-6 — Hearthlands adaptive full-game strategy, rewritten for the advisor-tip system.
 // Diagnose economy and military bottlenecks from live tips plus observed state; fix the cause before expanding production.
 // Build a reliable resource chain, protect a useful field army, scout reachable frontiers, and attack with a real advantage.
-// Game version: 206
+// Game version: 207
 
 const COST={
  wood:[2,2],forest:[3,1],saw:[3,4],fisher:[3,2],waterhut:[3,4],farm:[6,6],mill:[3,3],bakery:[4,5],
@@ -141,6 +141,15 @@ function runEconomy(v,M,out){
  const settlersTip=hasTip('settlers')||/settler|carrier|homeless|beds/.test(allTip);
  const timingTip=hasTip('timing')||/late|too long|timing|minute/.test(allTip);
 
+ // Process path failures before dispatching another scout on this same economy turn.
+ const log=Array.isArray(E.log)?E.log:[];
+ const pathFails=log.filter(e=>e.what==='pathfail'&&/explorer|geologist/.test(String(e.s||'')));
+ if(pathFails.length&&pathFails[pathFails.length-1].t>(M.pathFailSeen||-1)){
+  const e=pathFails[pathFails.length-1];M.pathFailSeen=e.t;
+  if(/geologist/.test(e.s||''))M.geoFailAt=t+90;
+  if(/explorer/.test(e.s||''))M.scoutFailAt=t+120;
+ }
+
  // Send a geologist to the nearest known unsearched mountain, and avoid repeatedly reordering a moving unit.
  const geos=units.filter(u=>u.role==='geologist');
  if(!geos.length&&t>20&&carriers>5&&idleC>1&&freeTool('pick')>0&&(E.land.unsearched||0)>0&&t>=(M.geoAt||0)){
@@ -261,13 +270,6 @@ function runEconomy(v,M,out){
  }
 
  // No speculative builder/digger workforce: recruit them only when sites are actually waiting for labour.
- const log=Array.isArray(E.log)?E.log:[];
- const pathFails=log.filter(e=>e.what==='pathfail'&&/explorer|geologist/.test(String(e.s||'')));
- if(pathFails.length&&pathFails[pathFails.length-1].t>(M.pathFailSeen||-1)){
-  const e=pathFails[pathFails.length-1];M.pathFailSeen=e.t;
-  if(/geologist/.test(e.s||''))M.geoFailAt=t+90;
-  if(/explorer/.test(e.s||''))M.scoutFailAt=t+120;
- }
  if(sites>=2&&idleC>5&&carriers>9){
   if((people.builder||0)<2&&freeTool('hammer')>0&&t>=(M.builderAt||0)){
    out.push(['profession',{role:'builder',d:1}]);M.builderAt=t+120;
@@ -338,6 +340,12 @@ function findFrontier(map,me,home,sequence){
  scan: for(let y=2;y<h-2;y+=2)for(let x=2;x<w-2;x+=2){
   const i=y*w+x;
   if(owner[i]!==me||known[i]!==2)continue;
+  // A frontier waypoint must be a currently visible, open grass tile, not a building,
+  // tree, rock or mountain/water tile that can strand the explorer or marching group.
+  if(map.ter&&map.ter[i]!==0)continue;
+  if(map.occupied&&map.occupied[i])continue;
+  if(map.tree&&map.tree[i])continue;
+  if(map.stone&&map.stone[i])continue;
   let fog=0,neutral=0;
   for(const d of dirs){
    const j=(y+d[1])*w+x+d[0];
