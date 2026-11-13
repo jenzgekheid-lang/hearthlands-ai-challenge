@@ -473,8 +473,10 @@ function runArmy(v,M,out){
    let need=target.manned===false?3:({guard:8,tower:13,castle:18,hq:15}[target.type]||10);
    for(const f of foes)if(dist(f,door(target))<16)need++;
    const gold=typeof v.gold==='number'?v.gold:0.6;
-   need=Math.max(target.manned===false?2:5,Math.ceil(need*(1.28-0.42*gold)));
-   if(t>3000)need=Math.max(target.manned===false?2:5,Math.ceil(need*0.92));
+   // Avoid tiny 2–3 soldier raids: reports showed repeated low-threshold
+   // attacks followed by losses and a depleted field army. Commit a real force.
+   need=Math.max(8,Math.ceil(need*(1.28-0.42*gold)));
+   if(t>3000)need=Math.max(8,Math.ceil(need*0.92));
    if(ready.length>=need){
     cmd(['attack',{ids:ready.map(s=>s.id),b:target.id}]);
     M.attackAt=t;M.attackId=target.id;M.reinforceAt=t+15;
