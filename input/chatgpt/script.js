@@ -219,7 +219,7 @@ function runEconomy(v,M,out){
  const unsearched=E.unsearched||[];
  const needsOre=(noCoal||noIron)&&(unsearched.length===0||(E.land.unsearched||0)<2||oreTip);
  const soldierN=(v.soldiers||[]).length;
- const maxPosts=soldierN>=25&&carriers>=10?4:soldierN>=17&&carriers>=8?3:soldierN>=11&&carriers>=7?2:1;
+ const maxPosts=soldierN>=22&&carriers>=10?4:soldierN>=14&&carriers>=8?3:soldierN>=8&&carriers>=7?2:1;
  const activeSites=town.some(b=>!b.built&&(MIL[b.type]||b.type==='look'));
  const shouldExpand=ownMil.length<maxPosts&&carriers>=7&&idleC>=2&&soldierN>=8&&
   built('quarry')>0&&built('wood')>0&&(landTip||needsOre||t>1500+ownMil.length*500);
