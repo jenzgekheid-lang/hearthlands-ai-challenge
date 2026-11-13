@@ -178,3 +178,23 @@ The script was rewritten as a new strategy rather than incrementally patched. It
 - The complete replacement parses in the JavaScript runtime.
 - Mock-view checks exercised an opening economy turn, an `armyOnly` turn with no economy log, an attack against a visible unmanned guard, and a turn with no economy object. No runtime errors occurred; command counts remained below the 50-command limit.
 - These are syntax/interface smoke tests only. The rewrite has **not** yet been played in the arena, and no win-rate or economic improvement is claimed. The next report must be checked for the exact tested commit and for real examples/holding times of the advisor tips.
+
+
+
+## Follow-up analysis of the 12 Nov arena report (old script 62ccc56) and v206 rewrite audit
+
+The current published report is still game 204 / script 62ccc56 (2 wins, 0 losses, 6 undecided). It does not test the v206 rewrite or contain advisor-tip examples.
+
+### Repeated old-script failure patterns
+- In the six undecided games, the economy commonly stopped around 20–25 buildings and one military post while the NPC reached 68–84 buildings and 12–23 military buildings.
+- Transport was the largest recurring bottleneck: wood/quarry/saw/fisher/farm/mill/water/bakery outputs spent roughly 47–98% of building time full and waiting for carriers. End-game waiting goods often reached 89–122; idle carriers were sometimes near zero, but in other games 27–38 carriers were idle. This means the problem is not simply “recruit more carriers”: production priority, task distance, and local delivery congestion also matter.
+- Iron deposits were often exhausted early (iron mine spent 71–89% of time finding little ore); coal deposits also wore out. Smelter/weaponsmith/barracks chains were then starved or idle. A single initial deposit was not enough for sustained recruitment.
+- Military expansion failed to scale consistently. Most undecided games ended with one post and one outside soldier, while the NPC expanded and recruited. Where the AI won (777 Gold and 4242 Blue), it captured resources/buildings and reached 19/13 soldiers respectively; taking land and supply stock visibly changed the economy.
+- The old script repeatedly attacked small groups (4–8) and lost many soldiers in the prolonged fights. Its field reserve/army target behaviour and reinforcement were ineffective.
+- Explorer pathfinding cut off 7–16 times per game in some maps; repeated blind exploration was not a reliable answer.
+
+### Rewrite audit and targeted follow-up (commit 464acf8)
+- Corrected the food recovery dependency: an iron-mine food shortage now also opens the farm → water → pig farm → butcher chain, rather than only reacting to coal-mine hunger.
+- A current `stall` advisor tip plus fewer than four idle carriers now activates a short production/expansion hold; pile/output wording can also trigger the hold when no building sites are active.
+- Syntax and a mocked live `stall` + `ore` tip turn passed; the hold timer was set as expected. This is not an arena test.
+- Remaining high-priority unknowns for the next real run: actual v206 tip text/holding durations; whether the army reaches 20+ field soldiers without crippling carriers; whether more than one deposit is found and exploited; whether the carrier backlog can be relieved without adding still more houses/production; and whether guard/tower expansion happens early enough to contest land.
