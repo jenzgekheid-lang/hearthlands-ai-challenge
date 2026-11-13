@@ -58,7 +58,13 @@ function builderExample() {
   const m = read(KIT).match(/\/\/ AI script: builder\.[\s\S]*?\n}\n/); if (!m) stop("the kit's builder example was not found");
   return `// AI script: ${NAME}\n// Model: ${MODEL} (local, Ollama)\n// Game version: ${gameVersion()}\n// Plan: the kit's builder example as a start; improved one change per round.\n` + m[0];
 }
-function gameVersion() { const m = read(REPORT).match(/Game version (\d+)/) || read(KIT).match(/New in game version (\d+)/); return m ? m[1] : '195'; }
+// the game version the arena plays now: the newest "Game version N" in any tournament report
+function gameVersion() {
+  let newest = 0;
+  try { for (const d of fs.readdirSync(path.join(ROOT, 'output'))) { const m = read(path.join(ROOT, 'output', d, 'latest.md')).match(/Game version (\d+)/); if (m) newest = Math.max(newest, +m[1]); } } catch (e) { /* no output folder yet */ }
+  if (newest) return String(newest);
+  const m = read(REPORT).match(/Game version (\d+)/) || read(KIT).match(/New in game version (\d+)/); return m ? m[1] : '195';
+}
 
 // ---------------------------------------------------------------- checking an answer before it is pushed
 function extractScript(answer) {
@@ -114,6 +120,7 @@ function trial(code) {
         land: { tiles: 1000 + 200 * mil.length, grass: 600, trees: 150, rocks: 60, water: 40, mountain: 150, unsearched: late ? 0 : 60 },
         ore: turn >= 6 ? [{ x: 30, y: 30, ore: 'coal' }, { x: 34, y: 30, ore: 'ironore' }, { x: 38, y: 30, ore: 'goldore' }, { x: 42, y: 30, ore: 'stone' }] : [],
         unsearched: late ? [] : [{ x: 28, y: 28, d: 40 }], spots, work: ['staff', 'recruit', 'sites', 'workshops', 'clear', 'surplus'], loose: {}, log: [],
+        tips: [{ k: 'stall', text: 'fisher: no fish in range inside your border 100% of the last 5 minutes.' }, { k: 'land', text: "Your land hasn't grown for 8 minutes: build a small tower at your border to claim more." }],
         army: { target: { sword: 4, bow: 2, spear: 2 }, keep: [{ weapon: 'sword', keep: 1 }, { weapon: 'bow', keep: 1 }, { weapon: 'spear', keep: 1 }], reserve: 0, list: null },
       },
     };
@@ -154,11 +161,25 @@ function parseReport(text) {
   return { made, played: true, won, lost, undecided, score, games,
     line: `won ${won}, lost ${lost}, undecided ${undecided}; after an hour on average ${avg(0).toFixed(1)} buildings, ${avg(3).toFixed(1)} soldiers, ${Math.round(avg(2))} land tiles` };
 }
-function digest(text, limit = 6000) {
+function digest(text, limit = 6600) {
   const R = parseReport(text); if (!R.played) return text.slice(0, 1500);
   const pick = (g, re) => (g.text.match(re) || [''])[0].trim();
   const out = [`Result: ${R.line}.`, 'Each game (buildings / military buildings / land tiles / soldiers / people after an hour; you, then the original game NPC):'];
   for (const g of R.games) out.push(`- ${g.title}: you ${g.me.join('/')}, NPC ${g.them}`);
+  // the advisor tips of all games together: minutes held summed over the games, longest first, ten lines at most
+  const tips = new Map();
+  for (const g of R.games) {
+    const sec = (g.text.match(/^Advisor tips[^\n]*\n((?:- [^\n]*\n?)+)/m) || [])[1] || '';
+    for (const l of sec.split('\n')) {
+      const m = l.match(/^- (\d+) min, \S+: (.*)$/); if (!m) continue;
+      const key = m[2].replace(/\d+%?/g, '#'), t = tips.get(key) || { min: 0, games: new Set(), text: m[2] };
+      t.min += +m[1]; t.games.add(g.title); tips.set(key, t);
+    }
+  }
+  if (tips.size) {
+    out.push('', 'Advisor tips over all games (minutes held in total, and in how many games they came up):');
+    for (const t of [...tips.values()].sort((a, b) => b.min - a.min).slice(0, 10)) out.push(`- ${t.min} min, ${t.games.size} of ${R.games.length} games: ${t.text}`);
+  }
   // two games in detail: the worst and the best town
   const sorted = R.games.slice().sort((a, b) => a.me[0] - b.me[0]), detail = [...new Set([sorted[0], sorted[sorted.length - 1]])].filter(Boolean);
   for (const g of detail) {
@@ -200,6 +221,7 @@ function question(script, S, reportText) {
   return [
     'You improve an AI script for Hearthlands, a Settlers-like strategy game. The script plays a whole game against the original game NPC: it must build a town, train soldiers and attack. A game is won when the other side has no soldiers and no military buildings left; after 60 game minutes it is undecided.',
     '== THE RULES (what the script sees and the orders it can give) ==\n' + kitRules(),
+    '== ADVISOR TIPS ==\nview.economy.tips exists: [{k, text}], renewed every game minute (k: the kind; kinds: land, ore, weapons, stall, army, settlers, orders, timing). A script may react to the tips while it plays.',
     '== THE CURRENT SCRIPT (the best so far) ==\n```js\n' + script.trim() + '\n```',
     '== WHAT HAPPENED WHEN IT PLAYED (4 maps, each twice) ==\n' + (reportText ? digest(reportText) : 'It has not played yet.'),
     hist ? '== YOUR EARLIER ROUNDS ==\n' + hist + '\nDo not repeat a change that was undone.' : '',
@@ -287,11 +309,15 @@ async function waitForReport(sha) {
 
 // take a finished report into the state: keep the change or go back to the best script
 function judge(S, reportText) {
-  const R = parseReport(reportText), P = S.pending, better = R.played && (!S.best || R.score > S.best.score);
-  log(`round ${P.round} result: ${R.line} (score ${R.score}${S.best ? ', best so far ' + S.best.score : ''}) -> ${better ? 'KEPT' : 'undone'}`);
+  // a baseline re-test (P.rebase) is always kept when played: it is the first score on this game version
+  const R = parseReport(reportText), P = S.pending, better = R.played && (P.rebase || !S.best || R.score > S.best.score);
+  log(`round ${P.round} result: ${R.line} (score ${R.score}${S.best && !P.rebase ? ', best so far ' + S.best.score : ''}) -> ${better ? 'KEPT' : 'undone'}`);
   S.history = (S.history || []).concat({ round: P.round, sha: P.sha.slice(0, 7), change: P.change, result: R.line, score: R.score, kept: better });
-  if (better) { S.best = { score: R.score, sha: P.sha.slice(0, 7), round: P.round }; fs.copyFileSync(SCRIPT, BEST); fs.writeFileSync(path.join(DIR, 'best-report.md'), reportText); }
-  fs.appendFileSync(NOTES, `\n## Round ${P.round} (${new Date().toISOString().slice(0, 16).replace('T', ' ')}, commit ${P.sha.slice(0, 7)})\n\n- Change: ${P.change}\n- Result: ${R.line} (score ${R.score})\n- ${better ? 'Kept: the best so far.' : 'Not better than round ' + (S.best ? S.best.round : '?') + ': the next round starts from the best script again.'}\n`);
+  if (better) { S.best = { score: R.score, sha: P.sha.slice(0, 7), round: P.round, version: gameVersion() }; fs.copyFileSync(SCRIPT, BEST); fs.writeFileSync(path.join(DIR, 'best-report.md'), reportText); }
+  const note = better ? (P.rebase ? 'Kept: the baseline for this game version.' : 'Kept: the best so far.')
+    : P.rebase ? 'Not played: the best script is re-tested on this game version next start.'
+    : 'Not better than round ' + (S.best ? S.best.round : '?') + ': the next round starts from the best script again.';
+  fs.appendFileSync(NOTES, `\n## Round ${P.round} (${new Date().toISOString().slice(0, 16).replace('T', ' ')}, commit ${P.sha.slice(0, 7)})\n\n- Change: ${P.change}\n- Result: ${R.line} (score ${R.score})\n- ${note}\n`);
   S.round = P.round; delete S.pending; saveState(S);
 }
 
@@ -316,8 +342,19 @@ async function main() {
     S.pending = { round: S.round || 0, change: SEED || !S.history ? "start: the kit's builder example" : 'start: the script as it was', sha: '' };
     saveState(S); S.pending.sha = push(`${NAME}: round ${S.pending.round} (start)`) && scriptCommit(); saveState(S); push(`${NAME}: loop state`);
   }
+  // the stored best was scored on an older game version: re-test it on this one first; it becomes the new baseline,
+  // the history stays. A round that was still waiting cannot be compared with the old score, so it is noted and dropped.
+  const v = gameVersion();
+  if (S.best && S.best.version !== v && !(S.pending && S.pending.rebase)) {
+    if (S.pending) { S.history = (S.history || []).concat({ round: S.pending.round, sha: (S.pending.sha || '-').slice(0, 7), change: S.pending.change, result: 'not compared: the best script was scored on game version ' + (S.best.version || 'an older one'), score: -1, kept: false }); delete S.pending; }
+    fs.writeFileSync(SCRIPT, read(BEST).replace(/^\/\/ Game version:.*$/m, '// Game version: ' + v));
+    S.pending = { round: S.round || 0, change: `baseline: the best script (round ${S.best.round}) re-tested on game version ${v}`, sha: '', rebase: true };
+    saveState(S); S.pending.sha = push(`${NAME}: baseline on game version ${v}`) && scriptCommit(); saveState(S); push(`${NAME}: loop state`);
+    log(`re-testing the best script (round ${S.best.round}) on game version ${v} as the new baseline`);
+  }
   for (let done = 0; ; ) {
     if (S.pending) { judge(S, await waitForReport(S.pending.sha)); push(`${NAME}: notes of round ${S.round}`); }
+    if (S.best && S.best.version !== gameVersion()) stop(`the best script is not re-tested on game version ${gameVersion()} yet (the re-test was not played). Start this script again: it tries once more.`);
     if (done++ >= ROUNDS) break;
     const base = read(BEST) || read(SCRIPT), round = (S.round || 0) + 1;
     log(`---- round ${round} ----`);
