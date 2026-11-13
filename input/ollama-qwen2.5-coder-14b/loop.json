@@ -1,5 +1,5 @@
 {
-  "round": 7,
+  "round": 8,
   "history": [
     {
       "round": 0,
@@ -80,6 +80,14 @@
       "result": "won 0, lost 0, undecided 8; after an hour on average 6.0 buildings, 10.0 soldiers, 2033 land tiles",
       "score": 130,
       "kept": false
+    },
+    {
+      "round": 8,
+      "sha": "46d4714",
+      "change": "Prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup, which will help in maintaining a stronger defense and increasing the ch",
+      "result": "won 0, lost 0, undecided 8; after an hour on average 5.6 buildings, 9.0 soldiers, 2376 land tiles",
+      "score": 125,
+      "kept": false
     }
   ],
   "best": {
@@ -87,10 +95,5 @@
     "sha": "9459aa8",
     "round": 4,
     "version": "207"
-  },
-  "pending": {
-    "round": 8,
-    "change": "Prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup, which will help in maintaining a stronger defense and increasing the ch",
-    "sha": "46d47141a0ae36d81e8d643cd656e4ae10b03f58"
   }
 }
