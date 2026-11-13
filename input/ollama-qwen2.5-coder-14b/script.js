@@ -12,7 +12,7 @@ function think(view){
   const ore = k => E.ore.some(o => o.ore === k);
   // what it wants next, in order: [condition, building]
   const want = [
-    [mil < 2, 'guard'], [mil < 4, 'guard'], [mil < 6, 'tower'], [mil < 8, 'tower'], // Prioritize building military structures
+    [mil < 1, 'guard'], [mil < 2, 'guard'], [mil < 3, 'tower'], [mil < 4, 'tower'], // Prioritize building military structures
     [has('wood') < 1, 'wood'], [has('quarry') < 1, 'quarry'], [has('saw') < 1, 'saw'], [has('wood') < 2, 'wood'],
     [has('forest') < 1, 'forest'], [(E.people.carrier || 0) < 6 && E.population >= E.beds - 4 && !E.town.some(b => !b.built && /house/.test(b.type)), 'house'], // a house only when few carriers are free
     [has('fisher') < 1, 'fisher'], [has('waterhut') < 1, 'waterhut'], [has('farm') < 1, 'farm'], [has('mill') < 1, 'mill'],
@@ -30,7 +30,7 @@ function think(view){
   // more land: a guard post or tower at the far edge, when what it wants has no room or every few minutes
   const noRoom = want.length && E.spots[want[0]] && !E.spots[want[0]].length;
   const empty = view.buildings.some(b => b.military && b.type !== 'hq' && b.built && !(b.troops && b.troops.length)); // nobody to man it yet
-  const milWanted = (noRoom || mil < Math.floor(view.t / 150)) && !empty && !E.town.some(b => !b.built && (b.type === 'guard' || b.type === 'tower'));
+  const milWanted = (noRoom || mil < Math.floor(view.t / 120)) && !empty && !E.town.some(b => !b.built && (b.type === 'guard' || b.type === 'tower'));
   const ask = (milWanted ? ['guard'] : []).concat(want.slice(0, 3));
   out.push(['ask', {spots: ask}]);
   if (sites >= 3 || st('plank') < 2) return out;                     // don't start too much at once
