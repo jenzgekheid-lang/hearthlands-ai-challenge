@@ -58,7 +58,7 @@
   "pending": {
     "round": 4,
     "change": "baseline: the best script (round 3) re-tested on game version 207",
-    "sha": "",
+    "sha": "9459aa80fc7fa7606c78d6ad69625e4f9af25126",
     "rebase": true
   }
 }
