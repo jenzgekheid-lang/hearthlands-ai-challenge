@@ -1,6 +1,6 @@
 // AI script: ollama-qwen2.5-coder-14b
 // Model: qwen2.5-coder:14b (local, Ollama)
-// Game version: 195
+// Game version: 207
 // Plan: the kit's builder example as a start; improved one change per round.
 // AI script: builder. Builds a town step by step with the economy view (view.economy) and commands.
 function think(view){
@@ -30,7 +30,7 @@ function think(view){
   // more land: a guard post or tower at the far edge, when what it wants has no room or every few minutes
   const noRoom = want.length && E.spots[want[0]] && !E.spots[want[0]].length;
   const empty = view.buildings.some(b => b.military && b.type !== 'hq' && b.built && !(b.troops && b.troops.length)); // nobody to man it yet
-  const milWanted = (noRoom || mil < Math.floor(view.t / 120)) && !empty && !E.town.some(b => !b.built && (b.type === 'guard' || b.type === 'tower'));
+  const milWanted = (noRoom || mil < Math.floor(view.t / 150)) && !empty && !E.town.some(b => !b.built && (b.type === 'guard' || b.type === 'tower'));
   const ask = (milWanted ? ['guard'] : []).concat(want.slice(0, 3));
   out.push(['ask', {spots: ask}]);
   if (sites >= 3 || st('plank') < 2) return out;                     // don't start too much at once
