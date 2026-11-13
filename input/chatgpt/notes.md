@@ -305,3 +305,16 @@ The army scouting branch called findFrontier(), which deliberately selects a cur
 - Does contact expose enemy military buildings in view.enemy.buildings and trigger actual attack orders?
 - Are scout groups released on arrival/timeout and reintegrated into attacks?
 - Check pathfails, deaths, army size, and whether attacks take/empty enemy posts. If contact still fails, audit explorer pathing and map start geometry rather than increasing army size blindly.
+
+
+## Version-207 field-attack threshold follow-up (commit edd67f3; awaiting arena)
+
+### Evidence from report tested at db03d8a
+- Enemy contact occurred at minute 16 in all eight matches; attacks were issued in all eight, and several guards/HQs were captured. The scout route correction is working.
+- The map-31 Gold log recorded attacks against buildings at threshold 3 (three field troops) repeatedly; its field force fell to 5 soldiers at minutes 40–45 while the NPC army reached 35. Other matches showed substantial attrition during prolonged fighting.
+- Seven matches timed out at 60 minutes; only map 777 Gold won. This is not evidence that the scout change alone caused the win (the report tested db03d8a, not 0dc9ee5).
+
+### Change in edd67f3
+- Raised the minimum field force commitment for a fresh attack to eight soldiers, including empty/unmanned targets. Gold and late-game scaling still influence the required force above that floor.
+- Intent: stop repeatedly launching tiny 2–3 soldier raids that can capture a post but leave the mobile army exposed to attrition. Attack orders still send the available field force once the threshold is met.
+- V8 syntax check passed. This is a code hypothesis, not an arena-validated improvement; compare enemy captures, attack timings, field-force survival, and wins in the next report.
