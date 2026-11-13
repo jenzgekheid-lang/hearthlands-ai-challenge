@@ -161,7 +161,7 @@ function runEconomy(v,M,out){
  if(!exps.length&&t>150&&carriers>9&&idleC>3&&st('plank')>=5&&t>=(M.expAt||0)){
   out.push(['profession',{role:'explorer',d:1}]);M.expAt=t+120;
  }
- for(const u of exps)if(!u.busy&&!u.moving&&ok&&t>=(M.scoutSend||0)){
+ for(const u of exps)if(!u.busy&&!u.moving&&ok&&t>=(M.scoutSend||0)&&t>=(M.scoutFailAt||0)){
   const p=findFrontier(map,me,home,M.scoutI||0);
   if(p){
    out.push(['sendUnit',{u:u.id,tx:p.x,ty:p.y}]);
