@@ -18,9 +18,9 @@
     "undecided": 8
   },
   "ollama-qwen2.5-coder-14b": {
-    "date": "2026-11-11",
-    "commit": "85454ed",
-    "version": 195,
+    "date": "2026-11-13",
+    "commit": "9459aa8",
+    "version": 207,
     "status": "played",
     "won": 0,
     "lost": 0,
