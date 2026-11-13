@@ -48,17 +48,20 @@
       "result": "not compared: the best script was scored on game version an older one",
       "score": -1,
       "kept": false
+    },
+    {
+      "round": 4,
+      "sha": "9459aa8",
+      "change": "baseline: the best script (round 3) re-tested on game version 207",
+      "result": "won 0, lost 0, undecided 8; after an hour on average 6.0 buildings, 10.0 soldiers, 2033 land tiles",
+      "score": 130,
+      "kept": true
     }
   ],
   "best": {
     "score": 130,
-    "sha": "7571a7b",
-    "round": 3
-  },
-  "pending": {
+    "sha": "9459aa8",
     "round": 4,
-    "change": "baseline: the best script (round 3) re-tested on game version 207",
-    "sha": "9459aa80fc7fa7606c78d6ad69625e4f9af25126",
-    "rebase": true
+    "version": "207"
   }
 }

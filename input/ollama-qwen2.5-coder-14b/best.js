@@ -1,6 +1,6 @@
 // AI script: ollama-qwen2.5-coder-14b
 // Model: qwen2.5-coder:14b (local, Ollama)
-// Game version: 195
+// Game version: 207
 // Plan: the kit's builder example as a start; improved one change per round.
 // AI script: builder. Builds a town step by step with the economy view (view.economy) and commands.
 function think(view){
