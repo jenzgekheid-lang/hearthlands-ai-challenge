@@ -219,3 +219,18 @@ The expansion policy had a circular threshold: it allowed only **one** post belo
 - V8 syntax parse passed after commit 6eb9409. The changed expression is within the existing carrier and `shouldExpand` safeguards. No game simulation is available in this local check; no arena outcome is claimed.
 - Script performance in v206 was safe in every game (1,800 turns; 1.4–4.7 ms average, 14–36 ms worst, zero >0.3 s, zero script errors). Refused orders: none in 7 games; one overlapping `place` on 20261030 Gold. The new change issues no new command type.
 - Next run must test script commit 6eb9409 or later. For the stalled starts, verify by minute 20–30: at least 2 staffed/claiming posts, land clearly above the ~1,328–1,350 plateau, newly searched mountain/ore signs, and a coal/iron mine placed by minute 30–40 if a deposit is reachable. Also check that the second post does not drain all field soldiers or starve carriers. Success should be demonstrated on multiple maps/sides, not just one; then assess actual enemy discovery and attack orders/wins.
+
+## Explorer path-failure cooldown correction (script commit f086f85; version 206)
+
+The v206 arena report recorded repeated explorer path failures ("cut-off"), including 29 on map 31 Gold, 86 on 4242 Blue, and 3 on 777 Gold. The script already recorded these failures and set `M.scoutFailAt = t + 120`, but the explorer dispatch condition never checked that cooldown. As a result, a newly idle explorer could be sent again during the intended recovery window.
+
+### Change
+- Explorer waypoint dispatch now also requires `t >= M.scoutFailAt`.
+- No economy, army-target, combat, or expansion values changed.
+- This is a narrow correction to make the existing failure cooldown effective, not a claim that it solves pathfinding or enemy discovery.
+
+### Validation and next report
+- V8 syntax parse passed after the edit.
+- No arena simulation is available from this edit; it is not yet measured.
+- Check whether repeated explorer cut-offs fall, whether the explorer resumes after the 120-second cooldown, and whether the army's scouting marches discover enemy territory/buildings earlier.
+- Separately verify the preceding post-threshold change from commit 6eb9409; this edit does not validate it.
