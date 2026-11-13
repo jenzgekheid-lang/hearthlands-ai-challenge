@@ -234,3 +234,24 @@ The v206 arena report recorded repeated explorer path failures ("cut-off"), incl
 - No arena simulation is available from this edit; it is not yet measured.
 - Check whether repeated explorer cut-offs fall, whether the explorer resumes after the 120-second cooldown, and whether the army's scouting marches discover enemy territory/buildings earlier.
 - Separately verify the preceding post-threshold change from commit 6eb9409; this edit does not validate it.
+
+
+## Version-207 arena review and reachable-frontier correction (tested commit d04e569)
+
+### What the v207 report shows
+- The report explicitly tested commit d04e569 (script declared game version 206) on game version 207: 0 wins, 0 losses, 8 undecided.
+- The army reached 55 soldiers on map 31 Gold, but only 1 military post and no recorded building-attack orders. Other starts were more resource/territory constrained.
+- Explorer pathfinding reported 17 cut-off failures on map 31 Gold. The army issued scouting marches, but the report records no attack orders.
+- Transport congestion remained severe on mature starts: 93–99 goods waiting and only 0–2 idle carriers in several games. Ironmine output also spent 62% of its time finding little ore and 21% stopped for food on map 31 Gold.
+- These observations point to scouting reachability and territorial access as the next immediate experiment; a broad economy or combat rewrite would confound the result.
+
+### Focused change after d04e569
+- Update the script header to game version 207.
+- Move path-failure log processing before explorer dispatch, so a newly reported explorer/geologist failure can suppress another dispatch in the same economy turn.
+- Make findFrontier reject non-grass, occupied, tree-covered and rock-covered candidate tiles. The old selector checked ownership and fog adjacency but did not check whether the chosen waypoint was physically open. This is a plausible contributor to the repeated cut-off paths; the report does not expose the exact failed coordinates, so it remains a hypothesis to test.
+- Leave attack thresholds, army composition, economy, garrisoning and military-post thresholds unchanged.
+
+### Validation and next report
+- V8 syntax parse passed after the change.
+- This is a targeted reachability/interface fix, not a simulated pathfinding test. It must not be described as proven until a v207+ arena report tests this commit.
+- Check whether explorer cut-offs fall, whether scouting reveals enemy buildings earlier, and whether attack orders begin. Also check refused orders and whether the 0–2 idle-carrier bottleneck persists.
