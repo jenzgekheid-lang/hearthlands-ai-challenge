@@ -282,3 +282,26 @@ The v206 arena report recorded repeated explorer path failures ("cut-off"), incl
 - Mock army-only turn (no economy/log) returned cleanly.
 - These are interface/smoke tests, not a game simulation. Pioneer effectiveness depends on a spare shovel being available; the kit documents the profession and claim behaviour, but does not expose a direct smith recipe-selection command.
 - The arena has not yet tested commit 534f824. The next report must verify whether 777/4242 reach a third post, whether housing stops growing unnecessarily, whether a mine/smelter/weaponsmith/barracks chain starts, whether enemy contact happens earlier, and whether attacks are actually issued and captured.
+
+
+## Enemy-contact audit and scout-route correction (script commit 0dc9ee5, 13 Nov 2026)
+
+### Confirmed from the v207 report (tested script daf78f4)
+- Eight games were undecided; seven had no recorded enemy contact, and the only contact was map 31 Gold at 43:00.
+- Despite 31–70 field soldiers in several games, the report showed no building-attack orders. Land was roughly 4.2k–4.4k tiles versus 13.4k–18.3k for the NPC on sampled sides.
+- This report is not the scout correction's test: its tested commit was daf78f4, not the previous scout fix or this change.
+
+### Code-level cause found
+The army scouting branch called findFrontier(), which deliberately selects a currently visible tile already owned by us next to fog. Soldiers therefore repeatedly visited our own border; they did not deliberately cross the map toward the opponent's likely diagonally opposite start. The separate explorer loop also used the same near-home frontier selector. This explains why contact was late/absent despite repeated scout dispatches.
+
+### Change in commit 0dc9ee5
+- Replaced the army scout waypoint with a diagonally opposite map destination (clamped inside map bounds), alternating small offsets across five attempts.
+- Kept the scout group at up to five available soldiers, plain march (not attack-move), existing release/timeout logic, and 180-second dispatch cooldown.
+- No economy, combat threshold, garrison, or combat numbers changed.
+- V8 syntax check passed; GitHub fetch verified the updated file. This is not arena-tested.
+
+### What the next arena report must establish
+- Does this exact script commit reach/contact the NPC earlier on all four maps and both sides?
+- Does contact expose enemy military buildings in view.enemy.buildings and trigger actual attack orders?
+- Are scout groups released on arrival/timeout and reintegrated into attacks?
+- Check pathfails, deaths, army size, and whether attacks take/empty enemy posts. If contact still fails, audit explorer pathing and map start geometry rather than increasing army size blindly.
