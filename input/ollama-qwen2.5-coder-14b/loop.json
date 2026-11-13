@@ -1,5 +1,5 @@
 {
-  "round": 13,
+  "round": 14,
   "history": [
     {
       "round": 0,
@@ -128,6 +128,14 @@
       "result": "won 0, lost 0, undecided 8; after an hour on average 5.0 buildings, 10.0 soldiers, 1822 land tiles",
       "score": 118,
       "kept": false
+    },
+    {
+      "round": 14,
+      "sha": "c56ba10",
+      "change": "Prioritize building a sawmill earlier to ensure a steady supply of planks, which are crucial for expanding the town and building more military structures.",
+      "result": "won 0, lost 1, undecided 7; after an hour on average 27.6 buildings, 9.4 soldiers, 2830 land tiles",
+      "score": 51,
+      "kept": false
     }
   ],
   "best": {
@@ -135,10 +143,5 @@
     "sha": "9459aa8",
     "round": 4,
     "version": "207"
-  },
-  "pending": {
-    "round": 14,
-    "change": "Prioritize building a sawmill earlier to ensure a steady supply of planks, which are crucial for expanding the town and building more military structures.",
-    "sha": "c56ba101d154e7758acb8b68164668cfdd49d093"
   }
 }

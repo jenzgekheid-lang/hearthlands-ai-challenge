@@ -85,3 +85,9 @@ Written by tools/ollama-loop.js: one change per round, kept only when the arena 
 - Change: Prioritize building a sawmill earlier to ensure a steady supply of planks, which are crucial for expanding the town and building more military structures.
 - Result: won 0, lost 0, undecided 8; after an hour on average 5.0 buildings, 10.0 soldiers, 1822 land tiles (score 118)
 - Not better than round 4: the next round starts from the best script again.
+
+## Round 14 (2026-11-13 13:39, commit c56ba10)
+
+- Change: Prioritize building a sawmill earlier to ensure a steady supply of planks, which are crucial for expanding the town and building more military structures.
+- Result: won 0, lost 1, undecided 7; after an hour on average 27.6 buildings, 9.4 soldiers, 2830 land tiles (score 51)
+- Not better than round 4: the next round starts from the best script again.
