@@ -87,5 +87,10 @@
     "sha": "9459aa8",
     "round": 4,
     "version": "207"
+  },
+  "pending": {
+    "round": 8,
+    "change": "Prioritize building military structures earlier and more aggressively to counter the NPC's rapid expansion and military buildup, which will help in maintaining a stronger defense and increasing the ch",
+    "sha": ""
   }
 }
