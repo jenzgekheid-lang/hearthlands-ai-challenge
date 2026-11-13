@@ -150,6 +150,15 @@ function runEconomy(v,M,out){
   if(/explorer/.test(e.s||''))M.scoutFailAt=t+120;
  }
 
+ // Pioneers extend the border toward neutral ground and nearby mountain resources.
+ const pioneers=units.filter(u=>u.role==='pioneer');
+ if(!pioneers.length&&t>300&&carriers>10&&idleC>5&&freeTool('shovel')>0&&t>=(M.pioneerAt||0)){
+  out.push(['profession',{role:'pioneer',d:1}]);M.pioneerAt=t+120;
+ }
+ for(const p of pioneers)if(!p.busy&&!p.moving&&ok&&t>=(M.pioneerSend||0)){
+  const q=findPioneerTarget(map,me,home,M.pioneerI||0);
+  if(q){out.push(['sendUnit',{u:p.id,tx:q.x,ty:q.y}]);M.pioneerI=(M.pioneerI||0)+1;M.pioneerSend=t+45;}
+ }
  // Send a geologist to the nearest known unsearched mountain, and avoid repeatedly reordering a moving unit.
  const geos=units.filter(u=>u.role==='geologist');
  if(!geos.length&&t>20&&carriers>5&&idleC>1&&freeTool('pick')>0&&(E.land.unsearched||0)>0&&t>=(M.geoAt||0)){
@@ -167,7 +176,7 @@ function runEconomy(v,M,out){
  }
  // Explorer waypoints stay on known land near a fog frontier; long blind corner paths failed too often.
  const exps=units.filter(u=>u.role==='explorer');
- if(!exps.length&&t>150&&carriers>9&&idleC>3&&st('plank')>=5&&t>=(M.expAt||0)){
+ if(exps.length<2&&t>150&&carriers>9&&idleC>5&&st('plank')>=5&&t>=(M.expAt||0)){
   out.push(['profession',{role:'explorer',d:1}]);M.expAt=t+120;
  }
  for(const u of exps)if(!u.busy&&!u.moving&&ok&&t>=(M.scoutSend||0)&&t>=(M.scoutFailAt||0)){
@@ -182,7 +191,7 @@ function runEconomy(v,M,out){
  const houses=count('house')+count('house2')+count('house3');
  const housePending=town.some(b=>/^house/.test(b.type)&&!b.built);
  const population=E.population||0,beds=E.beds||0,homeless=E.homeless||0;
- const needHouse=houses===0||homeless>0||(beds>0&&population>=beds-3)||(carriers<8&&idleC<4&&population>=beds-5);
+ const needHouse=houses===0||(homeless>0&&idleC<6)||(beds>0&&population>=beds-3&&idleC<6&&carriers<18)||(carriers<8&&idleC<4&&population>=beds-5);
  if(!housePending&&needHouse&&t>=(M.houseAt||0)){
   const type=t>600&&st('plank')>=10&&st('stone')>=12?'house3':
    st('plank')>=5&&st('stone')>=6?'house2':'house';
@@ -228,9 +237,11 @@ function runEconomy(v,M,out){
  const unsearched=E.unsearched||[];
  const needsOre=(noCoal||noIron)&&(unsearched.length===0||(E.land.unsearched||0)<2||oreTip);
  const soldierN=(v.soldiers||[]).length;
- const maxPosts=soldierN>=22&&carriers>=10?4:soldierN>=14&&carriers>=8?3:soldierN>=8&&carriers>=7?2:1;
+ const garrisoned=(v.buildings||[]).filter(b=>b.owner===me&&MIL[b.type]).reduce((n,b)=>n+((b.troops||[]).length),0);
+ const totalSoldiers=soldierN+garrisoned;
+ const maxPosts=totalSoldiers>=12&&carriers>=9?4:totalSoldiers>=9&&carriers>=8?3:totalSoldiers>=7&&carriers>=7?2:1;
  const activeSites=town.some(b=>!b.built&&(MIL[b.type]||b.type==='look'));
- const shouldExpand=ownMil.length<maxPosts&&carriers>=7&&idleC>=2&&soldierN>=8&&
+ const shouldExpand=ownMil.length<maxPosts&&carriers>=7&&idleC>=2&&totalSoldiers>=7&&
   built('quarry')>0&&built('wood')>0&&(landTip||needsOre||t>1500+ownMil.length*500);
  if(shouldExpand&&!activeSites&&!pending('guard')&&!goals.includes('guard'))goals.unshift('guard');
  if(ownMil.length>=2&&soldierN>=25&&count('tower')<1&&carriers>=10&&t>2100&&!pending('tower')&&!activeSites)
@@ -330,6 +341,29 @@ function gridArea(G,k,cx,cy,r){
  const y0=Math.max(0,Math.floor(cy-r)),y1=Math.min(G.h,Math.ceil(cy+r)+1),W=G.W,L=G.sum[k];
  if(x1<=x0||y1<=y0)return 0;
  return L[y1*W+x1]-L[y0*W+x1]-L[y1*W+x0]+L[y0*W+x0];
+}
+function findPioneerTarget(map,me,home,sequence){
+ const w=map.w,h=map.h,known=map.known,owner=map.owner,ter=map.ter;
+ if(!known||!owner||!ter)return null;
+ let best=null,bestScore=-1e9;
+ const dirs=[[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]];
+ const pref=[{x:w-8,y:home.y},{x:home.x,y:h-8},{x:8,y:home.y},{x:home.x,y:8}][sequence%4];
+ for(let y=2;y<h-2;y++)for(let x=2;x<w-2;x++){
+  const i=y*w+x;
+  if(known[i]===0||owner[i]!==0||ter[i]===1||(map.occupied&&map.occupied[i]))continue;
+  let ownNear=0,mountainNear=0;
+  for(const d of dirs){
+   const j=(y+d[1])*w+x+d[0];
+   if(owner[j]===me)ownNear++;
+   if(ter[j]===2&&known[j]>0)mountainNear++;
+  }
+  if(!ownNear)continue;
+  const dist=Math.abs(x-home.x)+Math.abs(y-home.y);
+  const score=ownNear*5+mountainNear*24+(ter[i]===2?35:0)-dist*0.06-
+   (Math.abs(x-pref.x)+Math.abs(y-pref.y))*0.012;
+  if(score>bestScore){bestScore=score;best={x,y};}
+ }
+ return best;
 }
 function findFrontier(map,me,home,sequence){
  const w=map.w,h=map.h,known=map.known,owner=map.owner;
@@ -450,7 +484,7 @@ function runArmy(v,M,out){
     }
    }
   }
- }else if(!active.length&&available().length>=7&&t>900&&t>=(M.searchAt||0)&&t>=(M.scoutFailAt||0)){
+ }else if(!active.length&&available().length>=5&&t>900&&t>=(M.searchAt||0)&&t>=(M.scoutFailAt||0)){
   const map=v.map,w=map&&map.w||240,h=map&&map.h||240;
   const hq=E&&E.town&&E.town.find(b=>b.type==='hq');
   const home=hq?{x:hq.x+2,y:hq.y+2}:{x:w/2,y:h/2};
