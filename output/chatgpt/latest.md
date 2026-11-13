@@ -2,9 +2,9 @@
 
 Game version 207. Written for: chatgpt 207.
 
-- chatgpt: hearthlands-ai-challenge, commit 35b5d2c
+- chatgpt: hearthlands-ai-challenge, commit db03d8a
 
-Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 61 s.
+Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 59 s.
 
 Each game ends with the script's own game log: what it may know (its own side, and what happened to it or what it saw). Times are game min:sec.
 
@@ -109,7 +109,7 @@ Your notes (9 in all; notes that differ only in their numbers are grouped: times
 - 40:00 Adaptive plan: 1 field soldiers, 2 posts, carriers 15 (14 idle), coal/iron 1/1, sites 0, tips stall/army.
 
 
-Script: 1879 turns, 1.0 ms average, worst 19 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1879 turns, 1.0 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 31: chatgpt (Blue) vs original game NPC: undecided
 
@@ -213,7 +213,7 @@ Your notes (12 in all; notes that differ only in their numbers are grouped: time
 - ×2 40:00–50:00 Adaptive plan: 23 field soldiers, 6 posts, carriers 14 (9 idle), coal/iron 1/1, sites 0, tips stall.
 
 
-Script: 2010 turns, 1.1 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 2010 turns, 1.1 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: chatgpt (Gold) vs original game NPC: **won** at 51 min
 
@@ -316,7 +316,7 @@ Your notes (11 in all; notes that differ only in their numbers are grouped: time
 - 50:00 Adaptive plan: 21 field soldiers, 5 posts, carriers 14 (9 idle), coal/iron 1/1, sites 0, tips land/stall.
 
 
-Script: 1605 turns, 1.0 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1605 turns, 1.0 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: chatgpt (Blue) vs original game NPC: undecided
 
@@ -408,7 +408,7 @@ Your notes (11 in all; notes that differ only in their numbers are grouped: time
 - 20:46 Attack: 16 field troops against hq 1; threshold 16.
 
 
-Script: 1902 turns, 7.8 ms average, worst 29 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1902 turns, 7.6 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: chatgpt (Gold) vs original game NPC: undecided
 
@@ -500,7 +500,7 @@ Your notes (10 in all; notes that differ only in their numbers are grouped: time
 - ×2 41:26–51:58 Attack: 9 field troops against guard 137; threshold 9.
 
 
-Script: 1897 turns, 1.7 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1897 turns, 1.6 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: chatgpt (Blue) vs original game NPC: undecided
 
@@ -595,7 +595,7 @@ Your notes (11 in all; notes that differ only in their numbers are grouped: time
 - 35:44 Attack: 16 field troops against hq 1; threshold 16.
 
 
-Script: 1959 turns, 1.1 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1959 turns, 1.1 ms average, worst 17 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 20261030: chatgpt (Gold) vs original game NPC: undecided
 
@@ -685,7 +685,7 @@ Your notes (7 in all; notes that differ only in their numbers are grouped: times
 - ×3 30:00–50:00 Adaptive plan: 9 field soldiers, 3 posts, carriers 25 (25 idle), coal/iron 1/1, sites 0, tips stall.
 
 
-Script: 1860 turns, 1.7 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: place 1 of 25.
+Script: 1860 turns, 1.7 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: place 1 of 25.
 
 ### Map 20261030: chatgpt (Blue) vs original game NPC: undecided
 
@@ -778,4 +778,4 @@ Your notes (10 in all; notes that differ only in their numbers are grouped: time
 - 37:08 Attack: 15 field troops against hq 1; threshold 15.
 
 
-Script: 1896 turns, 0.8 ms average, worst 17 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1896 turns, 0.8 ms average, worst 14 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
