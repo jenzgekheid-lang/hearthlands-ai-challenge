@@ -207,7 +207,7 @@ function runEconomy(v,M,out){
  };
  const coalHungry=mineFoodShort('coalmine'),ironHungry=mineFoodShort('ironmine');
  const foodTip=/food|hungr|meal|starv/.test(allTip);
- add((coalHungry||foodTip)&&count('farm')<1,'farm');
+ add((coalHungry||ironHungry||foodTip)&&count('farm')<1,'farm');
  add(count('farm')>0&&count('waterhut')<1&&(coalHungry||ironHungry||timingTip),'waterhut');
  add(count('farm')>0&&count('mill')<1&&coalHungry,'mill');
  add(count('mill')>0&&count('waterhut')>0&&count('bakery')<1&&coalHungry,'bakery');
@@ -281,7 +281,7 @@ function runEconomy(v,M,out){
   const type=st('plank')>=5&&st('stone')>=6?'house2':'house';
   if(place(type))M.houseAt=t+260;
  }
- if(outputTip&&sites===0){
+ if((stallTip&&idleC<4)||(outputTip&&sites===0)){
   // The goods already exist; pause expansion rather than adding another producer into a transport backlog.
   M.transportHoldUntil=t+180;
  }
