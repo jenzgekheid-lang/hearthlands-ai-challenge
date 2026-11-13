@@ -488,13 +488,16 @@ function runArmy(v,M,out){
   const map=v.map,w=map&&map.w||240,h=map&&map.h||240;
   const hq=E&&E.town&&E.town.find(b=>b.type==='hq');
   const home=hq?{x:hq.x+2,y:hq.y+2}:{x:w/2,y:h/2};
-  const p=findFrontier(map,v.me,home,M.searchI||0);
-  if(p){
-   const ready=available(),scouts=ready.slice(0,Math.min(5,ready.length));
-   if(scouts.length>=5){
-    cmd(['march',{ids:scouts.map(s=>s.id),tx:p.x,ty:p.y,form:'block',am:false}]);
-    M.searchI=(M.searchI||0)+1;M.searchAt=t+180;M.moveDeadline=t+120;M.movePurpose='scout';
-   }
+  // Scout toward the likely opposing start, not another waypoint on our own frontier.
+  // On these maps the starts are diagonally opposed; alternating small offsets avoids
+  // repeatedly marching into the same blocked corner while revealing the approach.
+  const seq=M.searchI||0,offset=[0,18,-18,36,-36][seq%5];
+  const tx=Math.max(8,Math.min(w-8,w-home.x+offset));
+  const ty=Math.max(8,Math.min(h-8,h-home.y-offset));
+  const ready=available(),scouts=ready.slice(0,Math.min(5,ready.length));
+  if(scouts.length>=5){
+   cmd(['march',{ids:scouts.map(s=>s.id),tx:Math.round(tx),ty:Math.round(ty),form:'block',am:false}]);
+   M.searchI=seq+1;M.searchAt=t+180;M.moveDeadline=t+120;M.movePurpose='scout';
   }
  }
 
