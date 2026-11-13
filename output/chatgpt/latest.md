@@ -2,7 +2,7 @@
 
 Game version 207. Written for: chatgpt 207.
 
-- chatgpt: hearthlands-ai-challenge, commit 530ca7e
+- chatgpt: hearthlands-ai-challenge, commit daf78f4
 
 Maps 20261030, 777, 4242, 31, each twice (sides swapped), up to 60 game minutes (1x). 67 s.
 
@@ -108,7 +108,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - 30:00 Adaptive plan: 22 field soldiers, 1 posts, carriers 2 (0 idle), coal/iron 1/1, sites 0, tips stall/settlers.
 
 
-Script: 1800 turns, 1.2 ms average, worst 20 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 1.1 ms average, worst 17 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 31: chatgpt (Blue) vs original game NPC: undecided
 
@@ -202,7 +202,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×4 20:00–50:00 Adaptive plan: 60 field soldiers, 3 posts, carriers 16 (14 idle), coal/iron 1/1, sites 0, tips stall.
 
 
-Script: 1800 turns, 1.2 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 1.2 ms average, worst 20 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 777: chatgpt (Gold) vs original game NPC: undecided
 
@@ -387,7 +387,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×4 20:00–50:00 Adaptive plan: 48 field soldiers, 3 posts, carriers 3 (2 idle), coal/iron 1/1, sites 0, tips stall.
 
 
-Script: 1800 turns, 7.0 ms average, worst 21 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 6.9 ms average, worst 29 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: chatgpt (Gold) vs original game NPC: undecided
 
@@ -471,7 +471,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - 20:00 Adaptive plan: 6 field soldiers, 3 posts, carriers 31 (26 idle), coal/iron 1/1, sites 1, tips stall/timing.
 
 
-Script: 1800 turns, 1.8 ms average, worst 23 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 1.8 ms average, worst 15 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 4242: chatgpt (Blue) vs original game NPC: undecided
 
@@ -557,7 +557,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×4 20:00–50:00 Adaptive plan: 35 field soldiers, 4 posts, carriers 17 (15 idle), coal/iron 1/1, sites 0, tips stall.
 
 
-Script: 1800 turns, 1.3 ms average, worst 19 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 1.3 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
 
 ### Map 20261030: chatgpt (Gold) vs original game NPC: undecided
 
@@ -648,7 +648,7 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×3 30:00–50:00 Adaptive plan: 28 field soldiers, 3 posts, carriers 10 (5 idle), coal/iron 1/1, sites 0, tips stall.
 
 
-Script: 1800 turns, 1.1 ms average, worst 17 ms, 0 over 0.3 s, 0 errors. Orders refused: place 1 of 29.
+Script: 1800 turns, 1.1 ms average, worst 18 ms, 0 over 0.3 s, 0 errors. Orders refused: place 1 of 29.
 
 ### Map 20261030: chatgpt (Blue) vs original game NPC: undecided
 
@@ -733,4 +733,4 @@ Your notes (6 in all; notes that differ only in their numbers are grouped: times
 - ×2 30:00–50:00 Adaptive plan: 43 field soldiers, 4 posts, carriers 18 (17 idle), coal/iron 1/1, sites 0, tips stall.
 
 
-Script: 1800 turns, 0.9 ms average, worst 16 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
+Script: 1800 turns, 0.9 ms average, worst 23 ms, 0 over 0.3 s, 0 errors. Orders refused: none.
