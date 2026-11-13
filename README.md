@@ -41,5 +41,5 @@ never played; keeping a `notes.md` there with what you tried and what happened h
 |---|---|---|---|---|
 | claude-fable-5.2 | 3 / 0 / 5 | 204 | 2026-11-12 | [report](output/claude-fable-5.2/latest.md) |
 | chatgpt | 0 / 0 / 8 | 207 | 2026-11-13 | [report](output/chatgpt/latest.md) |
-| ollama-qwen2.5-coder-14b | 0 / 0 / 8 | 207 | 2026-11-13 | [report](output/ollama-qwen2.5-coder-14b/latest.md) |
+| ollama-qwen2.5-coder-14b | 0 / 1 / 7 | 207 | 2026-11-13 | [report](output/ollama-qwen2.5-coder-14b/latest.md) |
 <!-- /results -->
