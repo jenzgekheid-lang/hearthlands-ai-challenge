@@ -255,3 +255,30 @@ The v206 arena report recorded repeated explorer path failures ("cut-off"), incl
 - V8 syntax parse passed after the change.
 - This is a targeted reachability/interface fix, not a simulated pathfinding test. It must not be described as proven until a v207+ arena report tests this commit.
 - Check whether explorer cut-offs fall, whether scouting reveals enemy buildings earlier, and whether attack orders begin. Also check refused orders and whether the 0–2 idle-carrier bottleneck persists.
+
+
+## Version-207 full report review and progression rewrite (script commit 534f824)
+
+### What the v207 arena actually showed (tested script commit 25c7b89)
+- 0 wins, 0 losses, 8 undecided; no script errors or timeouts, no refused orders in 7 games and one overlapping placement in the eighth.
+- Six games never reached a complete metal/weapons chain. Both 777 games ended with 7 soldiers, two guards, no smelter/weaponsmith/barracks, and 132–158 idle carriers. Both 4242 games also stalled at 7 soldiers and two guards, with no coal/iron chain.
+- The two 20261030 games and map 31 did reach metal and barracks, but enemy contact was extremely late (first contact at 57:00 on 20261030 Blue). There were no useful attacks in the report.
+- Housing was a major self-inflicted drain: a new house was queued roughly every 260 seconds whenever beds approached capacity, regardless of the fact that idle carriers had grown beyond 100. On map 777 this produced 150+ idle carriers and consumed building materials without creating productive demand.
+- Resource expansion was gated by field soldier count. The cap used only the field soldiers, not soldiers already in garrisons, and required 14 field soldiers for three posts. With two posts already staffed, the remaining field army could stay at seven and never unlock a third post.
+- The map-4242 ore warning showed that mountain discovery/resource access can remain blocked for the full game. The geologist/explorer path alone did not solve it.
+- In the successful economy games, mine depletion, food interruptions and output-pile congestion remained important, but they are secondary to the complete progression failure on 777/4242.
+
+### Changes in commit 534f824
+- Housing now requires actual carrier scarcity before adding beds once the first house exists. Near-full beds alone no longer trigger another house when there are plenty of idle carriers.
+- Military expansion counts both field soldiers and soldiers already inside owned military buildings. Thresholds are lowered to permit a third post at 9 total soldiers and a fourth at 12, with carrier safeguards retained.
+- Removed the unnecessary 8-field-soldier gate from the expansion decision; total army strength now controls whether a new post is feasible.
+- Added a pioneer path: when a spare shovel and idle carrier are available, recruit one pioneer and send it to a neutral frontier tile, preferring known mountain-adjacent ground. This is intended to open land access when the geologist cannot find useful ore within the current border.
+- Recruit a second explorer when staffing allows, to improve map coverage and enemy discovery.
+- Allow a five-soldier frontier scouting group rather than requiring seven available soldiers.
+
+### Validation and limits
+- JavaScript syntax check passed.
+- Mock full-game test with 150 carriers and 120 idle carriers produced no house placement; it correctly allowed pioneer/explorer recruitment when tools and conditions were present.
+- Mock army-only turn (no economy/log) returned cleanly.
+- These are interface/smoke tests, not a game simulation. Pioneer effectiveness depends on a spare shovel being available; the kit documents the profession and claim behaviour, but does not expose a direct smith recipe-selection command.
+- The arena has not yet tested commit 534f824. The next report must verify whether 777/4242 reach a third post, whether housing stops growing unnecessarily, whether a mine/smelter/weaponsmith/barracks chain starts, whether enemy contact happens earlier, and whether attacks are actually issued and captured.
