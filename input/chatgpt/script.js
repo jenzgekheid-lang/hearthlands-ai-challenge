@@ -1,7 +1,7 @@
 // ChatGPT GPT-6 — Hearthlands adaptive full-game strategy, rewritten for the advisor-tip system.
 // Diagnose economy and military bottlenecks from live tips plus observed state; fix the cause before expanding production.
 // Build a reliable resource chain, protect a useful field army, scout reachable frontiers, and attack with a real advantage.
-// Game version: 208
+// Game version: 210
 
 const COST={
  wood:[2,2],forest:[3,1],saw:[3,4],fisher:[3,2],waterhut:[3,4],farm:[6,6],mill:[3,3],bakery:[4,5],
@@ -464,11 +464,14 @@ function runArmy(v,M,out){
   const ready=available();
   const cx=ready.length?ready.reduce((a,s)=>a+s.x,0)/ready.length:0;
   const cy=ready.length?ready.reduce((a,s)=>a+s.y,0)/ready.length:0;
-  const rank={guard:0,tower:7,castle:16,hq:11};
+  const rank={guard:0,tower:3,castle:6};
   let target=null,best=1e9;
   for(const b of targets){
    const p=door(b);
-   let q=(ready.length?Math.hypot(p.x-cx,p.y-cy):1e6)+(rank[b.type]||0)-(b.manned===false?9:0);
+   // Full-game defeat requires HQ plus every manned military building. Clear
+   // staffed defenses first, then empty posts, and take HQ last.
+   const priority=b.type==='hq'?30:(b.manned===false?12:(rank[b.type]||4));
+   let q=(ready.length?Math.hypot(p.x-cx,p.y-cy):1e6)+priority;
    for(const f of foes)if(dist(f,p)<16)q+=1.5;
    if(q<best){best=q;target=b;}
   }
