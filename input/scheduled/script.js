@@ -73,7 +73,7 @@ function think(view){
   // Add housing only when the workforce/beds actually need it; do not consume carriers with speculative jobs.
   var houses=cnt('house')+cnt('house2')+cnt('house3'),houseSite=town.some(function(b){return /^house/.test(b.type)&&!b.built;});
   if(!houseSite&&houses<3&&((E.homeless||0)>0||(E.population||0)>=((E.beds||0)-2)&&carriers<18&&idleC<7)&&t>900)addN(goals,'house2',2);
-  if(!houseSite&&houses===0&&built('wood')&&built('quarry'))add(goals,'house');
+  if(!houseSite&&houses===0&&built('wood')&&built('quarry')&&!pending('house2')&&goals.indexOf('house2')<0)add(goals,'house');
 
   // ask is the authoritative placement API. E.spots contains the previous ask's answers.
   var asks=[];for(var urgent of ['guard','tower','castle'])if(goals.indexOf(urgent)>=0)asks.push(urgent);
