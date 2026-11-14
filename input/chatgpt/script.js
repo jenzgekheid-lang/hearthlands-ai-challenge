@@ -482,6 +482,9 @@ function runArmy(v,M,out){
    // Avoid tiny 2–3 soldier raids: reports showed repeated low-threshold
    // attacks followed by losses and a depleted field army. Commit a real force.
    need=Math.max(8,Math.ceil(need*(1.28-0.42*gold)));
+   // Staffed defenses require a larger synchronized force; HQ comes only after posts.
+   if(target.manned!==false&&target.type!=='hq')need=Math.max(need,target.type==='castle'?20:target.type==='tower'?15:10);
+   if(target.type==='hq'&&targets.some(b=>b.id!==target.id&&b.military&&b.manned!==false))need=Math.max(need,18);
    if(t>3000)need=Math.max(8,Math.ceil(need*0.92));
    if(ready.length>=need){
     cmd(['attack',{ids:ready.map(s=>s.id),b:target.id}]);
