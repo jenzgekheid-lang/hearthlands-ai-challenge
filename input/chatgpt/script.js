@@ -1,7 +1,7 @@
 // ChatGPT GPT-6 — Hearthlands adaptive full-game strategy, rewritten for the advisor-tip system.
 // Diagnose economy and military bottlenecks from live tips plus observed state; fix the cause before expanding production.
 // Build a reliable resource chain, protect a useful field army, scout reachable frontiers, and attack with a real advantage.
-// Game version: 207
+// Game version: 208
 
 const COST={
  wood:[2,2],forest:[3,1],saw:[3,4],fisher:[3,2],waterhut:[3,4],farm:[6,6],mill:[3,3],bakery:[4,5],
@@ -35,6 +35,7 @@ function runEconomy(v,M,out){
  const pending=k=>town.some(b=>b.type===k&&!b.built);
  const sites=town.filter(b=>!b.built).length;
  const carriers=people.carrier||0,idleC=idle.carrier||0;
+ const pileWaiting=town.reduce((n,b)=>n+Object.values(b.outputs||{}).reduce((a,q)=>a+(typeof q==='number'?q:0),0),0);
  const hq=town.find(b=>b.type==='hq');
  const home=hq?{x:hq.x+2.5,y:hq.y+2}:{x:(v.map.w||240)/2,y:(v.map.h||240)/2};
  const map=v.map,w=map&&map.w||0,h=map&&map.h||0;
