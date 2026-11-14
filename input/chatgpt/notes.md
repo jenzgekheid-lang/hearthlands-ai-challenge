@@ -318,3 +318,23 @@ The army scouting branch called findFrontier(), which deliberately selects a cur
 - Raised the minimum field force commitment for a fresh attack to eight soldiers, including empty/unmanned targets. Gold and late-game scaling still influence the required force above that floor.
 - Intent: stop repeatedly launching tiny 2–3 soldier raids that can capture a post but leave the mobile army exposed to attrition. Attack orders still send the available field force once the threshold is met.
 - V8 syntax check passed. This is a code hypothesis, not an arena-validated improvement; compare enemy captures, attack timings, field-force survival, and wins in the next report.
+
+
+## v207 report diagnosis and focused economy patch (script commits 69d7b0b, 2067b90; 14 Nov 2026)
+
+### Confirmed from the latest v207 report (tested commit 3bcb5c4)
+- Enemy contact is now consistent (minute 16), and attacks/captures occur. Do not undo the diagonal scout route or revert to tiny raid thresholds.
+- The most persistent resource failure is the mine → smelter → weaponsmith → barracks chain. Iron mines spend long periods stopped for meat/fish or searching depleted deposits; coal mines similarly stop for bread/fish. Smelters wait for ore, weaponsmiths wait for coal/iron, and barracks wait for weapons. The result is an army that peaks and then collapses during repeated fights.
+- Output piles are persistently blocked: wood/quarry/saw/fisher/farm/waterhut and downstream food buildings report roughly 70–90%+ waiting for carriers. At some snapshots carriers are idle while outputs remain, so “recruit more carriers” alone is not a valid diagnosis. The report also records carrier target-off-land path failures; inspect whether those persist.
+- Gold mining/smelting is optional but was being added while the core weapon chain still lacked coal/iron. It competes for coal, hammer, carriers, settlers and building materials.
+- Repeated wood/quarry/fisher additions can make the output backlog worse. Expansion should be conditional on actual low stocks and transport slack.
+
+### Changes
+- **69d7b0b:** update script header to game version 208; start the farm/water/mill/bakery and pigfarm/butcher dependencies as soon as mines exist, rather than waiting only for a prolonged hunger tip. This is intended to shorten food-starved mining time; it still depends on suitable build sites and water.
+- **2067b90:** calculate a visible output-pile backlog from each town building's `outputs`; use that together with idle carriers to gate second coal/iron mines and duplicate wood/quarry/fisher producers. Defer goldmine/goldsmelter until at least 20 field soldiers, adequate coal/iron stock, seven idle carriers, low output backlog and game time past 50 minutes.
+- No combat stats, attack threshold, scout destination, or challenge commands changed.
+
+### Validation / next run
+- JavaScript parse passed before each commit. GitHub writes succeeded; commits are sequential on main.
+- These are code-level hypotheses, **not arena-tested improvements**. The current report still tests 3bcb5c4 (v207); it does not test either new commit.
+- Next arena report should compare mine food-stopped percentages, smelter ore/coal waiting, weaponsmith/barracks starvation, output pile backlog and carrier task failures; verify optional gold is deferred; check army size at 30/45/60 minutes, enemy captures, and wins. If food chains are built but miners still starve, inspect actual food distribution/work priorities rather than add more farms blindly.
