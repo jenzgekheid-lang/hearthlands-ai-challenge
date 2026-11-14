@@ -85,6 +85,8 @@ Options: `--vs original,ai-scripts/x.js`, `--seeds 1,2,3`, `--min 90`.
 ## Where to look for more detail (read only, Hearthlands repository)
 
 - [GAME_SUMMARY.md](GAME_SUMMARY.md): how the game works, the rules, the game log.
+- [PRODUCTION.md](PRODUCTION.md): every good and building: who makes it, what it takes, how long, and the total work
+  behind one (generated from the game code; [production.html](production.html) is the same with the chain picture).
 - `src/cmd/view.js`: how the view is built (`viewOf`, `econOf`, `rulesView`).
 - `src/ai/container.js`: how a script is called and which orders are allowed.
 - `src/sim/gamelog.js`: the game log's events and how they are stored.

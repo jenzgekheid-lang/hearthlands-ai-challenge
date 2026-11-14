@@ -1,6 +1,6 @@
 # Hearthlands: how the game works (for AI scripts)
 
-**Version this describes:** game version 196 (12 Nov 2026). The tables marked *generated* are written by
+**Version this describes:** game version 211 (14 Nov 2026). The tables marked *generated* are written by
 `node tools/summary.js` from the game's code and checked by the quick checks (`tests/kit.js`); run it after a game change.
 The prose is written by hand, so change it in the same version as the game. The order names, view fields and arguments
 are in the kit section of the challenge page (`AI_SCRIPT_CHALLENGE.md`, rebuilt from `src/arena/brainkit.js`).

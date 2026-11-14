@@ -28,11 +28,11 @@
   },
   "scheduled": {
     "date": "2026-11-14",
-    "commit": "63c6af5",
-    "version": 208,
-    "status": "played",
+    "commit": "6217b21",
+    "version": null,
+    "status": "refused",
     "won": 0,
     "lost": 0,
-    "undecided": 8
+    "undecided": 0
   }
 }
