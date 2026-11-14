@@ -76,8 +76,9 @@ function think(view){
   if(!houseSite&&houses===0&&built('wood')&&built('quarry'))add(goals,'house');
 
   // ask is the authoritative placement API. E.spots contains the previous ask's answers.
-  var asks=goals.slice(0,6);
-  for(var extra of ['guard','farm','house2','coalmine','ironmine','barracks'])if(asks.length<6&&asks.indexOf(extra)<0)asks.push(extra);
+  var asks=[];for(var urgent of ['guard','tower','castle'])if(goals.indexOf(urgent)>=0)asks.push(urgent);
+  for(var wanted of goals)if(asks.length<6&&asks.indexOf(wanted)<0)asks.push(wanted);
+  for(var extra of ['farm','house2','coalmine','ironmine','barracks'])if(asks.length<6&&asks.indexOf(extra)<0)asks.push(extra);
   if(asks.length)out.push(['ask',{spots:asks}]);
 
   // One affordable site at a time; account for material already promised to every unfinished site.
