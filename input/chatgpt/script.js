@@ -251,18 +251,20 @@ function runEconomy(v,M,out){
 
  // A second mine is justified only by another distinct, known deposit; don't duplicate an exhausted site blindly.
  for(const kind of ['coal','ironore']){
-  const type=kind==='coal'?'coalmine':'ironmine';
-  const points=M.ore[kind]||[];
-  if(count(type)<2&&points.length>=2&&built('weaponsmith')>0&&
-   !town.some(b=>b.type===type&&b.built&&points.some(p=>Math.abs(p[0]-(b.x+1))<7&&Math.abs(p[1]-(b.y+1))<7))){
-   add(true,type);
-  }
+  const type=kind==='coal'?'coalmine':'ironmine',points=M.ore[kind]||[];
+  // A second mine is useful only after the core army chain exists and transport can absorb it.
+  if(count(type)<2&&points.length>=2&&built('weaponsmith')>0&&idleC>=5&&pileWaiting<35&&
+   !town.some(b=>b.type===type&&b.built&&points.some(p=>Math.abs(p[0]-(b.x+1))<7&&Math.abs(p[1]-(b.y+1))<7)))add(true,type);
  }
- add(count('wood')<2&&t>900&&st('plank')<12,'wood');
- add(count('quarry')<2&&t>900&&st('stone')<12,'quarry');
- add(count('fisher')<2&&ironHungry&&t>900,'fisher');
- add(count('goldmine')<1&&oreKnown('goldore')&&built('barracks')>0,'goldmine');
- add(count('goldsmelter')<1&&built('goldmine')>0,'goldsmelter');
+ // Duplicate raw producers only when stock is genuinely low and carriers are not swamped.
+ const transportClear=idleC>=4&&pileWaiting<30;
+ add(count('wood')<2&&t>900&&st('plank')<8&&transportClear,'wood');
+ add(count('quarry')<2&&t>900&&st('stone')<8&&transportClear,'quarry');
+ add(count('fisher')<2&&ironHungry&&t>900&&transportClear,'fisher');
+ // Gold is optional: defer it until the iron/weapon pipeline and field army are healthy.
+ const goldReady=soldierN>=20&&st('coal')>=14&&st('iron')>=8&&idleC>=7&&pileWaiting<25&&t>3000;
+ add(count('goldmine')<1&&oreKnown('goldore')&&built('barracks')>0&&goldReady,'goldmine');
+ add(count('goldsmelter')<1&&built('goldmine')>0&&goldReady&&st('coal')>=18,'goldsmelter');
 
  // The first iron/tool/weapon buildings get staffing priority; never spam unchanged settings.
  for(const type of ['quarry','smelter','smith','weaponsmith','barracks']){
