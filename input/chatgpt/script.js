@@ -456,7 +456,7 @@ function runArmy(v,M,out){
   if(!target){
    cmd(['release',{ids:active.map(s=>s.id),stop:true}]);
   }else if(t>=(M.reinforceAt||0)){
-   const needed=target.manned===false?3:({guard:8,tower:13,castle:18,hq:15}[target.type]||10);
+   const needed=target.manned===false?5:({guard:10,tower:15,castle:20,hq:16}[target.type]||12);
    const add=available().slice(0,Math.max(0,needed-active.length));
    if(add.length){cmd(['attack',{ids:add.map(s=>s.id),b:target.id}]);M.reinforceAt=t+12;}
   }
