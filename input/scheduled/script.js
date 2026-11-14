@@ -19,7 +19,7 @@ function think(view){
  var COST={wood:[2,2],quarry:[2,3],saw:[3,4],house:[3,3],house2:[5,6],house3:[10,12],fisher:[3,2],forest:[3,1],guard:[2,3],tower:[5,5],castle:[8,12],farm:[6,6],waterhut:[3,4],mill:[3,3],bakery:[4,5],pigfarm:[6,6],butcher:[4,4],coalmine:[4,1],ironmine:[4,1],goldmine:[5,1],smelter:[4,6],smith:[3,5],weaponsmith:[5,7],barracks:[4,5],goldsmelter:[4,6]};
  function free(it){var n=st(it);for(var b of sites)n-=Math.max(0,(b.cost&&b.cost[it]||0)-(b.delivered&&b.delivered[it]||0));return n;}
  function enough(k){var c=COST[k]||[0,0];return free('plank')>=c[0]&&free('stone')>=c[1];}
- function add(a,k){if(a.indexOf(k)<0&&!pending(k))a.push(k);}
+ function add(a,k){if(cnt(k)===0&&a.indexOf(k)<0&&!pending(k))a.push(k);}\n function addN(a,k,n){if(cnt(k)<n&&a.indexOf(k)<0&&!pending(k))a.push(k);}
  var mil=town.filter(function(b){return ['guard','tower','castle'].indexOf(b.type)>=0;});
  var unsearched=E.unsearched||[],geos=units.filter(function(u){return u.role==='geologist';}),exps=units.filter(function(u){return u.role==='explorer';});
 
@@ -66,13 +66,13 @@ function think(view){
 
   // Territory posts are placed from the game's own legal-site suggestions, not guessed coordinates.
   if(t>500&&built('saw')&&soldiers.length>=8&&mil.length<1)add(goals,'guard');
-  if(t>1500&&soldiers.length>=12&&carriers>10&&mil.length<2)add(goals,'guard');
+  if(t>1500&&soldiers.length>=12&&carriers>10&&mil.length<2)addN(goals,'guard',2);
   if(t>2500&&soldiers.length>=18&&carriers>14&&mil.length<3)add(goals,'tower');
   if(t>3800&&soldiers.length>=26&&carriers>18&&mil.length<4)add(goals,'castle');
 
   // Add housing only when the workforce/beds actually need it; do not consume carriers with speculative jobs.
   var houses=cnt('house')+cnt('house2')+cnt('house3'),houseSite=town.some(function(b){return /^house/.test(b.type)&&!b.built;});
-  if(!houseSite&&houses&&((E.homeless||0)>0||(E.population||0)>=((E.beds||0)-2)&&carriers<18&&idleC<7)&&t>900)add(goals,'house2');
+  if(!houseSite&&houses<3&&((E.homeless||0)>0||(E.population||0)>=((E.beds||0)-2)&&carriers<18&&idleC<7)&&t>900)addN(goals,'house2',2);
   if(!houseSite&&houses===0&&built('wood')&&built('quarry'))add(goals,'house');
 
   // ask is the authoritative placement API. E.spots contains the previous ask's answers.
@@ -130,7 +130,7 @@ function think(view){
  }
 
  // A small map probe is a plain move; release it on arrival so posts can call soldiers back.
- if(!attacking.length&&(!P.scoutIds||!P.scoutIds.length)&&!targets.length&&free.length>=12&&t>900&&(P.scoutAt||0)<=t){
+ if(!attacking.length&&!foes.length&&(!P.scoutIds||!P.scoutIds.length)&&!targets.length&&free.length>=12&&t>900&&(P.scoutAt||0)<=t){
   var w2=map.w||240,h2=map.h||240,seq=P.scoutI||0,pts=me===1?[[w2-12,h2-12],[w2-12,12],[12,h2-12]]:[[12,12],[12,h2-12],[w2-12,12]],p=pts[seq%pts.length],grp=free.slice(0,5);
   out.push(['march',{ids:grp.map(function(s){return s.id;}),tx:p[0],ty:p[1],form:'block',am:false}]);P.scoutIds=grp.map(function(s){return s.id;});P.scoutStart=t;P.scoutI=seq+1;P.scoutAt=t+150;
  }
