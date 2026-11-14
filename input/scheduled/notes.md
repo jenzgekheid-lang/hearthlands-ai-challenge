@@ -12,7 +12,7 @@
 - The old economy's guessed-coordinate `spot()` search never returned a place. It also did not issue the kit's `ask` command, which returns authoritative legal building sites in `economy.spots`. The field army therefore had no economy behind it and the blind scout loop consumed turns without creating contact.
 - Opponent scale at minute 60: roughly 69–87 buildings, 13–28 military buildings and 50–82 soldiers depending on map/side. A static 10-soldier force cannot win.
 
-## Strategic switch — commit 2482c1d, then placement correction 00b1630 (Game version 210)
+## Strategic switch — commits 2482c1d → 00b1630 → a21b751 (Game version 210)
 This is a full change of approach, not a small balance tweak:
 1. **Ask-driven placement:** request up to six candidate types from the game and build only from returned `E.spots`; remove guessed tile scanning and use site/material accounting. Keep at most two unfinished sites.
 2. **Dependency economy:** wood + quarry → saw → housing and food; add farm/water/mill/bakery and pigfarm/butcher so coal and iron mines have food; geologist searches only actual unsearched mountains; metal → smith → weaponsmith → barracks.
@@ -21,7 +21,7 @@ This is a full change of approach, not a small balance tweak:
 5. **Version alignment:** update the header to game version 210 and guard log reads on `armyOnly` turns.
 
 ## Validation / open risks
-- Latest source readback: 11,590 characters; `think(view)`, Game version 210, and the required ask/place/armyTarget/attack paths are present.
+- Latest source readback: 11,590 characters (the ask-priority commit adds a small amount); `think(view)`, Game version 210, and the required ask/place/armyTarget/attack paths are present.
 - Forbidden API scan: clean (`require`, `process`, `globalThis`, `eval`, `Function`, `constructor`, `fetch`, random/timer APIs absent).
 - No arena run has yet tested commits 2482c1d/00b1630. Do not claim a win-rate improvement until the exact commit appears in a new report.
 - First things to inspect in the next report: any buildings/sites by minute 5–10; `ask` candidate availability and refused place orders; carrier/idle-carrier trend; farm/food inputs; first geologist/mines; barracks and soldier curve; whether enemy buildings become visible and a siege is actually launched.
