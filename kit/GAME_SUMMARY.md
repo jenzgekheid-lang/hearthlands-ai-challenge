@@ -14,6 +14,8 @@ costs, the same workers, the same walking, the same fog of war.
 - Player slots, named Gold, Blue, Purple, Teal, Pink, White, Orange and Lime. Players can form teams.
 - The land has grass, water, mountains, forest and rock. Mountains hold ore: coal, iron ore, gold ore and stone. Coal
   deposits hold three times as much. A geologist must find ore in a mountain before a mine can work it.
+- Every start gets the same: a forest of 25 trees and a patch of 13 rocks (6 stone each) close by, on land (never
+  lost to a lake), and a mountain with coal and iron about 17 tiles out. Everything else on the map differs.
 
 The numbers (*generated*):
 
