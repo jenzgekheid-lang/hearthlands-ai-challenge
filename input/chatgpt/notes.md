@@ -338,3 +338,22 @@ The army scouting branch called findFrontier(), which deliberately selects a cur
 - JavaScript parse passed before each commit. GitHub writes succeeded; commits are sequential on main.
 - These are code-level hypotheses, **not arena-tested improvements**. The current report still tests 3bcb5c4 (v207); it does not test either new commit.
 - Next arena report should compare mine food-stopped percentages, smelter ore/coal waiting, weaponsmith/barracks starvation, output pile backlog and carrier task failures; verify optional gold is deferred; check army size at 30/45/60 minutes, enemy captures, and wins. If food chains are built but miners still starve, inspect actual food distribution/work priorities rather than add more farms blindly.
+
+
+## Version-210 full report and attack sequencing update (script commit 62fe6d2; 14 Nov 2026)
+
+### v210 report (tested commit cb8761b; script v208)
+- All 8 games completed without script errors; 0 wins / 0 losses / 8 undecided. Enemy contact and attack orders now happen reliably.
+- Map 31 Gold grew to 54 soldiers, 6 military buildings and 5,494 land; the NPC was reduced to 6 buildings / 3 military / 1,418 land / 2 soldiers. This is a major battlefield advantage, but not a win: the remaining enemy military buildings and HQ still need to be cleared/captured.
+- The report demonstrates that a large army and repeated captures alone are not sufficient. Full-game defeat requires the HQ **and every manned military building** to be lost. Target sequencing matters.
+- Persistent supply issues remain: mine deposits exhaust; iron mine reports 95% worn-out time; weaponsmith waits for coal 87%; barracks waits for weapons 80%; food chain and carrier pile backlog remain. At minute 60 the map31 Gold side has 54 soldiers but only 15 carriers and 87 goods waiting.
+- Do not infer the script's exact attack target order from captures alone; the report does not expose every target's current manning state at each decision.
+
+### Focused change (script commit 62fe6d2)
+- Enemy target scoring now explicitly prioritizes **manned guard/tower/castle defenses**, then empty military buildings, and puts HQ last. This matches the full-game elimination rule and avoids spending the main assault on HQ while staffed posts remain.
+- Attack reinforcement thresholds are raised modestly for staffed posts (guard 10, tower 15, castle 20) and HQ (16; 18 while other manned military targets remain), while preserving the existing minimum 8 and gold scaling. The intent is a synchronized assault rather than a drip-fed attack into a defended building.
+- No economy, recruitment, map scouting or combat stats changed.
+
+### Validation / next arena
+- JavaScript syntax parse passed and GitHub fetch/write confirmed.
+- This is a code hypothesis, not arena-validated. Next report should prove whether all manned military buildings are eliminated before HQ, HQ is captured after defenses are cleared, and the NPC is actually defeated. Compare losses and time-to-capture; if the army still stalls, inspect surviving building manning and attack orders rather than blindly growing the force.
