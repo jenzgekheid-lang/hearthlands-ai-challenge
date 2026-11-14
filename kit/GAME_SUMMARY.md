@@ -96,8 +96,9 @@ The numbers (*generated*):
   farm (grain), mill (flour), bakery (bread), water hut (water), pig farm and butcher (meat), fisher (fish), mine (ore;
   it needs food to work), smelter (iron or gold), smithy and weaponsmith (tools and weapons), barracks and tower
   (soldiers).
-- A building stops when its output pile is full and no carrier takes the goods. The game log records that as
-  `pile full, waiting for carriers`.
+- A building stops when its output pile is full. Carriers only take goods somewhere that needs them, so the game log
+  records `pile full, nothing needs it right now` when you have idle carriers (build or feed what uses those goods), and
+  `pile full, waiting for carriers` when every carrier is busy (more settlers or houses help).
 
 ## Land and territory
 
@@ -185,7 +186,8 @@ The report turns these into percentages of each building's time.
 - *Stock every 15 minutes:* the goods in stock, the idle carriers, the goods waiting to be carried, your land and the
   tiles you have seen.
 - *What the buildings did:* the share of each building's time spent on each status after it was built. A high share of
-  `pile full, waiting for carriers` means the output is stuck. Check the `task` and `taskend` events for the carriers.
+  `pile full, waiting for carriers` means you are short of carriers; `pile full, nothing needs it right now` means the
+  goods have no use yet. Check the `task` and `taskend` events for the carriers.
 - *Building sites:* the time each site spent waiting for materials, a digger, a builder, or being levelled.
 - *Build order:* when each building was placed and when it was finished.
 - *Orders given and refused:* counts per order name, and any refusals with their reasons.

@@ -207,6 +207,9 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     becomes a soldier. armyTarget {kind, d} is how many soldiers of that kind you want OUTSIDE buildings (at the start
     sword 4, bow 2, spear 2): military buildings call free soldiers in, and the barracks trains again up to the target.
     weaponKeep {k, d} is how many spare weapons of a kind to keep in stock (0-9, at the start 1).
+    toolKeep {k, d} (since v209) is how many spare tools of a kind the smith keeps in stock (0-9, at the start 1 each;
+    k is the position in view.economy.toolPlan, d 'up' moves it one place up the order). The smith first makes tools
+    for finished buildings that wait for a worker with one, then fills these spares in order.
   - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
     castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
   - Gold bars in stock make your soldiers stronger outside your land (view.gold).
@@ -222,13 +225,13 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   not show the slots. distUp {it, k}: for every good the game keeps a list of building types in the order they get it
   first; this moves entry k of the list for good it one place up; the view does not show these lists.
 - Economy commands: place {type, x, y}, demolish {b}, priority {b, on}, pause {b, on}, workArea {b, x, y},
-  workRange {b, d}, storeSlot {b, k, it}, profession {role, d: 1|-1}, sendUnit {u, tx, ty}, weaponKeep {k, d},
+  workRange {b, d}, storeSlot {b, k, it}, profession {role, d: 1|-1}, sendUnit {u, tx, ty}, weaponKeep {k, d}, toolKeep {k, d},
   armyTarget {kind, d}, archers {b, d}, fighters {b, d}, workOrder {k, d: -1|1} (move a job in your carriers' work list,
   view.economy.work: staff, recruit, sites, workshops, clear, surplus), priority {b, on} (a site, or a finished
   workplace: first for a worker and goods until it has them; a military building: manned first until full), distUp
   {it, k}, armyList {on} (military buildings call soldiers by your list instead of oldest first), armyOrder {k, d}
   (steps guards, border, rest), armyReserve {d or set} (free soldiers the buildings leave in the field); plus the army
-  commands above. Instead of a step d, workRange, archers, fighters, weaponKeep, armyTarget and armyReserve also take
+  commands above. Instead of a step d, workRange, archers, fighters, weaponKeep, toolKeep, armyTarget and armyReserve also take
   set: an exact number (kept within the same limits; armyTarget by set has no top of 40).
 - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 10 minutes.
 - THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, at(x,y)}.
@@ -250,6 +253,7 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   at most 30.
 - view.economy.loose: goods lying loose on your land {item: count}. view.economy.army: your army settings: target
   {sword, spear, bow}, keep [{weapon, keep}] (weaponKeep's k is the position in this list, 0 first), reserve, list.
+  view.economy.toolPlan (v209): the spare tools your smith keeps, in order [{tool, keep}] (toolKeep's k is the position).
 - view.economy.spots (the 'ask' helper) still works, but you don't need it.
 - THE GAME LOG (full game): view.economy.log = everything that happened to your side since your last economy turn
   (newest last, at most 400): {t, p, what, a, b, c, s, other}. what: 'place' (a building id, b/c x/y, s type), 'finish',

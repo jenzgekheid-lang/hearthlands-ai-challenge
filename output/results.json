@@ -9,9 +9,9 @@
     "undecided": 5
   },
   "chatgpt": {
-    "date": "2026-11-13",
-    "commit": "3bcb5c4",
-    "version": 207,
+    "date": "2026-11-14",
+    "commit": "69d7b0b",
+    "version": 210,
     "status": "played",
     "won": 0,
     "lost": 0,
