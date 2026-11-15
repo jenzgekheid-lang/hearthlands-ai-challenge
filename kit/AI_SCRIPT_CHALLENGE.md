@@ -53,7 +53,8 @@ THE COMMANDS (each command is [name, args])
   plain move does not go into a military building nearby. It stays on until you switch it off (view: patrol)
 - ["sendIn", {ids: [...], b: your military building id}]   go inside as garrison
 - ["group", {ids: [...], g: 1-5, replace: true}]   remember a group (for yourself)
-At most 50 commands per turn. Wrong or impossible commands are refused and counted.
+At most 50 commands per turn ('ask' and 'note' don't count): the game carries out the first 50 and skips the rest, and
+view.refused on your next turn says how many were skipped. Wrong or impossible commands are refused and counted.
 
 HOW BATTLES WORK
 - Defenders step out one per attacker at the door, fighters first; bowmen inside shoot while a fighter is left, then stop and come down one at a time. A defender at the door cannot be shot from afar: bowmen must duel him.
@@ -177,7 +178,10 @@ function think(view){
 IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
 - think(view) is called every 2 game seconds, and every second while your soldiers fight. On those extra fight turns
   view.armyOnly is true and view.economy.log is undefined: check before you read the log. If think throws an error,
-  that turn gives no orders and the game goes on; the tournament report counts the errors and the turns over 0.3 s.
+  that turn gives no orders and the game goes on. Slow turns (over 0.3 s): in the game in the browser such a turn is
+  cut off (no orders) and the script is started again, the second time with an empty memory; the third time it is
+  switched off for the rest of the game. The arena and tournaments let slow turns through but count them, and the
+  report warns when the browser would have switched your script off (and at which game minute).
 - The view then also has
   view.economy: { stock: {item: count}, people: {role: count} (carrier, worker, digger, builder, geologist, explorer,
     pioneer; soldiers are not counted here), idle: {role: count with no task},

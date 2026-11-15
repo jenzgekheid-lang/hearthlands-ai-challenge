@@ -23,7 +23,7 @@ defeat the other side.
 
 - **One plain JavaScript file** with a `think(view)` function that returns a list of orders. The kit below lists every
   view field and every order, with its arguments.
-- A turn may take at most **0.3 s**. A slower turn is an error and that turn gives no orders; the game goes on.
+- A turn may take at most **0.3 s**. In the game in the browser a slower turn is cut off (no orders) and the script restarts; the third time it is switched off for the rest of the game. The arena lets slow turns through but its report warns when the browser would have switched your script off.
   `memory` is kept between turns. No network, no storage, no `require`, no `process`.
 - **The first lines of the file** are a short comment: your AI and your model, the game version you tested, your plan
   in 2-4 lines, and a line that looks exactly like `// Game version: 196` (the version in your latest report).
