@@ -2,26 +2,27 @@
 
 ## Safety limits
 - Only modify `input/scheduled/script.js` and `input/scheduled/notes.md`.
-- If the last 3 real reports show no improvement in wins, stop incremental tuning: redesign the strategy and document the change here.
-- The empty placeholder is not a real report. One full-strategy report exists so far; the three-report trigger has not formally elapsed.
+- If the last 3 genuine reports show no improvement in wins, do not make another small fix: redesign and explain the change here.
+- A refused safety-scan run is not a genuine report and cannot count as a win-rate observation.
 
-## Report review — 14 Nov 2026 (game version 208, tested commit 63c6af5)
-- Result: 0 wins / 0 losses / 8 undecided. This is a genuine failed strategy run, not the placeholder.
-- In every game the scheduled side stayed at exactly 1 building (HQ), 10 soldiers and 6 carriers for the full 60 minutes. It never placed a site, staffed a production building, searched ore, trained troops or captured anything.
-- The script did not crash, exceed 0.3 s or receive refused orders. Its only orders were hundreds of repeated `march`/`release` cycles to blind corner coordinates. That is a logic/placement failure, not a runtime problem.
-- The old economy's guessed-coordinate `spot()` search never returned a place. It also did not issue the kit's `ask` command, which returns authoritative legal building sites in `economy.spots`. The field army therefore had no economy behind it and the blind scout loop consumed turns without creating contact.
-- Opponent scale at minute 60: roughly 69–87 buildings, 13–28 military buildings and 50–82 soldiers depending on map/side. A static 10-soldier force cannot win.
+## Report history and diagnosis
+- **13 Nov 2026 — commit 3bcb5c4, game v207:** 0 wins / 0 losses / 8 undecided. Every game remained at HQ only, 10 soldiers and 6 carriers. No buildings, mine, barracks or army orders; NPC reached 68–89 buildings and 28–82 soldiers. The script was syntactically safe but its guessed-coordinate placement never found a site.
+- **14 Nov 2026 — commit 63c6af5, game v208:** 0/0/8 again. HQ only, no economy, 10 soldiers throughout. The script repeatedly marched six soldiers to blind corners and released them; no sites, no ore, no attacks. This confirmed the failure was structural, not combat tuning.
+- **14 Nov 2026 — commit 6217b21:** refused before play because a literal `\\n` escaped into JavaScript (line 22). It is not a third played report; its results are not evidence of strategy performance.
+- The previous ask-driven full-chain rewrite never reached the arena because of that syntax error. The two actual reports show no improvement, so this run replaces the whole approach rather than patching a single condition.
 
-## Strategic switch — commits 2482c1d → 00b1630 → a21b751 → 5bc5ff1 (Game version 210)
-This is a full change of approach, not a small balance tweak:
-1. **Ask-driven placement:** request up to six candidate types from the game and build only from returned `E.spots`; remove guessed tile scanning and use site/material accounting. Keep at most two unfinished sites.
-2. **Dependency economy:** wood + quarry → saw → housing and food; add farm/water/mill/bakery and pigfarm/butcher so coal and iron mines have food; geologist searches only actual unsearched mountains; metal → smith → weaponsmith → barracks.
-3. **Territory and workforce:** add staffed guard posts early and expand toward towers/castles only as soldiers/carriers permit; use housing when beds or idle carriers become scarce; prioritize sites and essential production rather than filling the map with optional buildings.
-4. **Army:** set a stable mixed outside target (24→34→44), retain 8–10 free field soldiers, zero unnecessary spare weapons, and reinforce one live siege. Attack the nearest accessible enemy military building with a type/manning-aware force threshold; HQ only after military targets are gone. Use limited probes only when there is no contact, not perpetual corner marches.
-5. **Version alignment:** update the header to game version 210 and guard log reads on `armyOnly` turns.
+## Strategic switch — early mining rush (game version 211)
+The new script is deliberately different from the failed blind-march/long-chain plan:
 
-## Validation / open risks
-- Latest source readback: 11,590 characters (the ask-priority commit adds a small amount); `think(view)`, Game version 210, and the required ask/place/armyTarget/attack paths are present.
-- Forbidden API scan: clean (`require`, `process`, `globalThis`, `eval`, `Function`, `constructor`, `fetch`, random/timer APIs absent).
-- No arena run has yet tested commits 2482c1d/00b1630. Do not claim a win-rate improvement until the exact commit appears in a new report.
-- First things to inspect in the next report: any buildings/sites by minute 5–10; `ask` candidate availability and refused place orders; carrier/idle-carrier trend; farm/food inputs; first geologist/mines; barracks and soldier curve; whether enemy buildings become visible and a siege is actually launched.
+1. **Reliable opening:** request legal sites from `ask`; place a medium house, woodcutter and quarry first, with at most two unfinished sites and explicit material accounting. This establishes carriers/builders and the two raw construction inputs before optional production.
+2. **Short metal spine:** geologist searches only actual unsearched mountain tiles; coal/iron mines are placed as soon as ore is known. Both mines can consume the starting/renewed fish as fallback, so the script does not wait for the slow farm–mill–bakery–pig chain. That chain is only a live-advisor fallback if a mine reports starvation.
+3. **Earlier army:** smelter → toolsmith → weaponsmith → barracks; keep spare weapon targets at zero and raise the outside mixed army target in stages (20/28/36/42).
+4. **Actually man the border:** set `armyReserve=4` rather than 8–10. The old high reserve left small towers idle; the lower reserve allows their three-person garrisons to fill while the barracks replenishes the field target.
+5. **Concentrated war:** scout with two explorers, attack one visible enemy military building at a time, prefer empty posts, reinforce a live siege, release stale/captured targets, and take the HQ only after enemy military sites are gone. Defend nearby threats rather than sending the whole army on blind map-corner marches.
+6. **Live feedback:** read advisor tips to trigger missing mines, housing or food fallback; keep core workshops/mines prioritized and log concise checkpoints.
+
+## Validation and next evidence
+- New source parses as JavaScript; header is game version 211 and required `think(view)` is present.
+- No `Math.random`, timers, network, filesystem, dynamic code, or forbidden globals are used.
+- Only the two permitted files were changed.
+- This commit has **not** been arena-tested. The next genuine report must show sites placed/finished by the opening minutes, ore searched, a barracks and a growing soldier curve, posts manned, and enemy buildings taken. If it again fails, inspect its game log and switch the bottleneck—not claim an improvement from syntax validation.
