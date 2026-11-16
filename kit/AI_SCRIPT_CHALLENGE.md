@@ -20,20 +20,35 @@ THE SCRIPT
 
 THE VIEW (what your side may know; positions in map tiles, x to the east, y to the south)
 { t: game seconds, step: the game's step counter, me: your side (1 = Gold, 2 = Blue), map: {w, h},
-  gold: your strength outside your land (0.6-1),
+  gold: what gold in your vaults gives a soldier outside your land who stands near a bannerman (0.6-1),
   soldiers: [ only your soldiers OUTSIDE buildings (the ones inside a building are in buildings[].troops; they have no
                id here and take no orders until they are out):
-              {id, kind: "sword"|"spear"|"bow", hp, maxHp, x, y,
+              {id, kind: "sword"|"spear"|"bow"|"banner", arm, rank, xp, hp, maxHp, str, x, y,
+               (arm: his armor, 0 none, 1 iron, 2 gold; armor adds health: maxHp. rank: his veteran rank 0, 1 or 2 and
+               xp: his experience (both 0 while switches.vet is off; see Veterans below). str: his strength now, 100 = full:
+               100 on your own land; elsewhere 60, plus up to 40 for gold in your vaults (the 'gold' line above x 100)
+               only while a bannerman covers him; plus the bannerman's bonus while one covers him (anywhere). His blows do str/100 of their damage. The player sees it as a bar under each
+               soldier. A "banner" is a bannerman: he never fights, takes no building and never goes into one, but
+               he can be killed)
                order: null, or {k: "attack", b: building id}, or {k: "move"|"attack-move", x, y},
                fighting, stance: "aggr"|"hold", defends (the id of your building he stepped out of to defend it),
                held, moving, patrol} ],
   buildings: [ your buildings: {id, type, owner, x, y, w, h, door: {x, y}, built (false: still a building site), military,
-               troops: ["sword","bow",...] (the soldiers inside, kinds only), taken (true: you captured it)} ],
-  enemy: { soldiers: [ {id, owner, kind, x, y, hurt, hp, maxHp} only the ones you see now ],
+               troops: ["sword","bow",...] (the soldiers inside, kinds only), troopArm: [0,2,...] (their armor, same
+               order; only when one of them wears armor), troopRank: [0,1,...] (their veteran ranks, same order; only
+               when one of them has a rank), taken (true: you captured it)} ],
+  enemy: { soldiers: [ {id, owner, kind, arm, rank, x, y, hurt, hp, maxHp, str} only the ones you see now (str: as
+                       yours, from his side's land, gold and bannermen; rank: as yours, his xp is not shown) ],
            buildings: [ like yours, but instead of troops only manned: true|false. A building you don't see right now
                         is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
+  switches: {vault, banner, armor, vet} true|false, the same every turn: which optional mechanics this game has.
+            Off: the vault (gold in stock counts instead, 1 bar per soldier), bannermen (no banners; gold counts for
+            every soldier away from home) or armor (no armorer; everyone's arm stays 0). Fields keep their shape.
+            Orders for a switched-off mechanic (placing its building, vaultKeep, armyArmor, a banner armyTarget or
+            weaponKeep) are refused with why 'switched off: <id>'. vet: veterans (ranks and xp; needs banner); off:
+            every rank and xp is 0.
   rules: (first turn only) the numbers below }
 Soldiers with an order are busy; give orders to the ones whose order is null (and leave "defends" alone).
 held: your military buildings won't call him in (see march); moving: still walking.
@@ -79,21 +94,26 @@ THE NUMBERS
  "kinds": {
   "sword": {
    "hp": 10,
-   "melee": 2,
-   "rate": 1.2
+   "melee": 0.5,
+   "rate": 0.3
   },
   "spear": {
    "hp": 10,
-   "melee": 2,
-   "rate": 1.2
+   "melee": 0.5,
+   "rate": 0.3
   },
   "bow": {
    "hp": 7,
-   "melee": 0.8,
-   "rate": 1.4,
-   "shot": 1.5,
-   "shotRate": 1.3,
+   "melee": 0.2,
+   "rate": 0.35,
+   "shot": 0.375,
+   "shotRate": 0.325,
    "range": 10
+  },
+  "banner": {
+   "hp": 10,
+   "melee": 0,
+   "rate": 0.3
   }
  },
  "bonus": {
@@ -209,14 +229,43 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   - Mines only work while they get food (buildings.js: foods); ore lies where a geologist found signs of it.
   - Soldiers: the weaponsmith makes weapons from coal and iron; at the barracks an idle carrier picks up a weapon and
     becomes a soldier. armyTarget {kind, d} is how many soldiers of that kind you want OUTSIDE buildings (at the start
-    sword 4, bow 2, spear 2): military buildings call free soldiers in, and the barracks trains again up to the target.
-    weaponKeep {k, d} is how many spare weapons of a kind to keep in stock (0-9, at the start 1).
+    sword 4, bow 2, spear 2, banner 0): military buildings call free soldiers in, and the barracks trains again up to the
+    target. weaponKeep {k, d} is how many spare weapons of a kind to keep in stock (0-9, at the start 1; banner 0).
+  - Bannermen (army test version): the weaponsmith makes a banner from 1 plank + 1 gold bar (he asks for planks and
+    gold only while banners are wanted: armyTarget banner or weaponKeep); at the barracks an idle carrier picks it up
+    and becomes a bannerman (kind "banner"). He gives +10 strength to the soldiers of your side closest to him (outside
+    buildings); his veteran rank sets how many and how far: rank 0 8 within 5 tiles, rank 1 10 within 6, rank 2 12
+    within 7 (rank 0 while switches.vet is off; his armor only protects him). Anywhere; a soldier near two gets it
+    once; only covered soldiers get the gold bonus outside your land.
+    He never fights, never takes a building and never goes into one (soldiers in towers get no banner bonus); enemies
+    can kill him like any soldier. A bannerman ordered to attack keeps just behind the soldiers attacking with him.
+  - Armor (army test version): the armorer (type armorer) makes iron armor from 1 iron and gold plates from 2 gold;
+    it asks for iron and gold only while armor is wanted. armyArmor {kind, d} (or set: 0 none, 1 iron, 2 gold, at the
+    start 0 for every kind; view.economy.army.armor) says what a kind should wear: the barracks trains new soldiers of
+    that kind in it (iron armor, plus gold plates for gold; it waits for them), and first sends free soldiers of that
+    kind outside towers who wear less to its pile to put it on (gold = iron armor + gold plates). Armor adds health
+    (iron +3, gold +3 for now, on 10 for a swordsman); it is never taken off. Soldiers keep it inside buildings and heal
+    up to it. A full building: a soldier sent in who wears better armor than one of his slot type inside swaps with the
+    weakest (guard swordsmen only for another swordsman), who walks out.
+  - Veterans (switches.vet; army test version): a soldier's xp is the health he deals plus the health he takes, in
+    every fight (a bowman on a tower wall earns none): rank 1 at 20 xp, rank 2 at 60 (health as hp in the view: a
+    swordsman has 10). A bannerman's xp is the health dealt by the soldiers he covers: rank 1 at 200, rank 2 at 500. Ranks
+    are kept inside buildings (troopRank) and seen on enemy soldiers (a stripe on the helmet). The only perk so far: a
+    bowman of rank 1 or 2 never misses. Gold: with veterans on, the full gold bonus outside your land needs 4 / 5 / 6
+    vault bars per soldier outside towers by rank 0 / 1 / 2 (view.gold already counts it). A full building's armor
+    swap ignores rank.
     toolKeep {k, d} (since v209) is how many spare tools of a kind the smith keeps in stock (0-9, at the start 1 each;
     k is the position in view.economy.toolPlan, d 'up' moves it one place up the order). The smith first makes tools
     for finished buildings that wait for a worker with one, then fills these spares in order.
   - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
     castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
-  - Gold bars in stock make your soldiers stronger outside your land (view.gold).
+  - Gold (army plan, test version): outside your land a soldier fights at 60% strength, plus up to 40% from the gold
+    kept in your VAULTS (type vault, 3x3, 3 planks + 4 stone) while a bannerman covers him: full strength takes 4 bars
+    per soldier outside towers (soldiers in military buildings, bannermen and the headquarters guard don't count). Gold anywhere else does not count. Carriers
+    bring gold to a vault until it holds its 'keep' setting (0-40, at the start 40; your town list shows keep and
+    inputs.gold); gold never comes out of a vault again. vaultKeep {b, d} changes it (or set: an exact number). When an
+    enemy takes the land under a finished vault, the vault and its gold become theirs (it is not burned). view.gold is
+    what the vault gold gives a covered soldier outside your land now (0.6-1).
 - profession {role, d}: d 1 retrains an idle carrier, d -1 makes one a carrier again. role is one of: explorer (takes 1
   plank; walks where you send him and uncovers the map), geologist (takes a pickaxe; searches the mountain where you
   send him), pioneer (takes a shovel; claims land nobody owns, tile by tile, where you send him outside your border),
@@ -230,12 +279,12 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   first; this moves entry k of the list for good it one place up; the view does not show these lists.
 - Economy commands: place {type, x, y}, demolish {b}, priority {b, on}, pause {b, on}, workArea {b, x, y},
   workRange {b, d}, storeSlot {b, k, it}, profession {role, d: 1|-1}, sendUnit {u, tx, ty}, weaponKeep {k, d}, toolKeep {k, d},
-  armyTarget {kind, d}, archers {b, d}, fighters {b, d}, workOrder {k, d: -1|1} (move a job in your carriers' work list,
+  vaultKeep {b, d}, armyTarget {kind, d}, armyArmor {kind, d}, archers {b, d}, fighters {b, d}, workOrder {k, d: -1|1} (move a job in your carriers' work list,
   view.economy.work: staff, recruit, sites, workshops, clear, surplus), priority {b, on} (a site, or a finished
   workplace: first for a worker and goods until it has them; a military building: manned first until full), distUp
   {it, k}, armyList {on} (military buildings call soldiers by your list instead of oldest first), armyOrder {k, d}
   (steps guards, border, rest), armyReserve {d or set} (free soldiers the buildings leave in the field); plus the army
-  commands above. Instead of a step d, workRange, archers, fighters, weaponKeep, toolKeep, armyTarget and armyReserve also take
+  commands above. Instead of a step d, workRange, archers, fighters, weaponKeep, toolKeep, vaultKeep, armyTarget, armyArmor and armyReserve also take
   set: an exact number (kept within the same limits; armyTarget by set has no top of 40).
 - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 10 minutes.
 - THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, at(x,y)}.
@@ -251,12 +300,12 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
 - canPlace(type, x, y): true when a building of that type may stand with its top-left corner on tile x, y right now
   (whole tiles; the game's own rules: on your land, flat enough, free of trees, rocks and other buildings, room around
   it, a free tile in front of the door, mines fully on the mountain, military buildings out of enemy arrow range).
-  Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, weaponsmith 3x3 east, barracks 3x3 (door south unless east).
+  Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, vault 3x3, weaponsmith 3x3 east, armorer 3x3 east, barracks 3x3 (door south unless east).
   x grows to the east, y to the south.
-- view.refused: last turn's orders the game refused, as {order, args, why} (for place: the reason, like 'Too steep');
-  at most 30.
+- view.refused: last turn's orders the game refused, as {order, args, why} (for place: the reason, like 'Too steep';
+  'switched off: <id>' for a mechanic this game has switched off, see view.switches); at most 30.
 - view.economy.loose: goods lying loose on your land {item: count}. view.economy.army: your army settings: target
-  {sword, spear, bow}, keep [{weapon, keep}] (weaponKeep's k is the position in this list, 0 first), reserve, list.
+  {sword, spear, bow, banner}, armor {sword, spear, bow, banner} (0-2, armyArmor), keep [{weapon, keep}] (weaponKeep's k is the position in this list, 0 first), reserve, list.
   view.economy.toolPlan (v209): the spare tools your smith keeps, in order [{tool, keep}] (toolKeep's k is the position).
 - view.economy.spots (the 'ask' helper) still works, but you don't need it.
 - THE GAME LOG (full game): view.economy.log = everything that happened to your side since your last economy turn

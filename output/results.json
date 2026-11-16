@@ -27,9 +27,9 @@
     "undecided": 8
   },
   "scheduled": {
-    "date": "2026-11-15",
-    "commit": "1a73df0",
-    "version": 214,
+    "date": "2026-11-16",
+    "commit": "752f921",
+    "version": 217,
     "status": "played",
     "won": 0,
     "lost": 0,

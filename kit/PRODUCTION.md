@@ -1,4 +1,4 @@
-# Hearthlands production overview (game version 214)
+# Hearthlands production overview (game version 217)
 
 Generated from the game code by tools/production.js; do not edit by hand. The same overview as a page with the chain
 picture: production.html.
@@ -42,6 +42,9 @@ picture: production.html.
 | Swords | `sword` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
 | Bows | `bow` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
 | Spears | `spear` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
+| Banners | `banner` | Weaponsmith (`weaponsmith`) | `hammer` | 1 🪜 Planks + 1 🪙 Gold (set which one to make) | 7.5 s (12.5 s on the clock) per item | 1 🪵 Logs + 1 ⚫ Coal + 1 🟡 Gold ore | 53.5 s |
+| Iron armor | `armor` | Armorer (`armorer`) | `hammer` | 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 1 ⚫ Coal + 1 🟤 Iron ore | 39.5 s |
+| Gold plates | `plate` | Armorer (`armorer`) | `hammer` | 2 🪙 Gold (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 2 🟡 Gold ore | 62.1 s |
 
 ## Every building
 
@@ -70,8 +73,10 @@ picture: production.html.
 | Toolsmith | `smith` | Mining and metal | 3 🪜 Planks + 5 🪨 Stone | 38.4 s | `hammer` | tools |
 | Gold mine | `goldmine` | Mining and metal | 5 🪜 Planks + 1 🪨 Stone | 28.8 s | `pick` | Gold ore |
 | Gold smelter | `goldsmelter` | Mining and metal | 4 🪜 Planks + 6 🪨 Stone | 48 s | `hammer` | Gold |
+| Vault | `vault` | Mining and metal | 3 🪜 Planks + 4 🪨 Stone | 33.6 s | — | — |
 | Small tower | `guard` | Army | 2 🪜 Planks + 3 🪨 Stone | 24 s | — | border +14, 3 soldiers |
 | Big tower | `tower` | Army | 5 🪜 Planks + 5 🪨 Stone | 48 s | — | border +20, 6 soldiers |
 | Castle | `castle` | Army | 8 🪜 Planks + 12 🪨 Stone | 96 s | — | border +26, 10 soldiers |
 | Weaponsmith | `weaponsmith` | Army | 5 🪜 Planks + 7 🪨 Stone | 57.6 s | `hammer` | weapons |
+| Armorer | `armorer` | Army | 4 🪜 Planks + 5 🪨 Stone | 43.2 s | `hammer` | Iron armor |
 | Barracks | `barracks` | Army | 4 🪜 Planks + 5 🪨 Stone | 43.2 s | — | soldiers |

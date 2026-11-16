@@ -18,7 +18,7 @@ export const DEF = {
   ironmine:{n:'Iron mine', s:3, h:3, cost:{plank:4,stone:1}, tool:'pick', mine:'ironore', foods:['meat','fish'], inputs:{meat:4,fish:4}, roof:'#7a4632', desc:'Build anywhere on the mountain; signs of a geologist show where the iron ore is. Eats meat; fish only while no meat is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
   stonemine:{n:'Stone mine', s:3, h:3, cost:{plank:5}, tool:'pick', mine:'stone', foods:['bread','fish'], inputs:{bread:4,fish:4}, roof:'#77736a', desc:'Build anywhere on the mountain; signs of a geologist show where the stone is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
   goldmine:{n:'Gold mine', s:3, h:3, cost:{plank:5,stone:1}, tool:'pick', mine:'goldore', foods:['fish','bread','meat'], inputs:{fish:4,bread:2,meat:2}, roof:'#8a7130', desc:'Build anywhere on the mountain; signs of a geologist show where the gold ore is. Eats fish; bread or meat only while no fish is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
-  goldsmelter:{n:'Gold smelter', s:3, h:3, cost:{plank:4,stone:6}, tool:'hammer', inputs:{coal:6,goldore:6}, recipe:{in:{coal:1,goldore:1}, out:'gold', time:7.5, verb:'Smelting gold'}, roof:'#7a5a22', desc:'Coal + gold ore make gold. Gold in stock makes soldiers stronger outside your land'},
+  goldsmelter:{n:'Gold smelter', s:3, h:3, cost:{plank:4,stone:6}, tool:'hammer', inputs:{coal:6,goldore:6}, recipe:{in:{coal:1,goldore:1}, out:'gold', time:7.5, verb:'Smelting gold'}, roof:'#7a5a22', desc:'Coal + gold ore make gold. Gold kept in a vault makes soldiers stronger outside your land'},
   smelter:{n:'Iron smelter', s:3, h:3, cost:{plank:4,stone:6}, tool:'hammer', inputs:{coal:6,ironore:6}, recipe:{in:{coal:1,ironore:1}, out:'iron', time:7.5, verb:'Smelting iron'}, roof:'#6b3a2a', desc:'Coal + iron ore make iron'},
   smith: {n:'Toolsmith', s:3, h:3, door:'side', cost:{plank:3,stone:5}, tool:'hammer', inputs:{coal:6,iron:6}, recipe:{in:{coal:1,iron:1}, out:'tool', time:7.5, verb:'Forging'}, roof:'#5c5a6e', desc:'Coal + iron make tools. Set what to make by tapping it'},
   quarry:{n:'Stonecutter', s:3, h:3, cost:{plank:2,stone:3}, tool:'pick', range:16, roof:'#5d6670', desc:'Cuts stone from outcrops'},
@@ -38,8 +38,12 @@ export const DEF = {
   guard: {n:'Small tower', s:3, h:3, cost:{plank:2,stone:3}, r:14, mil:true, cap:3, fight:2, arch:1, guards:1, roof:'#6b6f6a', desc:'Room for 2 fighters (1 swordsman always on guard) and 1 archer. Pushes your border out 14 tiles'},
   tower: {n:'Big tower', s:5, h:4, cost:{plank:5,stone:5}, r:20, mil:true, cap:6, fight:3, arch:3, guards:2, roof:'#5f6460', desc:'Room for 3 fighters (2 swordsmen always on guard) and 3 archers. Pushes your border out 20 tiles'},
   castle:{n:'Castle', s:8, h:7, cost:{plank:8,stone:12}, r:26, mil:true, cap:10, fight:5, arch:5, guards:3, roof:'#555a56', desc:'Room for 5 fighters (3 swordsmen always on guard) and 5 archers. Pushes your border out 26 tiles'},
-  weaponsmith:{n:'Weaponsmith', s:3, h:3, door:'side', cost:{plank:5,stone:7}, tool:'hammer', inputs:{coal:6,iron:6}, recipe:{in:{coal:1,iron:1}, out:'weapon', time:7.5, verb:'Forging'}, roof:'#5a4a5e', desc:'Coal + iron make swords, bows and spears. Tap it to set what to make'},
-  barracks:{n:'Barracks', s:3, h:3, cost:{plank:4,stone:5}, inputs:{sword:4,bow:4,spear:4}, roof:'#7a3a32', desc:'A carrier picks up a weapon here and becomes a soldier. Set how many of each you want'}
+  // (army plan, 14 Nov) the vault: carriers bring gold until it holds the amount set (tap it); gold never comes out
+  // again. Only vault gold counts for soldiers' strength outside their land. Taken with the land, not burned.
+  vault: {n:'Vault', s:3, h:3, cost:{plank:3,stone:4}, inputs:{gold:40}, vault:true, rule:'vault' /* (C2) only with this switch on (data/rules.js) */, roof:'#8a7a3a', desc:'Holds up to 40 gold bars; tap it to set how many to keep. Gold in vaults makes soldiers stronger outside your land (4 bars per soldier outside towers for full strength). Gold never comes out again; if the enemy takes the land, the vault and its gold are theirs'},
+  weaponsmith:{n:'Weaponsmith', s:3, h:3, door:'side', cost:{plank:5,stone:7}, tool:'hammer', inputs:{coal:6,iron:6,plank:2,gold:2}, recipe:{in:{coal:1,iron:1}, out:'weapon', time:7.5, verb:'Forging'}, roof:'#5a4a5e', desc:'Coal + iron make swords, bows and spears; a plank + a gold bar make a banner. Tap it to set what to make'},
+  armorer:{n:'Armorer', rule:'armor', s:3, h:3, door:'side', cost:{plank:4,stone:5}, tool:'hammer', inputs:{iron:6,gold:4}, recipe:{in:{iron:1}, out:'armor', time:7.5, verb:'Making'}, roof:'#6a5a3e', desc:'Iron makes iron armor; 2 gold bars make gold plates (iron armor + gold plates = gold armor). Soldiers put armor on at the barracks'},
+  barracks:{n:'Barracks', s:3, h:3, cost:{plank:4,stone:5}, inputs:{sword:4,bow:4,spear:4,banner:2,armor:4,plate:4}, roof:'#7a3a32', desc:'A carrier picks up a weapon (or a banner) here and becomes a soldier (or a bannerman). Set how many of each you want'}
 };
 // Room around buildings (version 145, Jens: like the protected area of Settlers / JSettlers): every building keeps
 // `side` tiles free on its sides and back and `front` tiles in front (door, piles, work spot, later yards and
@@ -50,8 +54,8 @@ export const YARD = { side:1, front:2 };
 export const LOOK = { wood:[1,.9,1], forest:[.9,.88,1], saw:[1.1,.95,1], fisher:[.85,.85,.95], waterhut:[.8,.85,.95],
   farm:[1.15,.9,1], mill:[.78,.8,1.7], bakery:[1,.95,1.05], pigfarm:[1.15,.88,.9], butcher:[.95,.9,1], goldsmelter:[1,1,1.1],
   smelter:[1,1,1.1], smith:[1,.9,1], quarry:[.9,.9,1], house:[.9,.88,1], house2:[1,.95,1.7], house3:[1.05,1,1.7],
-  weaponsmith:[1.05,.9,1], barracks:[1.1,1,1.05], look:[1,1,1] };
-export const BUILD_GROUPS = [['Basics',['wood','quarry','saw','forest','store']],['Houses',['house','house2','house3']],['Land',['look']],['Food',['fisher','waterhut','farm','mill','bakery','pigfarm','butcher']],['Mining and metal',['stonemine','coalmine','ironmine','smelter','smith','goldmine','goldsmelter']],['Army',['guard','tower','castle','weaponsmith','barracks']]];
+  weaponsmith:[1.05,.9,1], armorer:[1,.9,1], barracks:[1.1,1,1.05], look:[1,1,1] };
+export const BUILD_GROUPS = [['Basics',['wood','quarry','saw','forest','store']],['Houses',['house','house2','house3']],['Land',['look']],['Food',['fisher','waterhut','farm','mill','bakery','pigfarm','butcher']],['Mining and metal',['stonemine','coalmine','ironmine','smelter','smith','goldmine','goldsmelter','vault']],['Army',['guard','tower','castle','weaponsmith','armorer','barracks']]];
 export const BUILD_ORDER = BUILD_GROUPS.flatMap(g=>g[1]);
 // Short texts for the Build tab (Jens, 12 Nov: 'way smaller and simple'). The full desc above stays for the game summary
 // and the AI script kit (tools/summary.js).
@@ -61,7 +65,7 @@ export const SHORT = {
   fisher:'Catches fish', waterhut:'Gathers water', farm:'Grows grain', mill:'Grain into flour', bakery:'Bakes bread',
   pigfarm:'Raises pigs', butcher:'Pigs into meat',
   stonemine:'Mines stone', coalmine:'Mines coal', ironmine:'Mines iron ore', smelter:'Makes iron', smith:'Makes tools',
-  goldmine:'Mines gold ore', goldsmelter:'Makes gold',
+  goldmine:'Mines gold ore', goldsmelter:'Makes gold', vault:'Keeps gold: stronger attacks',
   guard:'Border +14, 3 soldiers', tower:'Border +20, 6 soldiers', castle:'Border +26, 10 soldiers',
-  weaponsmith:'Makes weapons', barracks:'Trains soldiers',
+  weaponsmith:'Makes weapons', armorer:'Makes armor', barracks:'Trains soldiers',
 };

@@ -74,7 +74,7 @@ The numbers (*generated*):
 | Iron mine | `ironmine` | 4 plank, 1 stone | pick | meat, fish | — | Build anywhere on the mountain; signs of a geologist show where the iron ore is. Eats meat; fish only while no meat is in stock. 1 meal = up to 10 trips, not every trip finds ore |
 | Stone mine | `stonemine` | 5 plank | pick | bread, fish | — | Build anywhere on the mountain; signs of a geologist show where the stone is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore |
 | Gold mine | `goldmine` | 5 plank, 1 stone | pick | fish, bread, meat | — | Build anywhere on the mountain; signs of a geologist show where the gold ore is. Eats fish; bread or meat only while no fish is in stock. 1 meal = up to 10 trips, not every trip finds ore |
-| Gold smelter | `goldsmelter` | 4 plank, 6 stone | hammer | coal, goldore | gold (from coal, goldore) | Coal + gold ore make gold. Gold in stock makes soldiers stronger outside your land |
+| Gold smelter | `goldsmelter` | 4 plank, 6 stone | hammer | coal, goldore | gold (from coal, goldore) | Coal + gold ore make gold. Gold kept in a vault makes soldiers stronger outside your land |
 | Iron smelter | `smelter` | 4 plank, 6 stone | hammer | coal, ironore | iron (from coal, ironore) | Coal + iron ore make iron |
 | Toolsmith | `smith` | 3 plank, 5 stone | hammer | coal, iron | tool (from coal, iron) | Coal + iron make tools. Set what to make by tapping it |
 | Stonecutter | `quarry` | 2 plank, 3 stone | pick | — | — | Cuts stone from outcrops |
@@ -88,8 +88,10 @@ The numbers (*generated*):
 | Small tower | `guard` | 2 plank, 3 stone | — | — | — | Room for 2 fighters (1 swordsman always on guard) and 1 archer. Pushes your border out 14 tiles |
 | Big tower | `tower` | 5 plank, 5 stone | — | — | — | Room for 3 fighters (2 swordsmen always on guard) and 3 archers. Pushes your border out 20 tiles |
 | Castle | `castle` | 8 plank, 12 stone | — | — | — | Room for 5 fighters (3 swordsmen always on guard) and 5 archers. Pushes your border out 26 tiles |
-| Weaponsmith | `weaponsmith` | 5 plank, 7 stone | hammer | coal, iron | weapon (from coal, iron) | Coal + iron make swords, bows and spears. Tap it to set what to make |
-| Barracks | `barracks` | 4 plank, 5 stone | — | sword, bow, spear | — | A carrier picks up a weapon here and becomes a soldier. Set how many of each you want |
+| Vault | `vault` | 3 plank, 4 stone | — | gold | — | Holds up to 40 gold bars; tap it to set how many to keep. Gold in vaults makes soldiers stronger outside your land (4 bars per soldier outside towers for full strength). Gold never comes out again; if the enemy takes the land, the vault and its gold are theirs |
+| Weaponsmith | `weaponsmith` | 5 plank, 7 stone | hammer | coal, iron, plank, gold | weapon (from coal, iron) | Coal + iron make swords, bows and spears; a plank + a gold bar make a banner. Tap it to set what to make |
+| Armorer | `armorer` | 4 plank, 5 stone | hammer | iron, gold | armor (from iron) | Iron makes iron armor; 2 gold bars make gold plates (iron armor + gold plates = gold armor). Soldiers put armor on at the barracks |
+| Barracks | `barracks` | 4 plank, 5 stone | — | sword, bow, spear, banner, armor, plate | — | A carrier picks up a weapon (or a banner) here and becomes a soldier (or a bannerman). Set how many of each you want |
 <!-- /generated:buildings -->
 
 - Production chains: woodcutter (logs), sawmill (planks), quarry (stone), forest (plants trees for the woodcutter),
