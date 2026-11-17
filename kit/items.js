@@ -5,7 +5,8 @@ export const ITEMS = {
   axe:{n:'Axes',c:'#c96f4a',tool:1}, saw:{n:'Saws',c:'#c96f4a',tool:1}, pick:{n:'Pickaxes',c:'#c96f4a',tool:1}, shovel:{n:'Shovels',c:'#c96f4a',tool:1}, hammer:{n:'Hammers',c:'#c96f4a',tool:1}, rod:{n:'Fishing rods',c:'#c96f4a',tool:1}, scythe:{n:'Scythes',c:'#c96f4a',tool:1},
   sword:{n:'Swords',c:'#b9bfc5',weapon:1}, bow:{n:'Bows',c:'#a0703c',weapon:1}, spear:{n:'Spears',c:'#8d9aa3',weapon:1},
   banner:{n:'Banners',c:'#c4463a',weapon:1}, // (army step 3) made from a plank and a gold bar; a carrier takes one at the barracks and becomes a bannerman
-  armor:{n:'Iron armor',c:'#8a949c',armor:1}, plate:{n:'Gold plates',c:'#e8b830',armor:1} // (army step 4) made at the armorer, put on at the barracks
+  armor:{n:'Iron armor',c:'#8a949c',armor:1}, plate:{n:'Gold plates',c:'#e8b830',armor:1}, // (army step 4) made at the armorer, put on at the barracks
+  brokenarmor:{n:'Broken armor',c:'#7d858c'} // (dropping gear, switch gear) iron armor from a fallen soldier; an armorer with repair on makes it iron armor again (1 coal). Last, so the other goods keep their place in the economy counters
 };
 export const TOOLS = Object.keys(ITEMS).filter(k=>ITEMS[k].tool);
 export const TOOL_A = {axe:'an axe', saw:'a saw', pick:'a pickaxe', shovel:'a shovel', hammer:'a hammer', rod:'a fishing rod', scythe:'a scythe'};

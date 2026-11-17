@@ -1,4 +1,4 @@
-# Hearthlands production overview (game version 217)
+# Hearthlands production overview (game version 224)
 
 Generated from the game code by tools/production.js; do not edit by hand. The same overview as a page with the chain
 picture: production.html.
@@ -45,6 +45,7 @@ picture: production.html.
 | Banners | `banner` | Weaponsmith (`weaponsmith`) | `hammer` | 1 🪜 Planks + 1 🪙 Gold (set which one to make) | 7.5 s (12.5 s on the clock) per item | 1 🪵 Logs + 1 ⚫ Coal + 1 🟡 Gold ore | 53.5 s |
 | Iron armor | `armor` | Armorer (`armorer`) | `hammer` | 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 1 ⚫ Coal + 1 🟤 Iron ore | 39.5 s |
 | Gold plates | `plate` | Armorer (`armorer`) | `hammer` | 2 🪙 Gold (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 2 🟡 Gold ore | 62.1 s |
+| Broken armor | `brokenarmor` | not made by any building | | | | | |
 
 ## Every building
 

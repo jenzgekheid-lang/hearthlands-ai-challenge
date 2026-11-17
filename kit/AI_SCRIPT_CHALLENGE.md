@@ -24,10 +24,11 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
   soldiers: [ only your soldiers OUTSIDE buildings (the ones inside a building are in buildings[].troops; they have no
                id here and take no orders until they are out):
               {id, kind: "sword"|"spear"|"bow"|"banner", arm, rank, xp, hp, maxHp, str, x, y,
-               (arm: his armor, 0 none, 1 iron, 2 gold; armor adds health: maxHp. rank: his veteran rank 0, 1 or 2 and
+               (arm: his armor, 0 none, 1 iron, 2 gold; armor cuts every blow he takes, it adds no health: maxHp is his kind's. rank: his veteran rank 0, 1 or 2 and
                xp: his experience (both 0 while switches.vet is off; see Veterans below). str: his strength now, 100 = full:
                100 on your own land; elsewhere 60, plus up to 40 for gold in your vaults (the 'gold' line above x 100)
-               only while a bannerman covers him; plus the bannerman's bonus while one covers him (anywhere). His blows do str/100 of their damage. The player sees it as a bar under each
+               only while a bannerman covers him; a bowman ("bow") there never below 80 (his base is the higher of 80 and
+               what gold gives him); plus the bannerman's bonus while one covers him (anywhere). His blows do str/100 of their damage. The player sees it as a bar under each
                soldier. A "banner" is a bannerman: he never fights, takes no building and never goes into one, but
                he can be killed)
                order: null, or {k: "attack", b: building id}, or {k: "move"|"attack-move", x, y},
@@ -43,12 +44,16 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
                         is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
-  switches: {vault, banner, armor, vet} true|false, the same every turn: which optional mechanics this game has.
+  switches: {vault, banner, armor, vet, gear} true|false, the same every turn: which optional mechanics this game has.
             Off: the vault (gold in stock counts instead, 1 bar per soldier), bannermen (no banners; gold counts for
             every soldier away from home) or armor (no armorer; everyone's arm stays 0). Fields keep their shape.
+            gear: dropping gear (see Dropping gear below); off: nothing drops.
             Orders for a switched-off mechanic (placing its building, vaultKeep, armyArmor, a banner armyTarget or
-            weaponKeep) are refused with why 'switched off: <id>'. vet: veterans (ranks and xp; needs banner); off:
-            every rank and xp is 0.
+            weaponKeep, armorRepair) are refused with why 'switched off: <id>'. vet: veterans (ranks and xp; needs
+            banner); off: every rank and xp is 0.
+  gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
+        tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
+        land owner's pile (a pile is not in this list).
   rules: (first turn only) the numbers below }
 Soldiers with an order are busy; give orders to the ones whose order is null (and leave "defends" alone).
 held: your military buildings won't call him in (see march); moving: still walking.
@@ -74,7 +79,7 @@ view.refused on your next turn says how many were skipped. Wrong or impossible c
 HOW BATTLES WORK
 - Defenders step out one per attacker at the door, fighters first; bowmen inside shoot while a fighter is left, then stop and come down one at a time. A defender at the door cannot be shot from afar: bowmen must duel him.
 - The attacker closest to the door takes a building once nobody defends it. A taken building only gets land no other enemy building still covers.
-- Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier).
+- Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier); a bowman there never below 80% (v222).
 - Soldiers without an order step back out of arrow range; move routes around known arrow range; attack-move fights on the way.
 - A military building calls in the nearest free soldier (no order, not held) standing on your own land; if there is none, the nearest within 20 tiles of its door; otherwise it stays empty, and an empty building can be taken.
 - Kinds: spearmen beat swordsmen up close, swordsmen beat bowmen up close, bowmen beat spearmen at range (bowmen shoot
@@ -164,7 +169,7 @@ THE NUMBERS
  "notes": [
   "Defenders step out one per attacker at the door, fighters first; bowmen inside shoot while a fighter is left, then stop and come down one at a time. A defender at the door cannot be shot from afar: bowmen must duel him.",
   "The attacker closest to the door takes a building once nobody defends it. A taken building only gets land no other enemy building still covers.",
-  "Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier).",
+  "Outside its own land a soldier fights at its side's gold strength (60% with no gold, 100% with a gold bar per soldier); a bowman there never below 80% (v222).",
   "Soldiers without an order step back out of arrow range; move routes around known arrow range; attack-move fights on the way.",
   "A military building calls in the nearest free soldier (no order, not held) standing on your own land; if there is none, the nearest within 20 tiles of its door; otherwise it stays empty, and an empty building can be taken."
  ],
@@ -212,7 +217,8 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
       and waiting to be used, outputs = made or stored there and waiting to be carried off; test with
       (b.outputs.plank || 0) > 0), delivered, cost (a site only, {item: count}: goods brought so far, goods needed in all),
       dug (a site: levelled, ready for builders), coming (a house: settlers it still brings),
-      range, area (workplaces with a work area), archers, fighters (military buildings: their setting)} ],
+      range, area (workplaces with a work area), archers, fighters (military buildings: their setting),
+      repair (an armorer only: true|false, its repair tick-box, see Dropping gear; false while switches.gear is off)} ],
     land: {tiles, grass, trees, rocks, water, mountain, unsearched}, ore: [ {x, y, ore} ore you have seen signs of ],
     unsearched: [ {x, y, d} mountain on your land no geologist has searched, nearest first ],
     spots: { type: [ {x, y, d, n} ] } answers to last turn's ['ask', {spots: [types]}]: places where that building
@@ -235,18 +241,29 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     gold only while banners are wanted: armyTarget banner or weaponKeep); at the barracks an idle carrier picks it up
     and becomes a bannerman (kind "banner"). He gives +10 strength to the soldiers of your side closest to him (outside
     buildings); his veteran rank sets how many and how far: rank 0 8 within 5 tiles, rank 1 10 within 6, rank 2 12
-    within 7 (rank 0 while switches.vet is off; his armor only protects him). Anywhere; a soldier near two gets it
-    once; only covered soldiers get the gold bonus outside your land.
+    within 7 (rank 0 while switches.vet is off; his armor only protects him). Anywhere. One bannerman per soldier: a
+    soldier goes to the nearest bannerman whose ring reaches him and who still has room (else the next nearest) and
+    gets his bonus once; only covered soldiers get the gold bonus outside your land.
     He never fights, never takes a building and never goes into one (soldiers in towers get no banner bonus); enemies
     can kill him like any soldier. A bannerman ordered to attack keeps just behind the soldiers attacking with him.
   - Armor (army test version): the armorer (type armorer) makes iron armor from 1 iron and gold plates from 2 gold;
     it asks for iron and gold only while armor is wanted. armyArmor {kind, d} (or set: 0 none, 1 iron, 2 gold, at the
     start 0 for every kind; view.economy.army.armor) says what a kind should wear: the barracks trains new soldiers of
     that kind in it (iron armor, plus gold plates for gold; it waits for them), and first sends free soldiers of that
-    kind outside towers who wear less to its pile to put it on (gold = iron armor + gold plates). Armor adds health
-    (iron +3, gold +3 for now, on 10 for a swordsman); it is never taken off. Soldiers keep it inside buildings and heal
-    up to it. A full building: a soldier sent in who wears better armor than one of his slot type inside swaps with the
+    kind outside towers who wear less to its pile to put it on (gold = iron armor + gold plates). Armor adds no health
+    (maxHp stays 10 for a swordsman): every blow and arrow its wearer takes is cut by a fixed amount, iron 0.05, gold
+    0.08 (a swordsman's blow is 0.5 at full strength, 0.3 away from home; hp counts in the same sizes), and a blow
+    keeps at least 10% of itself. It is never taken off; soldiers keep it inside buildings. A full building: a soldier sent in who wears better armor than one of his slot type inside swaps with the
     weakest (guard swordsmen only for another swordsman), who walks out.
+  - Dropping gear (switches.gear; army test version): a soldier who falls drops, 1 time in 4, either (half and half)
+    his iron armor as broken armor or his weapon, usable as it is. Gold armor and a bannerman's banner never drop (that
+    half gives nothing; so does the armor half for a soldier without armor). It lies on his tile (view.gear); whoever
+    owns that land gets it: within a second it becomes goods on his pile, and his carriers take it on like any goods
+    (a weapon to the barracks, broken armor to a store slot set to it or to an armorer with repair on). On no one's
+    land it keeps lying; it never vanishes. Broken armor ('brokenarmor') is a stock good (view.economy.stock).
+    armorRepair {b, on} turns an armorer's repair on or off (off at the start; your town list shows repair true|false
+    on an armorer): with it on he asks for broken armor and one coal for each, repairs first (1 broken armor + 1 coal
+    = 1 iron armor), then makes new armor as before.
   - Veterans (switches.vet; army test version): a soldier's xp is the health he deals plus the health he takes, in
     every fight (a bowman on a tower wall earns none): rank 1 at 20 xp, rank 2 at 60 (health as hp in the view: a
     swordsman has 10). A bannerman's xp is the health dealt by the soldiers he covers: rank 1 at 200, rank 2 at 500. Ranks
@@ -259,7 +276,8 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     for finished buildings that wait for a worker with one, then fills these spares in order.
   - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
     castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
-  - Gold (army plan, test version): outside your land a soldier fights at 60% strength, plus up to 40% from the gold
+  - Gold (army plan, test version): outside your land a soldier fights at 60% strength (a bowman at 80% at least: the
+    higher of 80% and what the gold gives him), plus up to 40% from the gold
     kept in your VAULTS (type vault, 3x3, 3 planks + 4 stone) while a bannerman covers him: full strength takes 4 bars
     per soldier outside towers (soldiers in military buildings, bannermen and the headquarters guard don't count). Gold anywhere else does not count. Carriers
     bring gold to a vault until it holds its 'keep' setting (0-40, at the start 40; your town list shows keep and
@@ -279,7 +297,7 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   first; this moves entry k of the list for good it one place up; the view does not show these lists.
 - Economy commands: place {type, x, y}, demolish {b}, priority {b, on}, pause {b, on}, workArea {b, x, y},
   workRange {b, d}, storeSlot {b, k, it}, profession {role, d: 1|-1}, sendUnit {u, tx, ty}, weaponKeep {k, d}, toolKeep {k, d},
-  vaultKeep {b, d}, armyTarget {kind, d}, armyArmor {kind, d}, archers {b, d}, fighters {b, d}, workOrder {k, d: -1|1} (move a job in your carriers' work list,
+  vaultKeep {b, d}, armorRepair {b, on}, armyTarget {kind, d}, armyArmor {kind, d}, archers {b, d}, fighters {b, d}, workOrder {k, d: -1|1} (move a job in your carriers' work list,
   view.economy.work: staff, recruit, sites, workshops, clear, surplus), priority {b, on} (a site, or a finished
   workplace: first for a worker and goods until it has them; a military building: manned first until full), distUp
   {it, k}, armyList {on} (military buildings call soldiers by your list instead of oldest first), armyOrder {k, d}
