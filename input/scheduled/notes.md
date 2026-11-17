@@ -36,3 +36,41 @@ This replaces the failed economy-first/early-mining rush with a different openin
 - Local harness checks: opening issues reserve/geologist/ask orders; no attack is issued with 10 soldiers; a barracks-backed force can attack on an `armyOnly` turn.
 - Only `input/scheduled/script.js` and this `input/scheduled/notes.md` are to be changed. No files in the actual Hearthlands game repository are touched.
 - This rewrite has **not** been tournament-tested. The next genuine report must show: a staffed first guard and border growth; geologist assignment and coal/iron signs; a working quarry/mines and a growing metal chain; houses keeping carriers available; a barracks and a rising soldier curve; and no suicidal attack before the army threshold. Do not claim improvement until the exact new input commit appears in `output/scheduled/latest.md` and `output/results.json`.
+
+
+## 17 Nov 2026 — full strategy pivot after the v217 report
+
+### Evidence and safety trigger
+
+The latest scheduled report is for game version 217, written for the old script header version 214, input commit `752f921`. `output/results.json` records **0 wins, 0 losses, 8 undecided**. The last three genuine scheduled reports (14, 15 and 16 November) all remained at 0 wins, so the three-report safety rule is met again. The refused/syntax-invalid run is not counted as a tournament result.
+
+The 16 November report shows two distinct failure modes:
+
+- Seven of eight games stalled with one military building, no working mine chain, and no meaningful land expansion. The script's own notes recorded coal and iron signs (`ore CI`) and no unsearched mountain, but those games still did not place mines. Several settlements grew to roughly 60–80 people with a large idle-carrier surplus while the productive chain remained absent.
+- The one developed game (Map 777, Blue) reached the smelter, smith, weaponsmith and barracks, and recorded 23 soldiers in its detailed end state. It still made no attack or capture. Its guard buildings spent 100% of their recorded building time idle, with 0% of time showing soldiers on the way. The report's order totals contain no `sendIn` or `attack` orders, and there were no captures or kills.
+
+This is not a reason for another small numerical adjustment. The old plan relied on rotating `ask` queries, expanded housing as beds filled, relied on priority/automatic garrison behaviour, and required a large fixed field-army threshold before attacking. The current kit documents `canPlace` for direct legal-site checks and `sendIn` for explicit garrisoning.
+
+### New strategy: garrison-first, map-scanned economy
+
+The script has been replaced, not incrementally patched. It is now marked **Game version 217**.
+
+1. **Explicit border anchor:** place an early guard, set it to one fighter and zero archers, and explicitly send one swordsman inside. Apply the same one-soldier land-claim rule to later posts. Keep a three-soldier field reserve.
+2. **Direct map placement:** scan owned terrain and known ore signs, then call `canPlace` before choosing a site. Mine sites must be on mountain and near the matching coal/iron signs. This removes dependence on the previous rotating `ask`-only placement loop; `ask` remains a fallback if map/canPlace data is unavailable.
+3. **Carrier-aware growth:** keep at most two unfinished sites and place one new site per turn. Add housing only when carriers are genuinely scarce (under eight with fewer than four idle), or when homelessness confirms the need. Do not create medium houses merely because beds are filling.
+4. **Dependency-led production:** guard, wood, quarry, saw, discovered coal/iron mines, fisher, smelter, smith, weaponsmith and barracks. Add the bread/meat chain only when the advisor actually reports mine food starvation and fish stock is low. Expand to a second guard when ore access is blocked or the advisor reports stalled land growth.
+5. **Useful scouting and sieges:** send one explorer beyond the visible neutral frontier, then inspect the perimeter around a discovered enemy HQ. Attack known manned enemy military buildings first; leave HQ until later. Replace the old hard 24-soldier gate with target-specific force thresholds and reinforce an active siege in measured increments.
+6. **Recruitment:** target a staged 10–30 outside-building soldiers, but stop increasing the target when carriers or idle carriers collapse. The target is deliberately subordinate to a functioning transport economy.
+
+### Validation performed
+
+- JavaScript syntax check: passed (`node --check`).
+- Mock-view smoke checks: passed for a legal opening guard site, geologist recruitment, explicit `sendIn`, direct coal-mine placement, attack dispatch, and an army-only turn.
+- Forbidden API scan: clean (no random, timers, network calls, Node/process APIs, eval or dynamic Function).
+- These are local static/mock checks, **not** an arena result. The new strategy has not yet been tournament-tested.
+
+### Scope
+
+Only `input/scheduled/script.js` was changed in the script commit, followed by this notes update in `input/scheduled/notes.md`. No other challenge files and no files in the actual Hearthlands game repository were changed.
+
+Script commit: `53868dbae9acddd3a58726eef16f946c7e7149c6`.
