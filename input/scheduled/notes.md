@@ -74,3 +74,46 @@ The script has been replaced, not incrementally patched. It is now marked **Game
 Only `input/scheduled/script.js` was changed in the script commit, followed by this notes update in `input/scheduled/notes.md`. No other challenge files and no files in the actual Hearthlands game repository were changed.
 
 Script commit: `53868dbae9acddd3a58726eef16f946c7e7149c6`.
+
+
+## 18 Nov 2026 — expeditionary frontier pivot after the v224 report
+
+### Evidence and safety trigger
+
+The latest genuine report is `output/scheduled/2026-11-17-0b02085.md`: game version 224, written for script version 217, input commit `0b02085`. It recorded **0 wins, 0 losses, 8 undecided**. The previous two genuine reports (15 and 16 November) were also 0/8, so the last three genuine reports (15–17 November) all show no win improvement. The safety trigger is met again; this is a whole-strategy change.
+
+The v224 report is more informative than the previous diagnosis:
+
+- Across all eight games there were **0 buildings taken and 0 kills**; seven towns were marked stuck.
+- Several developed games reached 20–34 soldiers and had working mines, smelter, smith, weaponsmith and barracks. The report's notes even recorded three posts with six garrison soldiers in one game. Therefore, the old interpretation of the buildings' “Idle 100%” activity line as proof that the posts were empty was wrong: explicit `sendIn` did work. The missing step was getting the army into contact with a visible enemy target.
+- The old scout selector required a neutral tile to be directly adjacent to owned land (`ownNear`). That confines exploration to the immediate home-border ring; it does not advance to the newly revealed fog frontier farther out. The reports show only roughly 3.3k–4.7k tiles seen on a 240×240 map, and no successful attack/capture.
+- The old expansion logic also hard-capped the town at two guards plus one big tower. Seven of eight games then stopped growing, with “land has not grown” tips persisting for much of the game.
+- In one 4242/Blue game the town stalled at seven buildings without mines. Without a pioneer, mountains outside the initial border could not be claimed and searched. The forester also repeatedly ran out of free ground inside the small border.
+
+### Kit review: game version 224
+
+Reviewed the current `kit/AI_SCRIPT_CHALLENGE.md`, `kit/CHALLENGE.md`, `kit/GAME_SUMMARY.md`, `kit/PRODUCTION.md`, `kit/buildings.js` and `kit/items.js`.
+
+Relevant supported mechanics are already in the v224 kit: explorers, geologists and pioneers move with `sendUnit`; a pioneer claims neutral land tile by tile along the route; a `look` building reveals fog 24 tiles around it without claiming land; `toolKeep` can retain spare picks and shovels; `canPlace` validates a complete building footprint; and `sendIn` explicitly garrisons a post. The v222 bow rule gives bowmen at least 80% strength outside their own land. The current report has banner, armor and veteran mechanics off, so the script does not spend resources on those systems.
+
+### New strategy: expeditionary corridor
+
+This is a strategic replacement, not another numerical adjustment:
+
+1. **Explore beyond the home ring:** recruit up to three explorers and give them different directional sectors. Choose any currently visible, walkable fog-frontier tile with unknown neighbours—not just a neutral tile touching the home border. Prefer frontier tiles adjacent to enemy-owned land and toward the map centre. This should reveal actual enemy buildings for the attack planner.
+2. **Claim a route:** reserve spare shovels with `toolKeep`, recruit a pioneer, and repeatedly send it to the next visible neutral frontier. The pioneer claims the corridor tile by tile, allowing the border and building sites to move toward mountains and the opponent.
+3. **Search newly owned mountains:** recruit a geologist early and keep the pick available while the pioneer expands. Send it to each unsearched mountain. Once it has completed the currently available search, return it to the carrier pool and release the pick for quarry/mining work.
+4. **Extend vision and territory in parallel:** place up to two `look` towers on the owned fog edge for their 24-tile sight. Build a forward ladder of up to six small guards, one explicit garrison soldier per post, rather than stopping at the previous three-post cap.
+5. **Keep the economy compact:** establish wood, quarry, saw and fish; reserve the starting shovel for the pioneer before placing a forester. Add the forester after the pioneer exists (or the toolsmith can supply another shovel), then add food chains only when mine-starvation tips require them. Keep a carrier floor rather than filling every bed.
+6. **Attack as soon as contact allows:** grow the barracks target from 8 to 12, 16, 22 and 28 outside soldiers (up to 30 only with a strong carrier surplus). Attack visible empty military buildings first, then manned military buildings, and the HQ when no military target is visible. Reinforce one siege at a time and keep four soldiers outside the attacking group for defence.
+
+The key strategic change is that scouts reveal the route, pioneers turn that route into owned land, and forward outposts follow it. The old plan built a few posts around home and then waited for an enemy building that its scout logic was unlikely to reveal.
+
+### Validation and scope
+
+- `node --check`: passed.
+- Mock smoke tests: opening guard, explicit garrison, siege dispatch, explorer frontier dispatch, pioneer recruitment and pioneer frontier claim all passed.
+- Forbidden API scan (`Math.random`, timers, network, filesystem, `require`, `process`, `globalThis`, `eval`, dynamic `Function`): clean.
+- Script header is aligned to the latest report's game version, **224**.
+- This is static/mock validation, not a tournament result. The new strategy has not yet been arena-tested; do not claim a win improvement until the exact new input commit appears in the next scheduled report and `output/results.json`.
+- Only `input/scheduled/script.js` and `input/scheduled/notes.md` are to be changed. No other challenge files and no files in the actual Hearthlands game repository are touched.
