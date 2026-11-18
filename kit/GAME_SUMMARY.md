@@ -12,7 +12,9 @@ costs, the same workers, the same walking, the same fog of war.
 
 - A square grid of small tiles. Maps may grow, so do not assume one size.
 - Player slots, named Gold, Blue, Purple, Teal, Pink, White, Orange and Lime. Players can form teams.
-- The land has grass, water, mountains, forest and rock. Mountains hold ore: coal, iron ore, gold ore and stone. Coal
+- The land has grass, water, sand, mountains, forest and rock. Sand lies along the sea and the big lakes (1 tile where
+  the shore is steep, 2-3 where it is flat and low; small lakes have grass shores): you can build anything on it, but no fields are sown and no trees
+  are planted there. Mountains hold ore: coal, iron ore, gold ore and stone. Coal
   deposits hold three times as much. A geologist must find ore in a mountain before a mine can work it.
 - Every start gets the same: a forest of 25 trees and a patch of 13 rocks (6 stone each) close by, on land (never
   lost to a lake), and a mountain with coal and iron about 17 tiles out. Everything else on the map differs.

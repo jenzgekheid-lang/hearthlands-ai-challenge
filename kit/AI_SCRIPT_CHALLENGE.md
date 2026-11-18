@@ -273,7 +273,8 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     swap ignores rank.
     toolKeep {k, d} (since v209) is how many spare tools of a kind the smith keeps in stock (0-9, at the start 1 each;
     k is the position in view.economy.toolPlan, d 'up' moves it one place up the order). The smith first makes tools
-    for finished buildings that wait for a worker with one, then fills these spares in order.
+    for finished buildings that wait for a worker with one, then fills these spares in order. Spare (18 Nov 2026) =
+    unclaimed tools in your buildings and lying on your land; tools in people's hands or promised to someone don't count.
   - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
     castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
   - Gold (army plan, test version): outside your land a soldier fights at 60% strength (a bowman at 80% at least: the
@@ -305,14 +306,19 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   commands above. Instead of a step d, workRange, archers, fighters, weaponKeep, toolKeep, vaultKeep, armyTarget, armyArmor and armyReserve also take
   set: an exact number (kept within the same limits; armyTarget by set has no top of 40).
 - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 10 minutes.
-- THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, at(x,y)}.
+- THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, grounds, at(x,y)}.
   Each layer is a Uint8Array with one value per tile, index y*w+x, as far as your fog of war allows: known 0 = never
-  seen (all other layers 0 there), 1 = seen before (as it was then, height included), 2 = seen now (your own land always). ter 0 grass,
-  1 water, 2 mountain; tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
+  seen (all other layers 0 there), 1 = seen before (as it was then, height included), 2 = seen now (your own land always). ter = the
+  kind of ground, an index into grounds (today 0 grass, 1 water, 2 mountain, 3 sand; unseen tiles read 0); tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
   stands there (seen now only); fish = fish left in that water (seen now only); ore 0 not searched by a geologist,
   1 searched: nothing, 2+ = oreNames[ore-1]. oreNames is a plain list (since 201), the same for every value of ore:
-  ['none', 'coal', 'ironore', 'goldore', 'stone'], so oreNames.indexOf(kind) + 1 gives the ore value. map.at(x,y) gives one tile as an
-  object with the same names, but two of them in words: {known, ter: 'grass'|'water'|'mountain', tree, stone, owner,
+  ['none', 'coal', 'ironore', 'goldore', 'stone'], so oreNames.indexOf(kind) + 1 gives the ore value.
+  grounds: the rules of each kind of ground, grounds[ter] = {id, name, walk (people walk on it), build ('all' = any building
+  but a mine, 'none'), mine (mines stand here, geologists search here), fields (farms sow here), trees (the tree kinds that
+  grow here, [] = none; a forester plants on it), water (fishers, water huts, the farm bonus near water), land (counts for
+  territory)}. NEW KINDS OF GROUND WILL BE ADDED (a ground keeps its id for good; new ones come at the end): ask grounds,
+  never fixed numbers ("not water and not mountain" is not the same as "grass"). map.at(x,y) gives one tile as an
+  object with the same names, but two of them in words: {known, ter: the ground's name ('grass', 'water', 'mountain', ...), tree, stone, owner,
   height, occupied, fish, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
   Decide yourself where to build and where to expand: the map is all you need.
 - canPlace(type, x, y): true when a building of that type may stand with its top-left corner on tile x, y right now
