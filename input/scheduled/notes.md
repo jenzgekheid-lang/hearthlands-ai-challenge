@@ -123,7 +123,7 @@ The key strategic change is that scouts reveal the route, pioneers turn that rou
 
 ### Safety trigger and tournament evidence
 
-The three latest genuine reports (16, 17 and 18 November) all recorded **0 wins out of 8**. The 16 and 17 November reports had 0 losses; the 18 November report recorded 0 wins, 1 loss and 7 undecided. The safety threshold is met, so this is a whole-strategy change, not another small adjustment.
+The three latest genuine reports (16, 17 and 18 November) all recorded **0 wins out of 8**. All three reports recorded 0 wins, 0 match losses and 8 undecided. The 18 November report's separate war summary says the opponent took one building; that is a building loss, not a lost match. The safety threshold is met, so this is a whole-strategy change, not another small adjustment.
 
 The 18 November report (output/scheduled/2026-11-18-be52b9f.md, game version 240, script input be52b9f) shows why the expeditionary approach did not convert into wins:
 
