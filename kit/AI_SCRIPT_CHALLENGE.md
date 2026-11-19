@@ -44,13 +44,15 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
                         is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
-  switches: {vault, banner, armor, vet, gear} true|false, the same every turn: which optional mechanics this game has.
+  switches: {vault, banner, armor, vet, gear, dock, hunter} true|false, the same every turn: which optional mechanics this game has.
             Off: the vault (gold in stock counts instead, 1 bar per soldier), bannermen (no banners; gold counts for
             every soldier away from home) or armor (no armorer; everyone's arm stays 0). Fields keep their shape.
             gear: dropping gear (see Dropping gear below); off: nothing drops.
             Orders for a switched-off mechanic (placing its building, vaultKeep, armyArmor, a banner armyTarget or
             weaponKeep, armorRepair) are refused with why 'switched off: <id>'. vet: veterans (ranks and xp; needs
-            banner); off: every rank and xp is 0.
+            banner); off: every rank and xp is 0. dock: the fisher's dock (see Water below); off: a fisher stands
+            anywhere by water. hunter: the hunter's cabin and game in forest (see Hunting below); off: no game
+            (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before.
   gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
         tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
         land owner's pile (a pile is not in this list).
@@ -219,10 +221,10 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
       dug (a site: levelled, ready for builders), coming (a house: settlers it still brings),
       range, area (workplaces with a work area), archers, fighters (military buildings: their setting),
       repair (an armorer only: true|false, its repair tick-box, see Dropping gear; false while switches.gear is off)} ],
-    land: {tiles, grass, trees, rocks, water, mountain, unsearched}, ore: [ {x, y, ore} ore you have seen signs of ],
+    land: {tiles, grass, trees, rocks, water (water tiles next to your land: water is never owned), mountain, unsearched}, ore: [ {x, y, ore} ore you have seen signs of ],
     unsearched: [ {x, y, d} mountain on your land no geologist has searched, nearest first ],
     spots: { type: [ {x, y, d, n} ] } answers to last turn's ['ask', {spots: [types]}]: places where that building
-      may stand now, best first (n = trees/rocks/fish water/free grass/known ore in reach, or new land for military).
+      may stand now, best first (n = trees/rocks/fish water/game/free grass/known ore in reach, or new land for military).
       Ask for at most 6 types a turn; you get at most 8 places for each, all on your own land }
 - HOW A TOWN WORKS. The data files buildings.js and items.js that come with this kit (in the AI challenge they lie
   next to it) give every building's cost, tool, inputs, recipe, range, food and a line on what it does. In short:
@@ -277,6 +279,23 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     unclaimed tools in your buildings and lying on your land; tools in people's hands or promised to someone don't count.
   - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
     castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
+  - Water is never owned (v241): circles and building rings claim land only, so a border ends at the shore and can
+    reach land across a lake. A fisher or water hut uses water within its range that touches (4 sides) land you own;
+    two sides may fish the same lake.
+  - The fisher's dock (switches.dock, v243): a fisher needs a dock of 2 water tiles in a row out of its south side
+    (from its south-east corner column, so the door's tile stays land), else its east side, else its west side (both
+    from its middle row), never north; every dock tile must be water no other dock holds. The game picks the first
+    side that fits. The dock is part of the building (map.occupied 1 on its tiles). The fisher fishes water with fish
+    within 6 tiles of the dock's end (no land rule there), walking out along the dock (2 s more per fish). A spot
+    without such water simply has no fisher: canPlace and buildable say so ('Needs a dock: ...').
+  - Hunting (switches.hunter, v243): game (map.game, animals per tile, seen now only) lives only in forest: a tile is
+    forest while 6 or more grown trees stand in the 5x5 square around it (on ground where trees grow). Every forest
+    tile starts with 2; a forest tile with fewer gets one back with chance 1/240 a second; a tile that stops being
+    forest (trees felled) loses its game at once. The hunter's cabin (hunter: 3x3, planks 3 stone 2, range 14) needs
+    a bow (the weapon); a finished cabin without its hunter is served before any bowman: the barracks asks for no bows
+    while one waits. The hunter walks to a tile of game on your land within range, shoots (3 s) and brings 1 meat.
+    Games start with 2 bows more. With the switch on meat feeds coal mines (after bread and fish) and iron mines
+    (first, as always); gold mines no longer take meat (fish, then bread).
   - Gold (army plan, test version): outside your land a soldier fights at 60% strength (a bowman at 80% at least: the
     higher of 80% and what the gold gives him), plus up to 40% from the gold
     kept in your VAULTS (type vault, 3x3, 3 planks + 4 stone) while a bannerman covers him: full strength takes 4 bars
@@ -306,11 +325,12 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   commands above. Instead of a step d, workRange, archers, fighters, weaponKeep, toolKeep, vaultKeep, armyTarget, armyArmor and armyReserve also take
   set: an exact number (kept within the same limits; armyTarget by set has no top of 40).
 - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 10 minutes.
-- THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, grounds, at(x,y)}.
+- THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, game, ore, oreNames, grounds, at(x,y)}.
   Each layer is a Uint8Array with one value per tile, index y*w+x, as far as your fog of war allows: known 0 = never
   seen (all other layers 0 there), 1 = seen before (as it was then, height included), 2 = seen now (your own land always). ter = the
-  kind of ground, an index into grounds (today 0 grass, 1 water, 2 mountain, 3 sand; unseen tiles read 0); tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
-  stands there (seen now only); fish = fish left in that water (seen now only); ore 0 not searched by a geologist,
+  kind of ground, an index into grounds (today 0 grass, 1 water, 2 mountain, 3 sand; unseen tiles read 0); tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody; always 0 on water: water is never owned, v241); occupied 1 = something
+  stands there (seen now only; also a fisher's dock over water); fish = fish left in that water (seen now only); game = animals
+  on that tile (seen now only; always 0 while switches.hunter is off); ore 0 not searched by a geologist,
   1 searched: nothing, 2+ = oreNames[ore-1]. oreNames is a plain list (since 201), the same for every value of ore:
   ['none', 'coal', 'ironore', 'goldore', 'stone'], so oreNames.indexOf(kind) + 1 gives the ore value.
   grounds: the rules of each kind of ground, grounds[ter] = {id, name, walk (people walk on it), build ('all' = any building
@@ -319,12 +339,12 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   territory)}. NEW KINDS OF GROUND WILL BE ADDED (a ground keeps its id for good; new ones come at the end): ask grounds,
   never fixed numbers ("not water and not mountain" is not the same as "grass"). map.at(x,y) gives one tile as an
   object with the same names, but two of them in words: {known, ter: the ground's name ('grass', 'water', 'mountain', ...), tree, stone, owner,
-  height, occupied, fish, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
+  height, occupied, fish, game, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
   Decide yourself where to build and where to expand: the map is all you need.
 - canPlace(type, x, y): true when a building of that type may stand with its top-left corner on tile x, y right now
   (whole tiles; the game's own rules: on your land, flat enough, free of trees, rocks and other buildings, room around
   it, a free tile in front of the door, mines fully on the mountain, military buildings out of enemy arrow range).
-  Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, vault 3x3, weaponsmith 3x3 east, armorer 3x3 east, barracks 3x3 (door south unless east).
+  Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, hunter 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, vault 3x3, weaponsmith 3x3 east, armorer 3x3 east, barracks 3x3 (door south unless east).
   x grows to the east, y to the south.
 - view.refused: last turn's orders the game refused, as {order, args, why} (for place: the reason, like 'Too steep';
   'switched off: <id>' for a mechanic this game has switched off, see view.switches); at most 30.

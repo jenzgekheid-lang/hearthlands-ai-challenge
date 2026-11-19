@@ -2,22 +2,31 @@
 // Sizes, ranges and radii are in small tiles (G = 2 small tiles per old tile).
 // Footprints since version 147 (art plan step 2b): about 70% of the old area (most 4x3 -> 3x3). door:'side' = the house
 // is turned a quarter and its door is on the east edge (state.js doorAt); otherwise the door faces the camera (south).
+// (#36, v243) the fisher's dock (switch dock): len tiles of water out of the hut's south, east or west side; he fishes
+// water within reach of the dock's end, and walking out along the dock and back adds walk seconds (build/placement.js
+// dockFor, jobs/gatherers.js). Start values: the sweep tunes reach and walk.
+const DOCK = { len:2, reach:6, walk:2 };
+// (#37, v243) game for the hunter (switch hunter; world/nature.js): a tile is forest while at least `trees` grown trees
+// stand in the (2r+1)x(2r+1) square around it; only forest tiles hold game (at most max, every forest tile starts full)
+// and get an animal back with chance `back` a second; a tile that stops being forest loses its game. Start values.
+const GAME = { trees:6, r:2, back:1/240, max:2 };
 export const DEF = {
   hq:    {n:'Headquarters', s:5, h:4, cost:{}, r:18, roof:'#8a3b2e'},
   wood:  {n:'Woodcutter', s:3, h:3, cost:{plank:2,stone:2}, tool:'axe', range:14, roof:'#7a4f2c', desc:'Fells trees into logs'},
   forest:{n:'Forester', s:3, h:3, cost:{plank:3,stone:1}, tool:'shovel', range:10, roof:'#4f7a36', desc:'Plants new trees nearby'},
   saw:   {n:'Sawmill', s:3, h:3, door:'side', cost:{plank:3,stone:4}, tool:'saw', inputs:{log:8}, recipe:{in:{log:1}, out:'plank', time:7.5, verb:'Sawing planks'}, roof:'#a5562f', desc:'Turns logs into planks'},
-  fisher:{n:'Fisher', s:3, h:3, cost:{plank:3,stone:2}, tool:'rod', range:12, roof:'#4d6f86', desc:'Catches fish in nearby water. Fish slowly come back'},
-  waterhut:{n:'Water hut', s:3, h:3, cost:{plank:3,stone:4}, worker:true, water:true, range:10, roof:'#3f6f99', desc:'Fills buckets at shore water inside your border. Like every building it claims 1 tile of land around it, so building right next to a lake gives it water'},
+  fisher:{n:'Fisher', s:3, h:3, cost:{plank:3,stone:2}, tool:'rod', range:12, dock:DOCK, roof:'#4d6f86', desc:'Catches fish in water next to your land, within its range. Fish slowly come back'},
+  hunter:{n:'Hunter', rule:'hunter' /* (#37, v243) only with the switch on */, s:3, h:3, cost:{plank:3,stone:2}, tool:'bow', range:14, game:GAME, roof:'#6b5a32', desc:'Hunts game where trees stand together (forest), within its range, and brings meat. Needs a bow: hunters get bows before bowmen. Game slowly comes back in forest; where the forest is cut, it is gone'},
+  waterhut:{n:'Water hut', s:3, h:3, cost:{plank:3,stone:4}, worker:true, water:true, range:10, roof:'#3f6f99', desc:'Fills buckets at water next to your land, within its range. Water belongs to nobody: build it by a lake or the sea'},
   farm:  {n:'Grain farm', s:4, h:3, cost:{plank:6,stone:6}, tool:'scythe', range:8, roof:'#b8963e', desc:'Sows fields on open green land nearby and harvests the grain'},
   mill:  {n:'Mill', s:3, h:3, cost:{plank:3,stone:3}, worker:true, inputs:{grain:8}, recipe:{in:{grain:1}, out:'flour', time:4.5, verb:'Grinding flour'}, roof:'#c9b48a', desc:'Grinds grain into flour'},
   bakery:{n:'Bakery', s:3, h:3, door:'side', cost:{plank:4,stone:5}, worker:true, inputs:{flour:6,water:6}, recipe:{in:{flour:1,water:1}, out:'bread', time:13.5, verb:'Baking bread'}, roof:'#a0522d', desc:'Flour + water make bread'},
   pigfarm:{n:'Pig farm', s:3, h:3, cost:{plank:6,stone:6}, worker:true, inputs:{grain:6,water:6}, recipe:{in:{grain:1,water:1}, out:'pig', time:13.5, verb:'Raising a pig'}, roof:'#c98a7a', desc:'Grain + water raise pigs'},
   butcher:{n:'Slaughterhouse', s:3, h:3, cost:{plank:4,stone:4}, tool:'axe', inputs:{pig:6}, recipe:{in:{pig:1}, out:'meat', time:4.5, verb:'Butchering'}, roof:'#8e3b36', desc:'Turns pigs into meat'},
-  coalmine:{n:'Coal mine', s:3, h:3, cost:{plank:4,stone:1}, tool:'pick', mine:'coal', foods:['bread','fish'], inputs:{bread:4,fish:4}, roof:'#3a3633', desc:'Build anywhere on the mountain; signs of a geologist show where the coal is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
+  coalmine:{n:'Coal mine', s:3, h:3, cost:{plank:4,stone:1}, tool:'pick', mine:'coal', foods:['bread','fish'], inputs:{bread:4,fish:4}, foodsH:['bread','fish','meat'], inputsH:{bread:4,fish:4,meat:4}, roof:'#3a3633', desc:'Build anywhere on the mountain; signs of a geologist show where the coal is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
   ironmine:{n:'Iron mine', s:3, h:3, cost:{plank:4,stone:1}, tool:'pick', mine:'ironore', foods:['meat','fish'], inputs:{meat:4,fish:4}, roof:'#7a4632', desc:'Build anywhere on the mountain; signs of a geologist show where the iron ore is. Eats meat; fish only while no meat is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
   stonemine:{n:'Stone mine', s:3, h:3, cost:{plank:5}, tool:'pick', mine:'stone', foods:['bread','fish'], inputs:{bread:4,fish:4}, roof:'#77736a', desc:'Build anywhere on the mountain; signs of a geologist show where the stone is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
-  goldmine:{n:'Gold mine', s:3, h:3, cost:{plank:5,stone:1}, tool:'pick', mine:'goldore', foods:['fish','bread','meat'], inputs:{fish:4,bread:2,meat:2}, roof:'#8a7130', desc:'Build anywhere on the mountain; signs of a geologist show where the gold ore is. Eats fish; bread or meat only while no fish is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
+  goldmine:{n:'Gold mine', s:3, h:3, cost:{plank:5,stone:1}, tool:'pick', mine:'goldore', foods:['fish','bread','meat'], inputs:{fish:4,bread:2,meat:2}, foodsH:['fish','bread'], inputsH:{fish:4,bread:2}, roof:'#8a7130', desc:'Build anywhere on the mountain; signs of a geologist show where the gold ore is. Eats fish; bread or meat only while no fish is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
   goldsmelter:{n:'Gold smelter', s:3, h:3, cost:{plank:4,stone:6}, tool:'hammer', inputs:{coal:6,goldore:6}, recipe:{in:{coal:1,goldore:1}, out:'gold', time:7.5, verb:'Smelting gold'}, roof:'#7a5a22', desc:'Coal + gold ore make gold. Gold kept in a vault makes soldiers stronger outside your land'},
   smelter:{n:'Iron smelter', s:3, h:3, cost:{plank:4,stone:6}, tool:'hammer', inputs:{coal:6,ironore:6}, recipe:{in:{coal:1,ironore:1}, out:'iron', time:7.5, verb:'Smelting iron'}, roof:'#6b3a2a', desc:'Coal + iron ore make iron'},
   smith: {n:'Toolsmith', s:3, h:3, door:'side', cost:{plank:3,stone:5}, tool:'hammer', inputs:{coal:6,iron:6}, recipe:{in:{coal:1,iron:1}, out:'tool', time:7.5, verb:'Forging'}, roof:'#5c5a6e', desc:'Coal + iron make tools. Set what to make by tapping it'},
@@ -51,18 +60,18 @@ export const DEF = {
 export const YARD = { side:1, front:2 };
 // Tilted-view look (version 148, art plan step 2c; drawing only): [width, depth, height] of the house body relative to
 // its footprint's standard box, fixed per type (Jens: varied sizes look natural; height 1.7 = two storeys)
-export const LOOK = { wood:[1,.9,1], forest:[.9,.88,1], saw:[1.1,.95,1], fisher:[.85,.85,.95], waterhut:[.8,.85,.95],
+export const LOOK = { wood:[1,.9,1], forest:[.9,.88,1], saw:[1.1,.95,1], fisher:[.85,.85,.95], hunter:[.85,.85,.95], waterhut:[.8,.85,.95],
   farm:[1.15,.9,1], mill:[.78,.8,1.7], bakery:[1,.95,1.05], pigfarm:[1.15,.88,.9], butcher:[.95,.9,1], goldsmelter:[1,1,1.1],
   smelter:[1,1,1.1], smith:[1,.9,1], quarry:[.9,.9,1], house:[.9,.88,1], house2:[1,.95,1.7], house3:[1.05,1,1.7],
   weaponsmith:[1.05,.9,1], armorer:[1,.9,1], barracks:[1.1,1,1.05], look:[1,1,1] };
-export const BUILD_GROUPS = [['Basics',['wood','quarry','saw','forest','store']],['Houses',['house','house2','house3']],['Land',['look']],['Food',['fisher','waterhut','farm','mill','bakery','pigfarm','butcher']],['Mining and metal',['stonemine','coalmine','ironmine','smelter','smith','goldmine','goldsmelter','vault']],['Army',['guard','tower','castle','weaponsmith','armorer','barracks']]];
+export const BUILD_GROUPS = [['Basics',['wood','quarry','saw','forest','store']],['Houses',['house','house2','house3']],['Land',['look']],['Food',['fisher','hunter','waterhut','farm','mill','bakery','pigfarm','butcher']],['Mining and metal',['stonemine','coalmine','ironmine','smelter','smith','goldmine','goldsmelter','vault']],['Army',['guard','tower','castle','weaponsmith','armorer','barracks']]];
 export const BUILD_ORDER = BUILD_GROUPS.flatMap(g=>g[1]);
 // Short texts for the Build tab (Jens, 12 Nov: 'way smaller and simple'). The full desc above stays for the game summary
 // and the AI script kit (tools/summary.js).
 export const SHORT = {
   wood:'Fells trees for logs', quarry:'Cuts stone', saw:'Logs into planks', forest:'Plants trees', store:'Stores goods',
   house:'10 settlers', house2:'20 settlers', house3:'50 settlers', look:'Uncovers the fog',
-  fisher:'Catches fish', waterhut:'Gathers water', farm:'Grows grain', mill:'Grain into flour', bakery:'Bakes bread',
+  fisher:'Catches fish', hunter:'Hunts for meat', waterhut:'Gathers water', farm:'Grows grain', mill:'Grain into flour', bakery:'Bakes bread',
   pigfarm:'Raises pigs', butcher:'Pigs into meat',
   stonemine:'Mines stone', coalmine:'Mines coal', ironmine:'Mines iron ore', smelter:'Makes iron', smith:'Makes tools',
   goldmine:'Mines gold ore', goldsmelter:'Makes gold', vault:'Keeps gold: stronger attacks',

@@ -65,8 +65,9 @@ The numbers (*generated*):
 | Woodcutter | `wood` | 2 plank, 2 stone | axe | — | — | Fells trees into logs |
 | Forester | `forest` | 3 plank, 1 stone | shovel | — | — | Plants new trees nearby |
 | Sawmill | `saw` | 3 plank, 4 stone | saw | log | plank (from log) | Turns logs into planks |
-| Fisher | `fisher` | 3 plank, 2 stone | rod | — | — | Catches fish in nearby water. Fish slowly come back |
-| Water hut | `waterhut` | 3 plank, 4 stone | — | — | — | Fills buckets at shore water inside your border. Like every building it claims 1 tile of land around it, so building right next to a lake gives it water |
+| Fisher | `fisher` | 3 plank, 2 stone | rod | — | — | Catches fish in water next to your land, within its range. Fish slowly come back |
+| Hunter | `hunter` | 3 plank, 2 stone | bow | — | — | Hunts game where trees stand together (forest), within its range, and brings meat. Needs a bow: hunters get bows before bowmen. Game slowly comes back in forest; where the forest is cut, it is gone |
+| Water hut | `waterhut` | 3 plank, 4 stone | — | — | — | Fills buckets at water next to your land, within its range. Water belongs to nobody: build it by a lake or the sea |
 | Grain farm | `farm` | 6 plank, 6 stone | scythe | — | — | Sows fields on open green land nearby and harvests the grain |
 | Mill | `mill` | 3 plank, 3 stone | — | grain | flour (from grain) | Grinds grain into flour |
 | Bakery | `bakery` | 4 plank, 5 stone | — | flour, water | bread (from flour, water) | Flour + water make bread |
@@ -107,6 +108,13 @@ The numbers (*generated*):
 ## Land and territory
 
 - Each building claims land around it. A border separates your land from the enemy's.
+- Water belongs to nobody: only land is claimed, so a border ends at the shore (and may go on across a lake). A fisher
+  or water hut uses water within its range that touches your land; two sides may fish the same lake.
+- Two optional mechanics, off by default for now (v243, switches `dock` and `hunter`): with the dock, a fisher needs
+  a 2-tile dock over water out of his south, east or west side and fishes within 6 tiles of its end; with the hunter,
+  game lives in forest (6+ grown trees in the 5x5 around a tile, 2 per tile, slowly coming back, gone where the trees
+  are cut), a hunter's cabin with a bow (hunters before bowmen; 2 bows at the start) brings meat, and meat feeds coal
+  and iron mines but no longer gold mines.
 
 ## Military
 

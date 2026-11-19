@@ -1,4 +1,4 @@
-# Hearthlands production overview (game version 240)
+# Hearthlands production overview (game version 243)
 
 Generated from the game code by tools/production.js; do not edit by hand. The same overview as a page with the chain
 picture: production.html.
@@ -26,24 +26,25 @@ picture: production.html.
 | Flour | `flour` | Mill (`mill`) | — | 1 🌾 Grain | 4.5 s (7.5 s on the clock) per item | 1 🌾 Grain | 8.6 s |
 | Bread | `bread` | Bakery (`bakery`) | — | 1 🥣 Flour + 1 💧 Water | 13.5 s (22.5 s on the clock) per item | 1 🌾 Grain + 1 💧 Water | 25.3 s |
 | Pigs | `pig` | Pig farm (`pigfarm`) | — | 1 🌾 Grain + 1 💧 Water | 13.5 s (22.5 s on the clock) per item | 1 🌾 Grain + 1 💧 Water | 20.8 s |
-| Meat | `meat` | Slaughterhouse (`butcher`) | `axe` | 1 🐖 Pigs | 4.5 s (7.5 s on the clock) per item | 1 🌾 Grain + 1 💧 Water | 25.3 s |
+| Meat | `meat` | Hunter (`hunter`) | `bow` | shore water | 3 s (5 s on the clock) work at the spot + 0.3 s rest, plus walking there and back |  | 3.3 s |
+|  |  | Slaughterhouse (`butcher`) | `axe` | 1 🐖 Pigs | 4.5 s (7.5 s on the clock) per item |  |  |
 | Coal | `coal` | Coal mine (`coalmine`) | `pick` | 1 Bread = 10 trips, 1 Fish = 4 trips (first one preferred) | 3.6 s per trip; a trip finds ore 40% / 50% / 60% of the time (poor / normal / rich spot) = about 9 s / 7.2 s / 6 s per ore (15 s / 12 s / 10 s on the clock). Slower as the deposit wears out |  | 12.3 s |
-| Iron ore | `ironore` | Iron mine (`ironmine`) | `pick` | 1 Meat = 10 trips, 1 Fish = 4 trips (first one preferred) | 3.6 s per trip; a trip finds ore 40% / 50% / 60% of the time (poor / normal / rich spot) = about 9 s / 7.2 s / 6 s per ore (15 s / 12 s / 10 s on the clock). Slower as the deposit wears out |  | 12.3 s |
-| Iron | `iron` | Iron smelter (`smelter`) | `hammer` | 1 ⚫ Coal + 1 🟤 Iron ore | 7.5 s (12.5 s on the clock) per item | 1 ⚫ Coal + 1 🟤 Iron ore | 32 s |
+| Iron ore | `ironore` | Iron mine (`ironmine`) | `pick` | 1 Meat = 10 trips, 1 Fish = 4 trips (first one preferred) | 3.6 s per trip; a trip finds ore 40% / 50% / 60% of the time (poor / normal / rich spot) = about 9 s / 7.2 s / 6 s per ore (15 s / 12 s / 10 s on the clock). Slower as the deposit wears out |  | 7.9 s |
+| Iron | `iron` | Iron smelter (`smelter`) | `hammer` | 1 ⚫ Coal + 1 🟤 Iron ore | 7.5 s (12.5 s on the clock) per item | 1 ⚫ Coal + 1 🟤 Iron ore | 27.6 s |
 | Gold ore | `goldore` | Gold mine (`goldmine`) | `pick` | 1 Fish = 10 trips, 1 Bread = 4 trips, 1 Meat = 2 trips (first one preferred) | 3.6 s per trip; a trip finds ore 40% / 50% / 60% of the time (poor / normal / rich spot) = about 9 s / 7.2 s / 6 s per ore (15 s / 12 s / 10 s on the clock). Slower as the deposit wears out |  | 7.6 s |
 | Gold | `gold` | Gold smelter (`goldsmelter`) | `hammer` | 1 ⚫ Coal + 1 🟡 Gold ore | 7.5 s (12.5 s on the clock) per item | 1 ⚫ Coal + 1 🟡 Gold ore | 27.3 s |
-| Axes | `axe` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Saws | `saw` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Pickaxes | `pick` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Shovels | `shovel` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Hammers | `hammer` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Fishing rods | `rod` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Scythes | `scythe` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Swords | `sword` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Bows | `bow` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
-| Spears | `spear` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 51.8 s |
+| Axes | `axe` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Saws | `saw` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Pickaxes | `pick` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Shovels | `shovel` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Hammers | `hammer` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Fishing rods | `rod` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Scythes | `scythe` | Toolsmith (`smith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Swords | `sword` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Bows | `bow` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
+| Spears | `spear` | Weaponsmith (`weaponsmith`) | `hammer` | 1 ⚫ Coal + 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 1 🟤 Iron ore | 47.4 s |
 | Banners | `banner` | Weaponsmith (`weaponsmith`) | `hammer` | 1 🪜 Planks + 1 🪙 Gold (set which one to make) | 7.5 s (12.5 s on the clock) per item | 1 🪵 Logs + 1 ⚫ Coal + 1 🟡 Gold ore | 53.5 s |
-| Iron armor | `armor` | Armorer (`armorer`) | `hammer` | 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 1 ⚫ Coal + 1 🟤 Iron ore | 39.5 s |
+| Iron armor | `armor` | Armorer (`armorer`) | `hammer` | 1 🔩 Iron (set which one to make) | 7.5 s (12.5 s on the clock) per item | 1 ⚫ Coal + 1 🟤 Iron ore | 35.1 s |
 | Gold plates | `plate` | Armorer (`armorer`) | `hammer` | 2 🪙 Gold (set which one to make) | 7.5 s (12.5 s on the clock) per item | 2 ⚫ Coal + 2 🟡 Gold ore | 62.1 s |
 | Broken armor | `brokenarmor` | not made by any building | | | | | |
 
@@ -61,6 +62,7 @@ picture: production.html.
 | Large house | `house3` | Houses | 10 🪜 Planks + 12 🪨 Stone | 105.6 s | — | 50 settlers |
 | Lookout tower | `look` | Land | 2 🪜 Planks + 4 🪨 Stone | 28.8 s | — | — |
 | Fisher | `fisher` | Food | 3 🪜 Planks + 2 🪨 Stone | 24 s | `rod` | Fish |
+| Hunter | `hunter` | Food | 3 🪜 Planks + 2 🪨 Stone | 24 s | `bow` | undefined |
 | Water hut | `waterhut` | Food | 3 🪜 Planks + 4 🪨 Stone | 33.6 s | none | Water |
 | Grain farm | `farm` | Food | 6 🪜 Planks + 6 🪨 Stone | 57.6 s | `scythe` | Grain |
 | Mill | `mill` | Food | 3 🪜 Planks + 3 🪨 Stone | 28.8 s | none | Flour |
