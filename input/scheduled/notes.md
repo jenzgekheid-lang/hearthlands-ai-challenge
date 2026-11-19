@@ -117,3 +117,43 @@ The key strategic change is that scouts reveal the route, pioneers turn that rou
 - Script header is aligned to the latest report's game version, **224**.
 - This is static/mock validation, not a tournament result. The new strategy has not yet been arena-tested; do not claim a win improvement until the exact new input commit appears in the next scheduled report and `output/results.json`.
 - Only `input/scheduled/script.js` and `input/scheduled/notes.md` are to be changed. No other challenge files and no files in the actual Hearthlands game repository are touched.
+
+
+## 19 Nov 2026 — compact production surge and low-risk raid pivot after the v240 report
+
+### Safety trigger and tournament evidence
+
+The three latest genuine reports (16, 17 and 18 November) all recorded **0 wins out of 8**. The 16 and 17 November reports had 0 losses; the 18 November report recorded 0 wins, 1 loss and 7 undecided. The safety threshold is met, so this is a whole-strategy change, not another small adjustment.
+
+The 18 November report (output/scheduled/2026-11-18-be52b9f.md, game version 240, script input be52b9f) shows why the expeditionary approach did not convert into wins:
+
+- Three of eight towns were still marked stuck. Several games never reached a barracks or a complete iron chain; the strongest games reached 29–38 field soldiers but the NPC reached 73–92.
+- The script hired three explorers, one pioneer and one geologist, expanded to as many as six posts, and kept a 28-soldier field target. In the worst battle, carriers fell to 2 with 0 idle, while the army was reduced from 29 to 7. That is too much specialist, garrison and army demand for the transport workforce.
+- The pioneer repeatedly received the error "spot not next to the border" (12–39 per game). The selector chose fog-edge tiles, not necessarily neutral tiles directly adjacent to owned land.
+- The attack selector had a logic inversion: it chose manned military targets before empty targets. It also ignored all unguarded economic buildings. The single serious battle attacked four times from 37:25, lost 38 soldiers, killed 17, and the opponent captured a guard. The 10–18 soldier thresholds were far too low for a defended position.
+- Production was capped at one coal mine and one iron mine. Deposits wore out, weaponsmiths spent most of their time waiting for coal/iron, and barracks often waited for weapons. The forester repeatedly reported no free planting ground while consuming a worker.
+- Our side ended the report with zero gold, while opponents collectively held 269 gold. With the vault switch enabled, a discovered gold deposit is worth pursuing for the field-strength bonus.
+
+### Kit v240 review
+
+Reviewed the current kit/AI_SCRIPT_CHALLENGE.md, kit/PRODUCTION.md, kit/buildings.js and kit/items.js. The current view exposes visible and remembered enemy buildings, enemy soldiers currently seen, the grounds metadata (walk, mine, water, land), multiple ore signs, canPlace, sendIn, toolKeep, and the gold/vault state. The script now uses the ground metadata rather than assuming numeric terrain IDs. It does not use optional banner or armor mechanics because the report has those switches off.
+
+### New strategy: compact production surge + low-risk raids
+
+This replaces the wide expeditionary ladder with a smaller economy and a much more selective army:
+
+1. **Keep the transport workforce alive:** limit exploration to two scouts, one pioneer and one geologist; stop building foresters; expand housing toward eight small houses only when beds or carrier availability justify it. Keep a 12-carrier / 5-idle warning floor before increasing army targets.
+2. **Claim land correctly:** the pioneer scans every tile and only receives a neutral, walkable, land-counting target with an owned tile directly adjacent. It advances one border tile at a time instead of being sent to a distant fog edge. The explorer still uses fog-edge targets to reveal the opponent.
+3. **Build a scalable resource spine:** retain one early coal and iron mine, then add a second mine of each kind only after the first smelter is working and there is a distinct ore cluster at least 12 tiles from an existing mine. Add a second smelter and weaponsmith only after the second deposits are operational and carrier surplus exists. Add a second fisher when mine-food tips and low fish stock show a real shortage.
+4. **Use gold when the map offers it:** search gold signs, build a gold mine and gold smelter when found, then a vault when the vault switch is enabled. No gold chain is forced on maps without gold ore.
+5. **Limit defensive overhead:** use at most two staffed guard posts, one fighter each, and a four-soldier field reserve. Army targets rise toward 52 only when carrier and idle-carrier counts support it; otherwise recruitment is capped.
+6. **Raid instead of suiciding into the army:** attack exposed non-military buildings first, then empty military buildings. Skip targets covered by another enemy military building or surrounded by visible enemy soldiers. Attack manned military buildings only with a much larger field force; attack the HQ last. Track field losses during each siege and retreat to the HQ after four losses or 30% of the starting field force.
+
+### Validation and scope
+
+- JavaScript parser check: passed with a syntax compilation check.
+- Mock smoke test: pending; validate the adjacent-border pioneer target, exposed economic-building raid, and refusal to attack a defended military target with an undersized force before claiming runtime coverage.
+- Forbidden API scan: clean (no Math.random, timers, network, filesystem, require, process, globalThis, eval or dynamic Function in the submitted script).
+- Script header aligned to game version **240**.
+- This is static/mock validation only. The v240 tournament report is for the previous input commit be52b9f; the new strategy has not yet been arena-tested. Do not claim a win improvement until the next report names the new input commit.
+- Only input/scheduled/script.js and input/scheduled/notes.md were changed. No other challenge files and no files in the actual Hearthlands game repository were modified.
