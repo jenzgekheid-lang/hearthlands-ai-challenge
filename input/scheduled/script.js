@@ -210,8 +210,9 @@ function economy(view,M,out){
  var A=E.army||{};if(A.reserve!==4)out.push(['armyReserve',{set:4}]);
  if(built('barracks')){
   var desired=t<600?12:t<1200?22:t<1800?32:t<2700?44:52;
-  if(carriers<10||idleC<3)desired=Math.min(desired,Math.max(12,soldierN));
-  else if(carriers<14||idleC<5)desired=Math.min(desired,Math.max(20,soldierN+4));
+  if(carriers<8||idleC<2)desired=soldierN;
+  else if(carriers<12||idleC<5)desired=Math.max(soldierN,Math.min(desired,12));
+  else if(carriers<16||idleC<7)desired=Math.max(soldierN,Math.min(desired,20));
   else if(carriers>=18&&idleC>=7)desired=Math.min(58,desired+4);
   var targets={sword:Math.ceil(desired*.4),spear:Math.ceil(desired*.3)};targets.bow=desired-targets.sword-targets.spear;
   for(var kind of ['sword','spear','bow'])if((A.target||{})[kind]!==targets[kind])out.push(['armyTarget',{kind:kind,set:targets[kind]}]);
@@ -246,7 +247,7 @@ function army(view,M,out){
  function localFoes(b){var p=door(b),n=0;for(var f of foes)if(d2(f,p)<20*20)n++;return n;}
  function protectedByMil(b,list){var p=door(b);for(var e of list)if(e.id!==b.id&&isMil(e)&&d2(p,door(e))<18*18)return true;return false;}
  function need(b,near){
-  var n=!isMil(b)?6:b.type==='hq'?40:b.type==='guard'?(b.manned===false?8:24):b.type==='tower'?(b.manned===false?10:32):b.type==='castle'?(b.manned===false?14:40):(b.manned===false?8:28);
+  var n=b.type==='hq'?36:!isMil(b)?6:b.type==='guard'?(b.manned===false?8:24):b.type==='tower'?(b.manned===false?10:32):b.type==='castle'?(b.manned===false?14:40):(b.manned===false?8:28);
   n+=Math.min(12,near*3);if((view.gold===undefined?0.6:view.gold)<0.8)n=Math.ceil(n*1.2);return Math.max(6,n);
  }
  var attackers=mine.filter(function(s){return s.order&&s.order.k==='attack';}),active=attackers.length?byId(attackers[0].order.b):null;
@@ -275,7 +276,7 @@ function army(view,M,out){
   var emptyMil=visible.filter(function(b){return isMil(b)&&b.manned===false&&!protectedByMil(b,visibleMil)&&localFoes(b)<=3;});
   var manned=visible.filter(function(b){return isMil(b)&&b.manned===true&&!protectedByMil(b,visibleMil)&&localFoes(b)<=3;});
   var hqTargets=visible.filter(function(b){return b.type==='hq'&&!protectedByMil(b,visibleMil)&&localFoes(b)<=2;});
-  var pool=raids.length?raids:emptyMil.length?emptyMil:(ready.length>=36&&manned.length?manned:(ready.length>=50?hqTargets:[]));
+  var pool=raids.length?raids:emptyMil.length?emptyMil:(ready.length>=36&&manned.length?manned:(ready.length>=44?hqTargets:[]));
   var cx=ready.length?ready.reduce(function(a,s){return a+s.x;},0)/ready.length:(view.map&&view.map.w||240)/2;
   var cy=ready.length?ready.reduce(function(a,s){return a+s.y;},0)/ready.length:(view.map&&view.map.h||240)/2;
   var best=null,bestScore=1e18;
