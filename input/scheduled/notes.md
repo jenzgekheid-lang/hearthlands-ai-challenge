@@ -152,7 +152,7 @@ This replaces the wide expeditionary ladder with a smaller economy and a much mo
 ### Validation and scope
 
 - JavaScript parser check: passed with a syntax compilation check.
-- Mock smoke test: pending; validate the adjacent-border pioneer target, exposed economic-building raid, and refusal to attack a defended military target with an undersized force before claiming runtime coverage.
+- Mock smoke tests: passed for an adjacent-border pioneer target, an exposed economic-building raid, and withholding an attack on a defended military target with an undersized force.
 - Forbidden API scan: clean (no Math.random, timers, network, filesystem, require, process, globalThis, eval or dynamic Function in the submitted script).
 - Script header aligned to game version **240**.
 - This is static/mock validation only. The v240 tournament report is for the previous input commit be52b9f; the new strategy has not yet been arena-tested. Do not claim a win improvement until the next report names the new input commit.
