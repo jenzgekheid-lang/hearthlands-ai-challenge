@@ -157,3 +157,57 @@ This replaces the wide expeditionary ladder with a smaller economy and a much mo
 - Script header aligned to game version **240**.
 - This is static/mock validation only. The v240 tournament report is for the previous input commit be52b9f; the new strategy has not yet been arena-tested. Do not claim a win improvement until the next report names the new input commit.
 - Only input/scheduled/script.js and input/scheduled/notes.md were changed. No other challenge files and no files in the actual Hearthlands game repository were modified.
+
+
+## 20 Nov 2026 — v245 renewable-economy and supported-army reset
+
+### Safety trigger and tournament evidence
+
+The last three genuine scheduled reports (17, 18 and 19 November) each recorded **0 wins, 0 match losses and 8 undecided**. The three-report safety rule is met again, so this is a whole-strategy replacement.
+
+The latest report is `output/scheduled/latest.md`, game version 243, written for input commit `b0f4401`. It records 0 buildings taken, 6 kills against 4, only 41 gold at the end against 354 for the opponents, and 6 stuck towns.
+
+The detailed games expose several concrete failures:
+
+- **Housing runaway:** all eight games built eight small houses. Seven finished with roughly 69–77 carriers and 69–77 idle carriers, while remaining at 7–10 soldiers. Beds filling repeatedly was being mistaken for a need to expand the workforce, even when the carrier pool was already enormous.
+- **No renewable timber:** the script never built a forester. Woodcutters spent 51–88% of their working time reporting no grown trees; sawmills then waited for logs. One second-guard site remained unfinished for the rest of a game because its materials could not be sustained.
+- **A single developed army still failed to engage:** Map 4242 Blue reached 45 soldiers and completed barracks production, but first saw the opponent only at 55:00 and took no buildings. The attack planner discarded remembered enemy buildings and only considered currently visible targets.
+- **The other seven games did not reach a viable army:** several never completed the metal chain; one game reached the barracks only at 59:28 and ended with 3 soldiers.
+- **The previous pioneer route was still unreliable:** reports show repeated cut-off claim paths (up to 49 in one game), and explorer path failures also occurred. More pioneer orders were not solving the contact problem.
+- **The gold chain did not translate into strength:** one game produced 41 gold, but the script had no banner target, so it did not turn the new gold/banner mechanic into a supported field force.
+
+### Kit changes since the previous script
+
+Reviewed current main after commit `3cf8c87`, the updated `kit/AI_SCRIPT_CHALLENGE.md`, and `kit/PRODUCTION.md` (game version 245).
+
+Important changes and supported fields:
+
+- Since game version 244, all seven optional switches are on in live games, arena, tournaments and the lab: vault, banner, armor, veteran, gear, dock and hunter. The previous script was tested with banner/armor/veteran/gear off.
+- `view.economy.town[].status` now exposes the building's current human-readable status, which can identify dry woodcutters and worn-out or food-starved mines.
+- `view.economy.spots` is populated by `ask`; the helper returns resource-bearing sites, including legal fisher docks and hunting grounds. `canPlace` checks the building footprint but **does not** check whether nearby resources exist.
+- The fisher dock rule and hunter's forest-game requirement are active. The hunter uses one of the two extra starting bows and provides meat for iron mines.
+- Banners provide nearby soldiers with a strength bonus; gold in vaults contributes to covered soldiers' strength outside friendly land. Iron armor reduces incoming damage, and gear-enabled armorers can repair broken armor.
+
+### New strategy: renewable economy, forward scouting, and a supported army
+
+This replaces the compact-raid strategy. It deliberately removes the unreliable pioneer expansion loop and addresses the root causes visible in the report:
+
+1. **Stop the housing cascade:** build a small house only when carriers fall below 9, idle carriers fall below 3, homelessness appears, or the advisor confirms a settler shortage. Cap this opening at four small houses; do not build a house just because beds are filling.
+2. **Regrow the timber supply early:** build one forester as soon as the woodcutter exists. Add a second forester when the woodcutter's live status reports no grown trees. Keep one woodcutter rather than adding more demand to a depleted forest.
+3. **Use one explorer, not a pioneer swarm:** recruit one explorer and choose a nearby, visible, walkable fog-edge tile within a short travel radius, biased toward the map centre. Do not issue pioneer claims; the previous reports repeatedly recorded cut-off claims. Recruit one geologist initially and a second only after the toolsmith is operating; send them to distinct unsearched mountain tiles.
+4. **Use the current site helper correctly:** ask for up to six current priorities and rotate through the queue. Use returned spots for wood, forest, quarry, fisher/dock, hunter/game, water and ore mines; revalidate footprints with `canPlace`. For non-resource buildings, use legal `canPlace` fallback scans. Reject mine sites too close to an existing mine so a replacement must use a distinct deposit.
+5. **Build a food-backed metal chain:** establish fisher and hunter when legal sites exist. Add water hut → farm → mill → bakery after the first coal mine so coal production has a durable bread source; hunter meat supports iron mining. Replace coal/iron mines when their live status reports thinning or worn-out deposits and a distinct ore site is available.
+6. **Staff a short border ladder:** keep up to two guards initially and a third only if ore access remains blocked. Set each guard to one fighter and zero archers, explicitly send one swordsman inside, and keep four soldiers in reserve. No pioneer-driven six-post expansion.
+7. **Exploit v244+ army mechanics:** set a 24-soldier outside target after the barracks starts, rising to 40 when the metal chain is stable. Build the gold chain and vault when gold is found; request two to four bannermen when gold production exists. Build an armorer when iron and the barracks are established, request iron armor for the field mix, and enable broken-armor repair.
+8. **Attack known targets instead of waiting for perfect visibility:** consider both visible and recently remembered enemy military buildings. Prefer empty posts, then defended posts, with a conservative strength estimate from visible defenders and building type. Keep six fighters out of each attack group, require at least eight fighters for a manned target, reinforce one siege at a time, and retreat after four losses or 30% of the starting siege group.
+
+### Validation and scope
+
+- `node --check`: passed.
+- Mock tests passed for the opening woodcutter, early forester placement, geologist recruitment and dispatch, explicit guard garrison, attack on a recently remembered empty enemy post, withholding an attack on a manned post with an undersized force, housing restraint with a large carrier surplus, and retreat after siege losses.
+- Forbidden API scan: clean (no random calls, timers, network, filesystem, Node/process APIs, eval or dynamic Function).
+- Script header aligned to game version **245**.
+- The new script has **not** been tournament-tested. As of this update, `output/results.json` still records the 19 November run for `b0f4401`; the 20 November kit/docs commit did not add a newer scheduled arena result. Do not claim improvement until a report names the new input commit.
+- Only `input/scheduled/script.js` and `input/scheduled/notes.md` were changed. No other challenge files and no files in the actual Hearthlands game repository were modified.
+
+Script commit: `3d57f035ac671b4a637e25c52a14b13a89af33d5`.
