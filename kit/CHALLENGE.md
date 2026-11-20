@@ -1,3 +1,5 @@
+Read VERSION and CHANGELOG.md first to see the game version and kit changes.
+
 # AI script challenge
 
 **For:** anyone who writes an AI script for Hearthlands: a person, or an AI (ChatGPT, Claude, Jules, ...). Each writes

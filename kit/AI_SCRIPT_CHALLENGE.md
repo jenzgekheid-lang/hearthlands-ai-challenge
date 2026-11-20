@@ -45,6 +45,9 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
   switches: {vault, banner, armor, vet, gear, dock, hunter} true|false, the same every turn: which optional mechanics this game has.
+            Since version 244 (19 Nov 2026) every switch is on everywhere: the live game, the arena, tournaments and
+            the lab all play with all seven on, armor and bannermen included (scripts written before then met
+            banner and armor off in the arena). Still read view.switches: a test game can switch one off.
             Off: the vault (gold in stock counts instead, 1 bar per soldier), bannermen (no banners; gold counts for
             every soldier away from home) or armor (no armorer; everyone's arm stays 0). Fields keep their shape.
             gear: dropping gear (see Dropping gear below); off: nothing drops.
@@ -215,6 +218,7 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     homeless (people without a bed: more settlers than beds; carriers lose theirs first), beds, population,
     units: [ {id, role: "explorer"|"geologist"|"pioneer", x, y, busy, moving (still walking), to: {x, y} where sent} ],
     town: [ your buildings, the headquarters ('hq') too: {id, type, x, y, built, worker, paused, prio,
+      status: the building's current human-readable status, e.g. "Waiting for food"; omitted when unset,
       inputs, outputs (goods lying at the building, each an object {item: count}, never a list: inputs = brought in
       and waiting to be used, outputs = made or stored there and waiting to be carried off; test with
       (b.outputs.plank || 0) > 0), delivered, cost (a site only, {item: count}: goods brought so far, goods needed in all),
@@ -225,6 +229,8 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     unsearched: [ {x, y, d} mountain on your land no geologist has searched, nearest first ],
     spots: { type: [ {x, y, d, n} ] } answers to last turn's ['ask', {spots: [types]}]: places where that building
       may stand now, best first (n = trees/rocks/fish water/game/free grass/known ore in reach, or new land for military).
+      spotsFor samples every other tile, so it can miss valid sites; use canPlace to scan all tiles for building types
+      that do not need nearby resources.
       Ask for at most 6 types a turn; you get at most 8 places for each, all on your own land }
 - HOW A TOWN WORKS. The data files buildings.js and items.js that come with this kit (in the AI challenge they lie
   next to it) give every building's cost, tool, inputs, recipe, range, food and a line on what it does. In short:
@@ -234,7 +240,9 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     needs (buildings.js: tool). No idle carrier or no spare tool: the workplace stands still. The toolsmith (smith)
     makes tools from coal and iron.
   - A building site is levelled by diggers and then built by builders, with planks and stone carried to it.
-  - Mines only work while they get food (buildings.js: foods); ore lies where a geologist found signs of it.
+  - Mines mine nothing without food; which foods, in which order, is in src/data/buildings.js `foods` (and `foodsH`
+    while the hunter switch is on); fish is the fallback for coal, iron and stone. Ore lies where a geologist found
+    signs of it.
   - Soldiers: the weaponsmith makes weapons from coal and iron; at the barracks an idle carrier picks up a weapon and
     becomes a soldier. armyTarget {kind, d} is how many soldiers of that kind you want OUTSIDE buildings (at the start
     sword 4, bow 2, spear 2, banner 0): military buildings call free soldiers in, and the barracks trains again up to the
@@ -342,16 +350,18 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   height, occupied, fish, game, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
   Decide yourself where to build and where to expand: the map is all you need.
 - canPlace(type, x, y): true when a building of that type may stand with its top-left corner on tile x, y right now
-  (whole tiles; the game's own rules: on your land, flat enough, free of trees, rocks and other buildings, room around
-  it, a free tile in front of the door, mines fully on the mountain, military buildings out of enemy arrow range).
+  (whole tiles; the game's placement rules: on your land, flat enough, free of trees, rocks and other buildings, room
+  around it, a free tile in front of the door, mines fully on the mountain, military buildings out of enemy arrow
+  range). It does NOT check whether the needed resources are nearby. For wood, forest, quarry, fisher, waterhut and
+  every mine type, use view.economy.spots to find places with trees, rocks, fish/water or the right known ore in reach.
   Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, hunter 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, vault 3x3, weaponsmith 3x3 east, armorer 3x3 east, barracks 3x3 (door south unless east).
   x grows to the east, y to the south.
-- view.refused: last turn's orders the game refused, as {order, args, why} (for place: the reason, like 'Too steep';
+- view.refused: last turn's orders the game refused, as {order, args, why}, with a short reason in view.refused[].why (for place, e.g. 'Too steep';
   'switched off: <id>' for a mechanic this game has switched off, see view.switches); at most 30.
 - view.economy.loose: goods lying loose on your land {item: count}. view.economy.army: your army settings: target
   {sword, spear, bow, banner}, armor {sword, spear, bow, banner} (0-2, armyArmor), keep [{weapon, keep}] (weaponKeep's k is the position in this list, 0 first), reserve, list.
   view.economy.toolPlan (v209): the spare tools your smith keeps, in order [{tool, keep}] (toolKeep's k is the position).
-- view.economy.spots (the 'ask' helper) still works, but you don't need it.
+- view.economy.spots is filled by the 'ask' helper.
 - THE GAME LOG (full game): view.economy.log = everything that happened to your side since your last economy turn
   (newest last, at most 400): {t, p, what, a, b, c, s, other}. what: 'place' (a building id, b/c x/y, s type), 'finish',
   'demolish' (b 1 = burned), 'order' (a 1 accepted / 0 refused; s the order, with the reason when refused), 'deliver'
@@ -368,39 +378,215 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   tournament report shows your last notes next to what happened, so write down why you did something or why you wait.
 
 AN EXAMPLE FOR A FULL GAME: 'AI script: builder'
-// AI script: builder. Builds a town step by step with the economy view (view.economy) and commands.
+// AI script: builder. Grow a town, defend its border, and attack with a supported army.
 function think(view){
-  const E = view.economy, out = [];
-  const has = t => E.town.filter(b => b.type === t).length;          // built or being built
-  const sites = E.town.filter(b => !b.built).length;
-  const st = it => E.stock[it] || 0;
-  const mil = E.town.filter(b => b.type === 'guard' || b.type === 'tower').length;
-  const ore = k => E.ore.some(o => o.ore === k);
-  // what it wants next, in order: [condition, building]
-  const want = [
-    [has('wood') < 1, 'wood'], [has('quarry') < 1, 'quarry'], [has('saw') < 1, 'saw'], [has('wood') < 2, 'wood'],
-    [has('forest') < 1, 'forest'], [(E.people.carrier || 0) < 6 && E.population >= E.beds - 4 && !E.town.some(b => !b.built && /house/.test(b.type)), 'house'], // a house only when few carriers are free
-    [has('fisher') < 1, 'fisher'], [has('waterhut') < 1, 'waterhut'], [has('farm') < 1, 'farm'], [has('mill') < 1, 'mill'],
-    [has('bakery') < 1, 'bakery'], [has('quarry') < 2, 'quarry'], [has('wood') < 3, 'wood'], [has('forest') < 2, 'forest'],
-    [has('coalmine') < 1 && ore('coal'), 'coalmine'], [has('ironmine') < 1 && ore('ironore'), 'ironmine'],
-    [has('smelter') < 1 && has('coalmine') && has('ironmine'), 'smelter'], [has('smith') < 1 && has('smelter'), 'smith'],
-    [has('pigfarm') < 1 && has('farm'), 'pigfarm'], [has('butcher') < 1 && has('pigfarm'), 'butcher'], [has('farm') < 2 && has('mill'), 'farm'],
-    [has('weaponsmith') < 1 && has('smelter'), 'weaponsmith'], [has('barracks') < 1 && has('weaponsmith'), 'barracks'],
-    [has('coalmine') < 2 && has('smelter'), 'coalmine'], [has('saw') < 2 && has('wood') >= 3, 'saw'],
-  ].filter(w => w[0]).map(w => w[1]);
-  // a geologist while there is mountain it hasn't searched
-  const geos = E.units.filter(u => u.role === 'geologist');
-  if (!geos.length && E.land.unsearched > 20 && has('saw') && st('pick') > 0 && !(memory.geoT > view.t)) { out.push(['profession', {role: 'geologist', d: 1}]); memory.geoT = view.t + 60; } // ask once, then wait (a carrier fetches a pickaxe first)
-  for (const g of geos) if (!g.busy && E.unsearched.length) { const s = E.unsearched[(view.t / 2 | 0) % E.unsearched.length]; out.push(['sendUnit', {u: g.id, tx: s.x, ty: s.y}]); }
-  // more land: a guard post or tower at the far edge, when what it wants has no room or every few minutes
-  const noRoom = want.length && E.spots[want[0]] && !E.spots[want[0]].length;
-  const empty = view.buildings.some(b => b.military && b.type !== 'hq' && b.built && !(b.troops && b.troops.length)); // nobody to man it yet
-  const milWanted = (noRoom || mil < Math.floor(view.t / 150)) && !empty && !E.town.some(b => !b.built && (b.type === 'guard' || b.type === 'tower'));
-  const ask = (milWanted ? ['guard'] : []).concat(want.slice(0, 3));
-  out.push(['ask', {spots: ask}]);
-  if (sites >= 3 || st('plank') < 2) return out;                     // don't start too much at once
-  if (milWanted && E.spots.guard && E.spots.guard.length) { const s = E.spots.guard[0]; out.push(['place', {type: 'guard', x: s.x, y: s.y}]); return out; }
-  for (const t of want.slice(0, 3)) { const l = E.spots[t]; if (l && l.length) { out.push(['place', {type: t, x: l[0].x, y: l[0].y}]); break; } }
+  const E = view.economy, M = view.map, S = view.switches, out = [];
+  if (!E || !M || view.over) return out;
+  const order = (name, args) => out.push([name, args]);
+  const dist = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+  const stock = it => E.stock[it] || 0;
+  const hq = view.buildings.find(b => b.type === 'hq');
+  if (!hq) return out;
+  const time = view.t;
+  let {attackAfter = 0, rejected = null, expandAfter = 90, askAfter = 0, spots: cached = {}} = memory;
+
+  // Keep a home reserve. Estimate enemy strength from visible fighters and the target's garrison.
+  for (const r of view.refused) {
+    if (r.order === 'attack') attackAfter = time + 60;
+    if (r.order === 'place') rejected = {...r.args, until: time + 60};
+  }
+  const free = view.soldiers.filter(s => !s.order && !s.defends && !s.fighting && !s.moving);
+  const fighters = free.filter(s => s.kind !== 'banner' && s.hp >= s.maxHp * 0.75);
+  const banners = free.filter(s => s.kind === 'banner');
+  const power = s => s.hp * (0.6 + 0.2 * s.arm) * s.str / 100;
+  if (fighters.length >= 15 && time >= attackAfter) {
+    const targets = view.enemy.buildings.filter(b => b.built && b.military);
+    targets.sort((a, b) => dist(hq, a) - dist(hq, b) + 20 * (Number(!!a.manned) - Number(!!b.manned)));
+    for (const target of targets.slice(0, 4)) {
+      const group = fighters.slice().sort((a, b) => dist(a, target) - dist(b, target)).slice(0, -6);
+      const guards = {hq: 1, guard: 3, tower: 6, castle: 10};
+      const danger = view.enemy.soldiers.filter(s => dist(s, target) < 24).reduce((sum, s) => sum + power(s), 0);
+      const support = S.banner ? banners.slice().sort((a, b) => dist(a, target) - dist(b, target)).slice(0, Math.ceil(group.length / 8)) : [];
+      const strength = group.reduce((sum, s) => sum + power(s), 0) * (support.length ? view.gold : 0.65);
+      if (strength < 1.5 * (danger + 6 * (target.manned ? guards[target.type] || 3 : 1)) + 12) continue;
+      order('attack', {ids: group.concat(support).map(s => s.id), b: target.id});
+      attackAfter = time + 60;
+      break;
+    }
+  }
+
+  Object.assign(memory, {attackAfter, rejected});
+  if (view.armyOnly) return out;
+
+  // Gather the town counts and the materials still needed by sites.
+  const count = {}, built = {}, pending = {};
+  let sites = 0, bedsComing = 0;
+  for (const b of E.town) {
+    count[b.type] = (count[b.type] || 0) + 1;
+    if (b.built) built[b.type] = (built[b.type] || 0) + 1;
+    else {
+      sites++;
+      for (const it of Object.keys(b.cost)) pending[it] = (pending[it] || 0) + Math.max(0, b.cost[it] - (b.delivered[it] || 0));
+    }
+    bedsComing += b.coming || 0;
+  }
+  const has = t => count[t] || 0;
+  const tip = k => E.tips.some(t => t.k === k);
+  const spare = (it, n) => stock(it) >= n + (pending[it] || 0);
+  const ore = kind => E.ore.some(o => o.ore === kind);
+
+  // Search mountain on our land. Give recruit orders time to fetch their tools.
+  {
+    const geos = E.units.filter(u => u.role === 'geologist');
+    if (E.land.unsearched > 12 && geos.length < (built.smith ? 2 : 1) && stock('pick') && (E.people.carrier || 0) > 4 && time >= (memory.geoT || 0)) {
+      order('profession', {role: 'geologist', d: 1});
+      memory.geoT = time + 45;
+    }
+    for (const g of geos) {
+      if (g.busy || g.moving) continue;
+      const spot = E.unsearched.find(p => M.grounds[M.ter[p.y * M.w + p.x]].mine &&
+        geos.every(other => other.id === g.id || !other.to || dist(other.to, p) > 8));
+      if (spot) order('sendUnit', {u: g.id, tx: spot.x, ty: spot.y});
+    }
+  }
+
+  // Set exact reserves once a forge exists. Arm only part of the mix so weapons can still train immediately.
+  if (built.smith) E.toolPlan.forEach(({tool, keep}, k) => {
+    const set = tool === 'pick' ? 2 : 1;
+    if (keep !== set) order('toolKeep', {k, set});
+  });
+  if (has('barracks')) {
+    const trained = built.smelter && (built.coalmine || 0) >= 2;
+    const targets = {sword: trained ? 18 : 10, spear: trained ? 8 : 4, bow: trained ? 12 : 6};
+    if (S.banner && built.goldsmelter && E.army.target.banner !== (trained ? 3 : 1)) {
+      order('armyTarget', {kind: 'banner', set: trained ? 3 : 1});
+    }
+    for (const [kind, set] of Object.entries(targets)) {
+      if (E.army.target[kind] !== set) order('armyTarget', {kind, set});
+    }
+    if (S.armor && built.armorer && !E.army.armor.bow) order('armyArmor', {kind: 'bow', set: 1});
+  }
+  for (const b of E.town) {
+    if (S.armor && S.gear && b.type === 'armorer' && b.built && !b.repair) order('armorRepair', {b: b.id, on: true});
+    if (S.vault && b.type === 'vault' && b.built && b.keep !== 24) order('vaultKeep', {b: b.id, set: 24});
+  }
+
+  // Keep enough workers and carriers ahead of recruitment. Fund construction from uncommitted stock.
+  const want = [];
+  const add = (type, n, plank, stone, ready = true) => {
+    if (ready && has(type) < n && spare('plank', plank) && spare('stone', stone) && !want.includes(type)) want.push(type);
+  };
+  const peopleShort = (E.people.carrier || 0) < 9 || (E.idle.carrier || 0) < 3 || tip('settlers') || tip('weapons');
+  const homes = peopleShort && bedsComing < 6 && !E.town.some(b => !b.built && /^house/.test(b.type));
+  const border = view.buildings.filter(b => b.military && b.type !== 'hq');
+  // A small post needs one swordsman. Keep the starting bows in the field until recruitment starts.
+  for (const b of E.town) if (b.type === 'guard' && b.built) {
+    if (b.fighters > 1) order('fighters', {b: b.id, set: 1});
+    if (!built.barracks && b.archers) order('archers', {b: b.id, set: 0});
+  }
+  const canExpand = border.every(b => b.built && b.troops && b.troops.length);
+  const expand = canExpand && (time >= expandAfter || tip('land') || tip('ore'));
+  add('wood', 1, 2, 2);
+  add('quarry', 1, 2, 3);
+  add('saw', 1, 3, 4);
+  add('house', 1, 3, 3, homes && !!has('saw'));
+  add('wood', 2, 2, 2, !!has('saw'));
+  add('forest', 1, 3, 1, !!has('wood'));
+  add('guard', 1, 2, 3, expand);
+  add('house3', 20, 10, 12, homes && time > 1200);
+  add('house2', 20, 5, 6, homes && !!has('house'));
+  add('house', 20, 3, 3, homes);
+  /* The spot helper checks dock placement when dock is on. */ add('fisher', 1, 3, 2);
+  add('hunter', 1, 3, 2, S.hunter);
+  add('quarry', built.smith && stock('pick') > 1 ? 4 : 2, 2, 3, stock('stone') < 14);
+  add('castle', 3, 8, 12, expand && view.soldiers.length >= 14 && time > 1500);
+  add('tower', 10, 5, 5, expand && view.soldiers.length >= 8 && border.length >= 3);
+  add('guard', 30, 2, 3, expand);
+  const coalFood = built.fisher || built.bakery || (S.hunter && (built.hunter || built.butcher));
+  const coalStable = (built.coalmine || 0) >= 2 || stock('coal') >= 12;
+  add('coalmine', 1, 4, 1, ore('coal') && !!coalFood);
+  add('ironmine', 1, 4, 1, ore('ironore') && !!(built.fisher || built.butcher || built.hunter));
+  add('smelter', 1, 4, 6, !!(built.coalmine && built.ironmine));
+  add('smith', 1, 3, 5, !!built.smelter);
+  add('weaponsmith', 1, 5, 7, !!built.smelter || stock('iron') >= 4);
+  add('barracks', 1, 4, 5, !!has('weaponsmith') || stock('sword') >= 2);
+  add('waterhut', 1, 3, 4);
+  add('farm', 1, 6, 6, !!has('waterhut'));
+  add('mill', 1, 3, 3, !!has('farm'));
+  add('bakery', 1, 4, 5, !!(has('mill') && has('waterhut')));
+  add('pigfarm', 1, 6, 6, !!(has('farm') && has('waterhut')));
+  add('butcher', 1, 4, 4, !!has('pigfarm'));
+  add('coalmine', 6, 4, 1, ore('coal') && !!(built.smith && coalFood) && stock('pick') > 0 && stock('coal') < 16);
+  add('ironmine', 3, 4, 1, ore('ironore') && !!built.smith && stock('pick') > 1 && stock('ironore') < 10);
+  add('stonemine', 2, 5, 0, !!built.smith && stock('pick') > 1 && ore('stone') && !!(built.bakery || built.fisher) && stock('stone') < 15);
+  add('goldmine', 2, 5, 1, coalStable && !!built.smith && stock('pick') > 1 && stock('goldore') < 5 && ore('goldore') && !!(built.fisher || built.bakery));
+  add('goldsmelter', 1, 4, 6, coalStable && !!built.goldmine);
+  add('vault', 3, 3, 4, S.vault && !!built.goldsmelter && (has('vault') === 0 || stock('gold') > 12));
+  add('armorer', 1, 4, 5, S.armor && !!built.barracks && coalStable && stock('iron') >= 2 && view.soldiers.length >= 6);
+  add('wood', 4, 2, 2, !!built.smith && stock('log') < 12);
+  add('saw', 2, 3, 4, !!built.smith && stock('plank') < 18);
+  add('forest', 3, 3, 1, has('wood') >= 3 || E.town.some(b => b.type === 'wood' && /^No grown trees/.test(b.status || '')));
+  add('farm', 3, 6, 6, !!built.pigfarm && stock('grain') < 10);
+  add('waterhut', 2, 3, 4, !!built.pigfarm && stock('water') < 10);
+  add('bakery', 2, 4, 5, (built.coalmine || 0) >= 2 && !!built.mill && stock('bread') < 8);
+  add('fisher', 3, 3, 2, !!built.smith && stock('fish') < 10);
+  add('hunter', 2, 3, 2, S.hunter && !!built.weaponsmith && stock('meat') < 10);
+
+  // Reuse the spot answers briefly. Recheck each footprint and spread military sites toward new land.
+  if (sites < (time < 360 ? 3 : 5)) {
+    const answered = Object.keys(E.spots);
+    if (answered.length) cached = {...cached, ...E.spots};
+    const best = want.filter(t => cached[t] === undefined || cached[t].length).slice(0, 6);
+    if (best.length < 6 && want.length) {
+      const retry = want.filter(t => cached[t] && !cached[t].length);
+      if (retry.length) best.push(retry[Math.floor(time / 12) % retry.length]);
+    }
+    if (best.length && time >= askAfter) {
+      order('ask', {spots: best});
+      askAfter = time + 12;
+    }
+    for (const type of want) {
+      let spots = cached[type] || [];
+      const military = type === 'guard' || type === 'tower' || type === 'castle';
+      if (military && Object.hasOwn(E.spots, type)) {
+        // Look around existing posts for a route toward visible mountain and room for the town.
+        const reach = {guard: 14, tower: 20, castle: 26};
+        const seekOre = !has('ironmine') || !has('coalmine');
+        const candidates = spots.slice();
+        for (const b of [hq, ...border]) {
+          const radius = reach[b.type] || 14;
+          for (let dx = -radius; dx <= radius; dx += 4) for (let dy = -radius; dy <= radius; dy += 4) {
+            if (Math.abs(dx) + Math.abs(dy) < radius) continue;
+            const x = Math.floor(b.x) + dx, y = Math.floor(b.y) + dy;
+            if (canPlace(type, x, y)) candidates.push({x, y});
+          }
+        }
+        spots = candidates.map(p => {
+          let land = 0, mountain = 0;
+          const r = reach[type];
+          for (let dx = -r; dx <= r; dx += 4) for (let dy = -r; dy <= r; dy += 4) {
+            if (dx * dx + dy * dy > r * r) continue;
+            const x = p.x + dx + 2, y = p.y + dy + 2, i = y * M.w + x;
+            if (x < 0 || x >= M.w || y < 0 || y >= M.h || M.owner[i]) continue;
+            if (!M.known[i]) { land += 0.4; continue; }
+            const g = M.grounds[M.ter[i]];
+            if (g.land) land++;
+            if (g.mine) mountain++;
+          }
+          return {...p, score: land + (seekOre ? 2 : 0.3) * mountain};
+        }).filter(p => p.score >= 5).sort((a, b) => b.score - a.score);
+        cached[type] = spots.slice(0, 8);
+      }
+      const spot = spots.find(p => canPlace(type, p.x, p.y) &&
+        (!rejected || rejected.until <= time || rejected.type !== type || p.x !== rejected.x || p.y !== rejected.y));
+      if (!spot) { if (spots.length) cached[type] = []; continue; }
+      order('place', {type, x: spot.x, y: spot.y});
+      cached[type] = [];
+      if (military) expandAfter = time + (border.length < 5 ? 60 : 100);
+      break;
+    }
+  }
+  Object.assign(memory, {expandAfter, askAfter, spots: cached});
   return out;
 }
 
