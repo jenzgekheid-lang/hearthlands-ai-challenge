@@ -204,10 +204,11 @@ This replaces the compact-raid strategy. It deliberately removes the unreliable 
 ### Validation and scope
 
 - `node --check`: passed.
-- Mock tests passed for the opening woodcutter, early forester placement, geologist recruitment and dispatch, explicit guard garrison, attack on a recently remembered empty enemy post, withholding an attack on a manned post with an undersized force, housing restraint with a large carrier surplus, and retreat after siege losses.
+- Mock tests passed for the opening woodcutter, early forester placement, geologist recruitment and dispatch, explicit guard garrison, attack on a recently remembered empty enemy post, withholding an attack on a manned post with an undersized force, housing restraint with a large carrier surplus, retreat after siege losses, and the early bread-chain response when coal-mine food is short.
+- Follow-up hardening also keeps remembered enemy buildings eligible when the kit does not supply a `seenAt` timestamp, and moves the bread chain ahead of the smelter when fish/coal-mine food is short or the first coal mine has been running for 15 minutes.
 - Forbidden API scan: clean (no random calls, timers, network, filesystem, Node/process APIs, eval or dynamic Function).
 - Script header aligned to game version **245**.
 - The new script has **not** been tournament-tested. As of this update, `output/results.json` still records the 19 November run for `b0f4401`; the 20 November kit/docs commit did not add a newer scheduled arena result. Do not claim improvement until a report names the new input commit.
 - Only `input/scheduled/script.js` and `input/scheduled/notes.md` were changed. No other challenge files and no files in the actual Hearthlands game repository were modified.
 
-Script commit: `3d57f035ac671b4a637e25c52a14b13a89af33d5`.
+Script commits: `3d57f035ac671b4a637e25c52a14b13a89af33d5` (full rewrite) and `662f0ac9cdd29238203c22b57c0b154cc0361672` (early bread-chain and remembered-target hardening).
