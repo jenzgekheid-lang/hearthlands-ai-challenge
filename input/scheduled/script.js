@@ -70,7 +70,7 @@ function economy(view,M,out){
   if(uq)out.push(['sendUnit',{u:g.id,tx:uq.x,ty:uq.y}]);
  }
 
- // One local explorer advances along reachable visible fog edges; no long blind jumps or pioneer claims.
+ // One local explorer advances along nearby visible fog edges; no long blind jumps or pioneer claims.
  var explorers=units.filter(function(u){return u.role==='explorer';});
  if(explorers.length<1&&t>240&&carriers>10&&idleC>3&&spare('plank')>1&&(M.expAt||0)<=t){
   out.push(['profession',{role:'explorer',d:1}]);M.expAt=t+180;
@@ -126,6 +126,8 @@ function economy(view,M,out){
  add('ironmine',1,4,1,ore('ironore')&&hasMineFood);
  add('coalmine',2,4,1,ore('coal')&&coalDry&&st('coal')<12);
  add('ironmine',2,4,1,ore('ironore')&&ironDry&&st('ironore')<12);
+ var breadNow=done('coalmine')>0&&done('bakery')===0&&(coalFoodShort||st('fish')<14||t>900);
+ if(breadNow){add('waterhut',1,3,4,true);add('farm',1,6,6,done('waterhut')>0);add('mill',1,3,3,done('farm')>0);add('bakery',1,4,5,done('mill')>0&&done('waterhut')>0);}
  add('smelter',1,4,6,done('coalmine')>0&&done('ironmine')>0);
  add('smith',1,3,5,done('smelter')>0);
  add('weaponsmith',1,5,7,done('smith')>0);
@@ -251,7 +253,6 @@ function army(view,M,out){
  function door(b){return b.door||{x:b.x+(b.w||3)/2,y:b.y+(b.h||3)/2};}
  function power(s){return (s.hp||s.maxHp||10)*(s.str===undefined?1:s.str/100)*(1+0.15*(s.arm||0));}
  function isMil(b){return !!b.military||['guard','tower','castle','hq'].indexOf(b.type)>=0;}
- function slots(b){return b.type==='castle'?10:b.type==='tower'?6:b.type==='guard'?3:1;}
  var free=mine.filter(function(s){return !s.order&&!s.defends&&!s.fighting&&!s.moving&&!M.sentThisTurn[s.id];});
  var fighters=free.filter(function(s){return s.kind!=='banner'&&s.hp>=(s.maxHp||10)*0.7;});
  var banners=free.filter(function(s){return s.kind==='banner';});
@@ -297,7 +298,7 @@ function army(view,M,out){
  }
 
  if(fighters.length<10||(M.attackAfter||0)>t)return;
- var targets=eb.filter(function(b){return b.built!==false&&isMil(b)&&!(b.remembered&&t-(b.seenAt||0)>1200);});
+ var targets=eb.filter(function(b){return b.built!==false&&isMil(b)&&!(b.remembered&&typeof b.seenAt==='number'&&t-b.seenAt>1200);});
  targets.sort(function(a,b){
   var am=a.manned===false?0:1,bm=b.manned===false?0:1;
   var ar=a.remembered?1:0,br=b.remembered?1:0;
@@ -316,7 +317,7 @@ function army(view,M,out){
   if(strength<required)continue;
   var support=banners.slice().sort(function(a,b){return manhattan(a,p)-manhattan(b,p)||a.id-b.id;}).slice(0,Math.min(banners.length,Math.ceil(squad.length/8)));
   out.push(['attack',{ids:squad.concat(support).map(function(s){return s.id;}),b:target1.id}]);
-  M.attackAfter=t+60;M.reinforceAt=t+30;M.siegeTarget=target1.id;M.siegeStart=squad.length;M.siegePrev=squad.length;M.siegeLosses=0;
+  M.attackAfter=t+60;M.reinforceAt=t+30;M.siegeTarget=target1.id;M.siegeStart=squad.length;M.siegePrev=squad.length+support.length;M.siegeLosses=0;
   out.push(['note',{text:'Siege: '+squad.length+' fighters plus '+support.length+' banners against '+target1.type+' '+target1.id+'; estimated power '+Math.round(strength)+' vs '+Math.round(required)+'.'}]);
   return;
  }
