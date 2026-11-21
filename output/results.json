@@ -27,10 +27,10 @@
     "undecided": 8
   },
   "scheduled": {
-    "date": "2026-11-20",
-    "commit": "d91d2c3",
-    "version": 245,
-    "lastPlayedVersion": 245,
+    "date": "2026-11-21",
+    "commit": "9a795a5",
+    "version": 247,
+    "lastPlayedVersion": 247,
     "status": "played",
     "brokenOn": null,
     "errors": 0,
