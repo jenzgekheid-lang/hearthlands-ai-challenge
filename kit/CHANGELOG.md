@@ -2,6 +2,26 @@
 
 Generated with tools/kit-version.js; read VERSION and this file before editing a script.
 
+## v247
+
+v247-9d41f8f6cb55: kit changed
+
+```diff
+Kit v246-74d7534874cf -> v247-9d41f8f6cb55: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+
+### kit (AI_SCRIPT_CHALLENGE.md)
+@@ line 366 @@
+    gather wood'; b/c building ids or target), 'taskend' (that order ended: a person id, b tenths of a second, s 'done' or
+    'failed: why'), 'tip' (every game minute, each of the advisor's tips for your side that holds now: a the game minute,
+-   s 'kind: text', kinds land, ore, weapons, stall, army, settlers, orders, timing; the player sees the same tips under
++   s 'kind: text', kinds land, ore, weapons, stall, carriers, army, settlers, orders, timing; the player sees the same tips under
+    Goals). The current tips are also in view.economy.tips: [{k, text}] (k: the kind; renewed every game minute).
++   carriers (21 Nov 2026): a building type waited for goods at least 7 of the last 10 minutes while they lie in
++   stock and no carrier is idle (it replaces that type's stall tip), or no carrier was idle for 10 minutes: build houses.
+    Only what your side may know.
+  - ["note", {text}]: write your own note into the game log (at most 5 a turn, 200 characters each). After the game the
+```
+
 ## v246
 
 v246-74d7534874cf: kit changed
@@ -612,40 +632,14 @@ Kit v238-931dca2c2334 -> v239-df98a7fbbb8c: kit changed (kit (AI_SCRIPT_CHALLENG
 
 v238-931dca2c2334: kit changed
 
-```diff
-Kit v237-cfe0e812b6af -> v238-931dca2c2334: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
-
-### kit (AI_SCRIPT_CHALLENGE.md)
-@@ line 298 @@
-    set: an exact number (kept within the same limits; armyTarget by set has no top of 40).
-  - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 10 minutes.
-- - THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, at(x,y)}.
-+ - THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, grounds, at(x,y)}.
-    Each layer is a Uint8Array with one value per tile, index y*w+x, as far as your fog of war allows: known 0 = never
--   seen (all other layers 0 there), 1 = seen before (as it was then, height included), 2 = seen now (your own land always). ter 0 grass,
--   1 water, 2 mountain; tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
-+   seen (all other layers 0 there), 1 = seen before (as it was then, height included), 2 = seen now (your own land always). ter = the
-+   kind of ground, an index into grounds (today 0 grass, 1 water, 2 mountain; unseen tiles read 0); tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
-    stands there (seen now only); fish = fish left in that water (seen now only); ore 0 not searched by a geologist,
-    1 searched: nothing, 2+ = oreNames[ore-1]. oreNames is a plain list (since 201), the same for every value of ore:
--   ['none', 'coal', 'ironore', 'goldore', 'stone'], so oreNames.indexOf(kind) + 1 gives the ore value. map.at(x,y) gives one tile as an
--   object with the same names, but two of them in words: {known, ter: 'grass'|'water'|'mountain', tree, stone, owner,
-+   ['none', 'coal', 'ironore', 'goldore', 'stone'], so oreNames.indexOf(kind) + 1 gives the ore value.
-+   grounds: the rules of each kind of ground, grounds[ter] = {id, name, walk (people walk on it), build ('all' = any building
-+   but a mine, 'none'), mine (mines stand here, geologists search here), fields (farms sow here), trees (the tree kinds that
-+   grow here, [] = none; a forester plants on it), water (fishers, water huts, the farm bonus near water), land (counts for
-+   territory)}. NEW KINDS OF GROUND WILL BE ADDED (a ground keeps its id for good; new ones come at the end): ask grounds,
-+   never fixed numbers ("not water and not mountain" is not the same as "grass"). map.at(x,y) gives one tile as an
-+   object with the same names, but two of them in words: {known, ter: the ground's name ('grass', 'water', 'mountain', ...), tree, stone, owner,
-    height, occupied, fish, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
-    Decide yourself where to build and where to expand: the map is all you need.
-```
+Initial version in this history.
 
 ## v237
 
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 ## v236
 
