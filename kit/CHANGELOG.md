@@ -4,12 +4,21 @@ Generated with tools/kit-version.js; read VERSION and this file before editing a
 
 ## v247
 
-v247-82ef49b502ac: kit changed
+v247-57cfb038e106: kit changed
 
 ```diff
-Kit v246-74d7534874cf -> v247-82ef49b502ac: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+Kit v246-74d7534874cf -> v247-57cfb038e106: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
 
 ### kit (AI_SCRIPT_CHALLENGE.md)
+@@ line 311 @@
+    send him), pioneer (takes a shovel; claims land nobody owns, tile by tile, where you send him outside your border),
+    digger (a shovel), builder (a hammer). It needs that tool lying spare, an idle carrier, and more than 2 carriers.
+-   Careful: a profession order that could not be done is NOT in view.refused; look at view.economy.people on a later
+-   turn. Send no other role names. Explorers, geologists and pioneers are in view.economy.units; move them with sendUnit.
++   Careful: a profession order that could not be done is NOT in view.refused, unless the switch scriptInfo is on (then it is,
++   with the reason, like the other refusals); otherwise look at view.economy.people on a later turn. Send no other role names. Explorers, geologists and pioneers are in view.economy.units; move them with sendUnit.
+  - More on some orders: pause {b, on} works on a building site only. workArea {b, x, y} moves the middle of a
+    workplace's work area (x: null = back around the building). storeSlot {b, k, it}: a stockpile (store) has 4 slots,
 @@ line 366 @@
     gather wood'; b/c building ids or target), 'taskend' (that order ended: a person id, b tenths of a second, s 'done' or
     'failed: why'), 'tip' (every game minute, each of the advisor's tips for your side that holds now: a the game minute,
@@ -640,6 +649,7 @@ Initial version in this history.
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 
 

@@ -318,8 +318,8 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
   plank; walks where you send him and uncovers the map), geologist (takes a pickaxe; searches the mountain where you
   send him), pioneer (takes a shovel; claims land nobody owns, tile by tile, where you send him outside your border),
   digger (a shovel), builder (a hammer). It needs that tool lying spare, an idle carrier, and more than 2 carriers.
-  Careful: a profession order that could not be done is NOT in view.refused; look at view.economy.people on a later
-  turn. Send no other role names. Explorers, geologists and pioneers are in view.economy.units; move them with sendUnit.
+  Careful: a profession order that could not be done is NOT in view.refused, unless the switch scriptInfo is on (then it is,
+  with the reason, like the other refusals); otherwise look at view.economy.people on a later turn. Send no other role names. Explorers, geologists and pioneers are in view.economy.units; move them with sendUnit.
 - More on some orders: pause {b, on} works on a building site only. workArea {b, x, y} moves the middle of a
   workplace's work area (x: null = back around the building). storeSlot {b, k, it}: a stockpile (store) has 4 slots,
   k 0-3; set a slot to an item (it) and carriers bring up to 8 of it there (it: null clears the slot); the view does
