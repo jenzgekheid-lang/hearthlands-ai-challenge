@@ -4,10 +4,10 @@ Generated with tools/kit-version.js; read VERSION and this file before editing a
 
 ## v247
 
-v247-9d41f8f6cb55: kit changed
+v247-82ef49b502ac: kit changed
 
 ```diff
-Kit v246-74d7534874cf -> v247-9d41f8f6cb55: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+Kit v246-74d7534874cf -> v247-82ef49b502ac: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
 
 ### kit (AI_SCRIPT_CHALLENGE.md)
 @@ line 366 @@
@@ -16,6 +16,7 @@ Kit v246-74d7534874cf -> v247-9d41f8f6cb55: kit changed (kit (AI_SCRIPT_CHALLENG
 -   s 'kind: text', kinds land, ore, weapons, stall, army, settlers, orders, timing; the player sees the same tips under
 +   s 'kind: text', kinds land, ore, weapons, stall, carriers, army, settlers, orders, timing; the player sees the same tips under
     Goals). The current tips are also in view.economy.tips: [{k, text}] (k: the kind; renewed every game minute).
++   Only when the switch scriptInfo is on (off by default; the game's switches say which): view.economy.logCut: how many of the log events since your last economy turn the 400 cut left out. view.economy.minute: {m, stock, bld, ppl, sol, land, seen, beds, pop, idle, waiting, econ, status}, your side's latest game-minute snapshot (the same fields as the game log's minute snapshot, without its hash), sent once per new game minute; status = {building type: {state: seconds}} gained since your last minute (states as in the game log's status time: working, waiting for ..., no worker, ...).
 +   carriers (21 Nov 2026): a building type waited for goods at least 7 of the last 10 minutes while they lie in
 +   stock and no carrier is idle (it replaces that type's stall tip), or no carrier was idle for 10 minutes: build houses.
     Only what your side may know.
@@ -639,6 +640,7 @@ Initial version in this history.
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 
 
