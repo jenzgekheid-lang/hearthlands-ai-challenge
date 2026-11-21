@@ -154,7 +154,7 @@ function economy(view,M,out){
  add('wood',1,2,2,true);
  add('saw',1,3,4,done('wood')>0);
  add('forest',1,3,1,done('wood')>0);
- add('guard',5,2,3,done('saw')>0&&(border.length===0||expand));
+ add('guard',1,2,3,done('saw')>0&&border.length===0);
  // The quarry is deliberately after the first border post and first geologist attempt.
  var firstGuardAffordable=done('saw')>0&&spare('plank')>=2&&spare('stone')>=3;
  var quarryReady=!geoPending&&(border.length===0?!firstGuardAffordable:(canExpand&&((land.mountain||0)>0||border.length>=2)));
@@ -162,6 +162,8 @@ function economy(view,M,out){
  add('fisher',1,3,2,done('saw')>0);
  add('hunter',1,3,2,S.hunter&&done('forest')>0);
  add('house',6,3,3,homes&&done('saw')>0);
+ // Once the first post is in place, answer a carrier shortage before adding another frontier post.
+ add('guard',5,2,3,done('saw')>0&&border.length>0&&expand);
  add('tower',2,5,5,expand&&border.length>=2&&totalSoldiers>=14);
  add('look',1,2,4,border.length>=2&&t>900&&(view.enemy&&view.enemy.buildings||[]).length===0);
  add('coalmine',1,4,1,ore('coal')&&mineFood);
