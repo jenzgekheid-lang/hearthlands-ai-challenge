@@ -156,7 +156,9 @@ function economy(view,M,out){
  add('forest',1,3,1,done('wood')>0);
  add('guard',5,2,3,done('saw')>0&&(border.length===0||expand));
  // The quarry is deliberately after the first border post and first geologist attempt.
- add('quarry',1,2,3,!geoPending);
+ var firstGuardAffordable=done('saw')>0&&spare('plank')>=2&&spare('stone')>=3;
+ var quarryReady=!geoPending&&(border.length===0?!firstGuardAffordable:(canExpand&&((land.mountain||0)>0||border.length>=2)));
+ add('quarry',1,2,3,quarryReady);
  add('fisher',1,3,2,done('saw')>0);
  add('hunter',1,3,2,S.hunter&&done('forest')>0);
  add('house',6,3,3,homes&&done('saw')>0);
