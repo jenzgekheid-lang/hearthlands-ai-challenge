@@ -2,6 +2,35 @@
 
 Generated with tools/kit-version.js; read VERSION and this file before editing a script.
 
+## v246
+
+v246-74d7534874cf: kit changed
+
+```diff
+Kit v245-0ead3337d9c8 -> v246-74d7534874cf: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+
+### kit (AI_SCRIPT_CHALLENGE.md)
+@@ line 37 @@
+                          may be gone, or manned differently, by now ] },
+    over: null or {winners},
+-   switches: {vault, banner, armor, vet, gear, dock, hunter} true|false, the same every turn: which optional mechanics this game has.
++   switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair} true|false, the same every turn: which optional mechanics this game has.
+              Since version 244 (19 Nov 2026) every switch is on everywhere: the live game, the arena, tournaments and
+-             the lab all play with all seven on, armor and bannermen included (scripts written before then met
++             the lab all play with all of them on, armor and bannermen included (scripts written before then met
+              banner and armor off in the arena). Still read view.switches: a test game can switch one off.
+              Off: the vault (gold in stock counts instead, 1 bar per soldier), bannermen (no banners; gold counts for
+@@ line 48 @@
+              banner); off: every rank and xp is 0. dock: the fisher's dock (see Water below); off: a fisher stands
+              anywhere by water. hunter: the hunter's cabin and game in forest (see Hunting below); off: no game
+-             (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before.
++             (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before. carryfair (#41,
++             21 Nov 2026): carriers serve workshops waiting for goods of the same delivery rank by the shortest trip
++             minus the time waited (1 minute = 10 tiles); off: in building order. Nothing to order for it.
+    gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
+          tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
+```
+
 ## v245
 
 v245-0ead3337d9c8: same
@@ -616,9 +645,7 @@ Kit v237-cfe0e812b6af -> v238-931dca2c2334: kit changed (kit (AI_SCRIPT_CHALLENG
 
 v237-cfe0e812b6af: same
 
-```diff
-Kit v236-cfe0e812b6af -> v237-cfe0e812b6af: same
-```
+Initial version in this history.
 
 ## v236
 

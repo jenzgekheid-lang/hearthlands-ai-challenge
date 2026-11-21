@@ -44,9 +44,9 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
                         is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
-  switches: {vault, banner, armor, vet, gear, dock, hunter} true|false, the same every turn: which optional mechanics this game has.
+  switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair} true|false, the same every turn: which optional mechanics this game has.
             Since version 244 (19 Nov 2026) every switch is on everywhere: the live game, the arena, tournaments and
-            the lab all play with all seven on, armor and bannermen included (scripts written before then met
+            the lab all play with all of them on, armor and bannermen included (scripts written before then met
             banner and armor off in the arena). Still read view.switches: a test game can switch one off.
             Off: the vault (gold in stock counts instead, 1 bar per soldier), bannermen (no banners; gold counts for
             every soldier away from home) or armor (no armorer; everyone's arm stays 0). Fields keep their shape.
@@ -55,7 +55,9 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
             weaponKeep, armorRepair) are refused with why 'switched off: <id>'. vet: veterans (ranks and xp; needs
             banner); off: every rank and xp is 0. dock: the fisher's dock (see Water below); off: a fisher stands
             anywhere by water. hunter: the hunter's cabin and game in forest (see Hunting below); off: no game
-            (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before.
+            (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before. carryfair (#41,
+            21 Nov 2026): carriers serve workshops waiting for goods of the same delivery rank by the shortest trip
+            minus the time waited (1 minute = 10 tiles); off: in building order. Nothing to order for it.
   gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
         tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
         land owner's pile (a pile is not in this list).
