@@ -35,10 +35,6 @@ function economy(view,M,out){
  }
  function ore(kind){
   for(var o of (E.ore||[]))if(o.ore===kind)return true;
-  if(map.ore&&map.oreNames){
-   var v=map.oreNames.indexOf(kind)+1;
-   if(v>1)for(var i=0;i<map.ore.length;i++)if(map.ore[i]===v)return true;
-  }
   return false;
  }
  var hq=null;
@@ -399,6 +395,7 @@ function army(view,M,out){
   out.push(['note',{text:'Siege: '+squad.length+' fighters plus '+support.length+' banners against '+target1.type+'; estimated power '+Math.round(strength)+' vs '+Math.round(need)+'.'}]);
   return;
  }
+ if(targets.length)return;
 
  // No target is visible: send a supported attack-move column toward enemy land or the central frontier.
  var activeProbe=mine.some(function(s){return s.order&&s.order.k==='attack-move';});
