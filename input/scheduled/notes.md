@@ -212,3 +212,43 @@ This replaces the compact-raid strategy. It deliberately removes the unreliable 
 - Only `input/scheduled/script.js` and `input/scheduled/notes.md` were changed. No other challenge files and no files in the actual Hearthlands game repository were modified.
 
 Script commits: `3d57f035ac671b4a637e25c52a14b13a89af33d5` (full rewrite) and `662f0ac9cdd29238203c22b57c0b154cc0361672` (early bread-chain and remembered-target hardening).
+
+
+## 21 Nov 2026 — v247 forward-corridor and expeditionary-army reset
+
+### Safety trigger and report evidence
+
+The three latest genuine scheduled tournament reports (18, 19 and 20 November) all recorded **0 wins, 0 losses and 8 undecided**. The three-report safety condition is met, so this is a strategy-level change, not another incremental tweak.
+
+The latest report is \`output/scheduled/latest.md\`, game version 245, written for input commit \`d91d2c3\`. It recorded 0 buildings taken, 0 kills, 0 gold against 271 for the NPC, and all eight towns marked stuck. The report shows two different failure modes:
+
+- Some games reached 26 buildings and 28 soldiers, but land stopped growing at 1,459 tiles after the second guard. The script had no next territorial objective and never attacked or captured anything.
+- Other sides stalled at 14 buildings and 10 soldiers, with no mines or smelter. Three mountain tiles were on the land, but no geologist was recruited.
+- The gold-side games had 5–8 idle carriers and roughly 90–101 goods waiting to be carried. The script kept sending two garrison-setting orders every turn: 3,297 \`fighters\` and 3,297 \`archers\` commands in one game.
+- The previous army waited for a visible military building before acting. It had no attack-move expedition, so the enemy was discovered too late or not at all.
+- The barracks spent up to 100% of its time waiting for iron armor for new spearmen. The previous script requested armor for swords, spears and bows at once, delaying basic recruitment.
+
+### Kit v247 changes
+
+Reviewed the current main branch and the v246/v247 kit changes. v247 adds the \`carryfair\` carrier allocation rule and a new \`carriers\` advisor tip. The tip identifies a workshop that has waited for goods while those goods are in stock and no carrier is idle, or a prolonged absence of idle carriers. The script uses that signal to request housing only when delivery capacity is genuinely short. The optional \`scriptInfo\` minute snapshot is off by default, so the strategy does not depend on it.
+
+### New strategy: forward corridor plus expeditionary contact
+
+This replaces the previous two-post, wait-for-visibility plan:
+
+1. **Build the first border post early, then keep expanding.** Use the kit's military spot answers plus bounded \`canPlace\` candidates around the HQ and existing posts. Score each candidate by neutral land, unexplored area, mountain tiles and direction toward the map centre. Keep up to five small guards, add up to two big towers after the frontier is established, and add a castle only after the army is large enough. This replaces the old arbitrary placement near the home ring and the hard stop at two guards.
+2. **Staff posts through priority and the game's automatic garrison system.** Set minimum fighter counts (guard 1, tower 2, castle 3), zero archers, and turn on military-building priority. Stop issuing manual \`sendIn\` orders. Read the actual fighter/archer settings from \`view.economy.town\`; \`view.buildings\` exposes troops, not those settings. This also removes the thousands of duplicate garrison-setting commands.
+3. **Secure geology before the quarry takes the opening pick.** Attempt geologist recruitment as soon as an unsearched mountain is inside our border and a pick is free; briefly defer the quarry while that recruitment is pending. Keep the geologist moving across distinct unsearched tiles. Continue the food-backed coal/iron chain once ore is identified.
+4. **Keep the renewable economy, but respond to the v247 carrier signal.** Retain one woodcutter, sawmill and early forester. Do not add a second forester when the existing one says there is no free ground to plant; expand the border instead. Use the new \`carriers\` tip along with settler/weapons tips to decide when another house is warranted. v247's carryfair handles fairer delivery allocation without extra script commands.
+5. **Recruit an unarmored field army first.** Set staged targets up to 44–46 soldiers when both mines and the metal chain are stable. Request bow armor only at first; do not armor all three weapon classes before the barracks has recruited. Add sword armor only after a large force and surplus iron exist. Keep a small reserve for home defence.
+6. **Make contact proactively.** Keep one explorer moving along the visible fog edge toward the map centre. When no enemy building is visible and at least 14 healthy field fighters are available, send a supported 8–12 soldier attack-move expedition toward known enemy land or the central frontier. This is designed to discover and engage the opponent instead of waiting indefinitely for a lookout to reveal a target.
+7. **Attack military objectives once contact is made.** Prefer empty posts, then defended posts, and the HQ last. Estimate nearby visible enemy strength and garrison size, keep six fighters back, reinforce one siege at a time, and retreat after sustained field losses.
+
+### Validation and scope
+
+- JavaScript syntax compilation: passed.
+- Static forbidden-API scan: clean (no random calls, timers, network, filesystem, Node/process APIs, eval, dynamic Function, Math.hypot, Math.sin or Math.cos).
+- The script header is aligned to game version **247**.
+- This is static validation, not a tournament result. The latest published scheduled report still tests input commit \`d91d2c3\` on game version 245. Do not claim a win improvement until a later report names this new input commit.
+- Only \`input/scheduled/script.js\` and \`input/scheduled/notes.md\` are intended to change. No challenge kit, output, or actual Hearthlands game files are modified.
+
