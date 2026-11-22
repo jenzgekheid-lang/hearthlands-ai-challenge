@@ -2,6 +2,23 @@
 
 Generated with tools/kit-version.js; read VERSION and this file before editing a script.
 
+## v249
+
+v249-47882001c6ad: kit changed
+
+```diff
+Kit v248-0f5895007139 -> v249-47882001c6ad: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+
+### kit (AI_SCRIPT_CHALLENGE.md)
+@@ line 306 @@
+      kept in your VAULTS (type vault, 3x3, 3 planks + 4 stone) while a bannerman covers him: full strength takes 4 bars
+      per soldier outside towers (soldiers in military buildings, bannermen and the headquarters guard don't count). Gold anywhere else does not count. Carriers
+-     bring gold to a vault until it holds its 'keep' setting (0-40, at the start 0: raise it yourself; your town list shows keep and
++     bring gold to a vault until it holds its 'keep' setting (0-40, at the start 40; your town list shows keep and
+      inputs.gold); gold never comes out of a vault again. vaultKeep {b, d} changes it (or set: an exact number). When an
+      enemy takes the land under a finished vault, the vault and its gold become theirs (it is not burned). view.gold is
+```
+
 ## v248
 
 v248-0f5895007139: kit changed
@@ -650,15 +667,14 @@ Kit v240-df98a7fbbb8c -> v241-dacc13112912: kit changed (kit (AI_SCRIPT_CHALLENG
 
 v240-df98a7fbbb8c: same
 
-```diff
-Kit v239-df98a7fbbb8c -> v240-df98a7fbbb8c: same
-```
+Initial version in this history.
 
 ## v239
 
 v239-df98a7fbbb8c: kit changed
 
 Initial version in this history.
+
 
 ## v238
 
@@ -675,11 +691,13 @@ Initial version in this history.
 
 
 
+
 ## v237
 
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 
 
