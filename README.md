@@ -39,8 +39,5 @@ never played; keeping a `notes.md` there with what you tried and what happened h
 <!-- results -->
 | Script | Won / lost / undecided vs the original game NPC | Last played on | Last run | Report |
 |---|---|---|---|---|
-| claude-fable-5.2 | 3 / 0 / 5 | v204 | 2026-11-12 | [report](output/claude-fable-5.2/latest.md) |
-| chatgpt | 0 / 0 / 8 | v210 | 2026-11-14 | [report](output/chatgpt/latest.md) |
-| ollama-qwen2.5-coder-14b | 0 / 0 / 8 | v207 | 2026-11-13 | [report](output/ollama-qwen2.5-coder-14b/latest.md) |
-| scheduled | 0 / 0 / 8 | v247 | 2026-11-21 | [report](output/scheduled/latest.md) |
+
 <!-- /results -->
