@@ -44,7 +44,7 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
                         is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
-  switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair} true|false, the same every turn: which optional mechanics this game has.
+  switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair, backslope} true|false, the same every turn: which optional mechanics this game has.
             Since version 244 (19 Nov 2026) every switch is on everywhere: the live game, the arena, tournaments and
             the lab all play with all of them on, armor and bannermen included (scripts written before then met
             banner and armor off in the arena). Still read view.switches: a test game can switch one off.
@@ -57,7 +57,10 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
             anywhere by water. hunter: the hunter's cabin and game in forest (see Hunting below); off: no game
             (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before. carryfair (#41,
             21 Nov 2026): carriers serve workshops waiting for goods of the same delivery rank by the shortest trip
-            minus the time waited (1 minute = 10 tiles); off: in building order. Nothing to order for it.
+            minus the time waited (1 minute = 10 tiles); off: in building order. Nothing to order for it. backslope (22 Nov
+            2026): hill sides facing away from the camera (toward -x,-y) are gentle on new maps, and a site whose ground
+            rises toward +x,+y by more than 3 height steps (more for bigger sites) is refused: 'Too steep: the far side of
+            a hill'. Nothing to order for it.
   gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
         tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
         land owner's pile (a pile is not in this list).

@@ -2,6 +2,33 @@
 
 Generated with tools/kit-version.js; read VERSION and this file before editing a script.
 
+## v248
+
+v248-b8d6d95df211: kit changed
+
+```diff
+Kit v247-3d2908c247c9 -> v248-b8d6d95df211: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+
+### kit (AI_SCRIPT_CHALLENGE.md)
+@@ line 37 @@
+                          may be gone, or manned differently, by now ] },
+    over: null or {winners},
+-   switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair} true|false, the same every turn: which optional mechanics this game has.
++   switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair, backslope} true|false, the same every turn: which optional mechanics this game has.
+              Since version 244 (19 Nov 2026) every switch is on everywhere: the live game, the arena, tournaments and
+              the lab all play with all of them on, armor and bannermen included (scripts written before then met
+@@ line 50 @@
+              (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before. carryfair (#41,
+              21 Nov 2026): carriers serve workshops waiting for goods of the same delivery rank by the shortest trip
+-             minus the time waited (1 minute = 10 tiles); off: in building order. Nothing to order for it.
++             minus the time waited (1 minute = 10 tiles); off: in building order. Nothing to order for it. backslope (22 Nov
++             2026): hill sides facing away from the camera (toward -x,-y) are gentle on new maps, and a site whose ground
++             rises toward +x,+y by more than 3 height steps (more for bigger sites) is refused: 'Too steep: the far side of
++             a hill'. Nothing to order for it.
+    gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
+          tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
+```
+
 ## v247
 
 v247-3d2908c247c9: kit changed
@@ -606,37 +633,7 @@ Kit v239-df98a7fbbb8c -> v240-df98a7fbbb8c: same
 
 v239-df98a7fbbb8c: kit changed
 
-```diff
-Kit v238-931dca2c2334 -> v239-df98a7fbbb8c: kit changed (kit (AI_SCRIPT_CHALLENGE.md), GAME_SUMMARY.md)
-
-### kit (AI_SCRIPT_CHALLENGE.md)
-@@ line 266 @@
-      toolKeep {k, d} (since v209) is how many spare tools of a kind the smith keeps in stock (0-9, at the start 1 each;
-      k is the position in view.economy.toolPlan, d 'up' moves it one place up the order). The smith first makes tools
--     for finished buildings that wait for a worker with one, then fills these spares in order.
-+     for finished buildings that wait for a worker with one, then fills these spares in order. Spare (18 Nov 2026) =
-+     unclaimed tools in your buildings and lying on your land; tools in people's hands or promised to someone don't count.
-    - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
-      castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
-@@ line 301 @@
-    Each layer is a Uint8Array with one value per tile, index y*w+x, as far as your fog of war allows: known 0 = never
-    seen (all other layers 0 there), 1 = seen before (as it was then, height included), 2 = seen now (your own land always). ter = the
--   kind of ground, an index into grounds (today 0 grass, 1 water, 2 mountain; unseen tiles read 0); tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
-+   kind of ground, an index into grounds (today 0 grass, 1 water, 2 mountain, 3 sand; unseen tiles read 0); tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody); occupied 1 = something
-    stands there (seen now only); fish = fish left in that water (seen now only); ore 0 not searched by a geologist,
-    1 searched: nothing, 2+ = oreNames[ore-1]. oreNames is a plain list (since 201), the same for every value of ore:
-
-### GAME_SUMMARY.md
-@@ line 13 @@
-  - A square grid of small tiles. Maps may grow, so do not assume one size.
-  - Player slots, named Gold, Blue, Purple, Teal, Pink, White, Orange and Lime. Players can form teams.
-- - The land has grass, water, mountains, forest and rock. Mountains hold ore: coal, iron ore, gold ore and stone. Coal
-+ - The land has grass, water, sand, mountains, forest and rock. Sand lies along the sea and the big lakes (1 tile where
-+   the shore is steep, 2-3 where it is flat and low; small lakes have grass shores): you can build anything on it, but no fields are sown and no trees
-+   are planted there. Mountains hold ore: coal, iron ore, gold ore and stone. Coal
-    deposits hold three times as much. A geologist must find ore in a mountain before a mine can work it.
-  - Every start gets the same: a forest of 25 trees and a patch of 13 rocks (6 stone each) close by, on land (never
-```
+Initial version in this history.
 
 ## v238
 
@@ -644,11 +641,13 @@ v238-931dca2c2334: kit changed
 
 Initial version in this history.
 
+
 ## v237
 
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 
 
