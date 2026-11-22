@@ -313,7 +313,7 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     higher of 80% and what the gold gives him), plus up to 40% from the gold
     kept in your VAULTS (type vault, 3x3, 3 planks + 4 stone) while a bannerman covers him: full strength takes 4 bars
     per soldier outside towers (soldiers in military buildings, bannermen and the headquarters guard don't count). Gold anywhere else does not count. Carriers
-    bring gold to a vault until it holds its 'keep' setting (0-40, at the start 40; your town list shows keep and
+    bring gold to a vault until it holds its 'keep' setting (0-40, at the start 0: raise it yourself; your town list shows keep and
     inputs.gold); gold never comes out of a vault again. vaultKeep {b, d} changes it (or set: an exact number). When an
     enemy takes the land under a finished vault, the vault and its gold become theirs (it is not burned). view.gold is
     what the vault gold gives a covered soldier outside your land now (0.6-1).

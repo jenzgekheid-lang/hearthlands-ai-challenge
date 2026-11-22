@@ -4,10 +4,10 @@ Generated with tools/kit-version.js; read VERSION and this file before editing a
 
 ## v248
 
-v248-b8d6d95df211: kit changed
+v248-0f5895007139: kit changed
 
 ```diff
-Kit v247-3d2908c247c9 -> v248-b8d6d95df211: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+Kit v247-3d2908c247c9 -> v248-0f5895007139: kit changed (kit (AI_SCRIPT_CHALLENGE.md), buildings.js, GAME_SUMMARY.md)
 
 ### kit (AI_SCRIPT_CHALLENGE.md)
 @@ line 37 @@
@@ -27,6 +27,31 @@ Kit v247-3d2908c247c9 -> v248-b8d6d95df211: kit changed (kit (AI_SCRIPT_CHALLENG
 +             a hill'. Nothing to order for it.
     gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
           tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
+@@ line 303 @@
+      kept in your VAULTS (type vault, 3x3, 3 planks + 4 stone) while a bannerman covers him: full strength takes 4 bars
+      per soldier outside towers (soldiers in military buildings, bannermen and the headquarters guard don't count). Gold anywhere else does not count. Carriers
+-     bring gold to a vault until it holds its 'keep' setting (0-40, at the start 40; your town list shows keep and
++     bring gold to a vault until it holds its 'keep' setting (0-40, at the start 0: raise it yourself; your town list shows keep and
+      inputs.gold); gold never comes out of a vault again. vaultKeep {b, d} changes it (or set: an exact number). When an
+      enemy takes the land under a finished vault, the vault and its gold become theirs (it is not burned). view.gold is
+
+### buildings.js
+@@ line 50 @@
+    // (army plan, 14 Nov) the vault: carriers bring gold until it holds the amount set (tap it); gold never comes out
+    // again. Only vault gold counts for soldiers' strength outside their land. Taken with the land, not burned.
+-   vault: {n:'Vault', s:3, h:3, cost:{plank:3,stone:4}, inputs:{gold:40}, vault:true, rule:'vault' /* (C2) only with this switch on (data/rules.js) */, roof:'#8a7a3a', desc:'Holds up to 40 gold bars; tap it to set how many to keep. Gold in vaults makes soldiers stronger outside your land (4 bars per soldier outside towers for full strength). Gold never comes out again; if the enemy takes the land, the vault and its gold are theirs'},
++   vault: {n:'Vault', s:3, h:3, cost:{plank:3,stone:4}, inputs:{gold:40}, vault:true, rule:'vault' /* (C2) only with this switch on (data/rules.js) */, roof:'#8a7a3a', desc:'Holds up to 40 gold bars; it starts keeping none: tap it to set how many to keep. Gold in vaults makes soldiers stronger outside your land (4 bars per soldier outside towers for full strength). Gold never comes out again; if the enemy takes the land, the vault and its gold are theirs'},
+    weaponsmith:{n:'Weaponsmith', s:3, h:3, door:'side', cost:{plank:5,stone:7}, tool:'hammer', inputs:{coal:6,iron:6,plank:2,gold:2}, recipe:{in:{coal:1,iron:1}, out:'weapon', time:7.5, verb:'Forging'}, roof:'#5a4a5e', desc:'Coal + iron make swords, bows and spears; a plank + a gold bar make a banner. Tap it to set what to make'},
+    armorer:{n:'Armorer', rule:'armor', s:3, h:3, door:'side', cost:{plank:4,stone:5}, tool:'hammer', inputs:{iron:6,gold:4}, recipe:{in:{iron:1}, out:'armor', time:7.5, verb:'Making'}, roof:'#6a5a3e', desc:'Iron makes iron armor; 2 gold bars make gold plates (iron armor + gold plates = gold armor). Soldiers put armor on at the barracks'},
+
+### GAME_SUMMARY.md
+@@ line 92 @@
+  | Big tower | `tower` | 5 plank, 5 stone | — | — | — | Room for 3 fighters (2 swordsmen always on guard) and 3 archers. Pushes your border out 20 tiles |
+  | Castle | `castle` | 8 plank, 12 stone | — | — | — | Room for 5 fighters (3 swordsmen always on guard) and 5 archers. Pushes your border out 26 tiles |
+- | Vault | `vault` | 3 plank, 4 stone | — | gold | — | Holds up to 40 gold bars; tap it to set how many to keep. Gold in vaults makes soldiers stronger outside your land (4 bars per soldier outside towers for full strength). Gold never comes out again; if the enemy takes the land, the vault and its gold are theirs |
++ | Vault | `vault` | 3 plank, 4 stone | — | gold | — | Holds up to 40 gold bars; it starts keeping none: tap it to set how many to keep. Gold in vaults makes soldiers stronger outside your land (4 bars per soldier outside towers for full strength). Gold never comes out again; if the enemy takes the land, the vault and its gold are theirs |
+  | Weaponsmith | `weaponsmith` | 5 plank, 7 stone | hammer | coal, iron, plank, gold | weapon (from coal, iron) | Coal + iron make swords, bows and spears; a plank + a gold bar make a banner. Tap it to set what to make |
+  | Armorer | `armorer` | 4 plank, 5 stone | hammer | iron, gold | armor (from iron) | Iron makes iron armor; 2 gold bars make gold plates (iron armor + gold plates = gold armor). Soldiers put armor on at the barracks |
 ```
 
 ## v247
@@ -642,11 +667,13 @@ v238-931dca2c2334: kit changed
 Initial version in this history.
 
 
+
 ## v237
 
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 
 
