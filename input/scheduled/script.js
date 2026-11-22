@@ -46,7 +46,6 @@ function economy(view,M,out){
  var border=ownBuildings.filter(function(x){return x.type==='guard'||x.type==='tower'||x.type==='castle';});
  var totalSoldiers=(view.soldiers||[]).length;
  for(var ob of ownBuildings)if(ob.military)totalSoldiers+=(ob.troops||[]).length;
- var troopsByKind=function(b,k){var n=0;for(var q of (b.troops||[]))if(q===k)n++;return n;};
  function staffed(b){
   var f=0,a=0;for(var q of (b.troops||[])){if(q==='bow')a++;else f++;}
   var wantF=b.type==='guard'?1:b.type==='tower'?2:3;
@@ -125,7 +124,6 @@ function economy(view,M,out){
   }
   if(uq&&(M.geoUnitAt||0)<=t){out.push(['sendUnit',{u:g.id,tx:uq.x,ty:uq.y}]);M.geoUnitAt=t+30;}
  }
- var geoPending=!geos.length&&(M.geoPendingUntil||0)>t;
 
  // One explorer is a secondary scout, not a substitute for the pioneer corridor.
  if(!explorers.length&&t>600&&carriers>10&&idleC>3&&spare('plank')>2&&(M.expAt||0)<=t){
@@ -367,25 +365,42 @@ function army(view,M,out){
 
  // Keep one assault active. Once its target disappears from the enemy list, free the held attackers;
  // otherwise the army stays held forever and the border buildings cannot call replacements.
- var attackers=mine.filter(function(s){return s.order&&s.order.k==='attack';});
- if(attackers.length){
-  var targetId=attackers[0].order.b,target=null;
+ var attackUnits=mine.filter(function(s){return s.order&&s.order.k==='attack';});
+ var attackers=attackUnits.filter(function(s){return s.kind!=='banner';});
+ if(attackUnits.length){
+  var heldDuringSiege=mine.filter(function(s){return s.held&&!s.order&&!s.defends&&!s.fighting&&!s.moving;});
+  if(heldDuringSiege.length){out.push(['free',{ids:heldDuringSiege.map(function(s){return s.id;})}]);return;}
+  var siegeThreat=null,siegeThreatD=22;
+  for(var sf of foes)for(var so of bld)if(so.owner===me){
+   var sd=dist(sf,{x:so.x+(so.w||3)/2,y:so.y+(so.h||3)/2});
+   if(sd<siegeThreatD){siegeThreatD=sd;siegeThreat=sf;}
+  }
+  if(siegeThreat&&(M.defendAt||0)<=t&&fighters.length>=4){
+   var siegeDefenders=fighters.slice().sort(function(a,b){return dist(a,siegeThreat)-dist(b,siegeThreat);}).slice(0,Math.max(0,fighters.length-2));
+   if(siegeDefenders.length>=4){
+    out.push(['march',{ids:siegeDefenders.map(function(s){return s.id;}),tx:Math.round(siegeThreat.x),ty:Math.round(siegeThreat.y),form:'block',am:true}]);
+    M.defendAt=t+30;return;
+   }
+  }
+  var targetId=attackUnits[0].order.b,target=null;
   for(var eb0 of eb)if(eb0.id===targetId){target=eb0;break;}
   if(!target){
-   out.push(['free',{ids:attackers.map(function(s){return s.id;})}]);
+   var release=attackUnits.filter(function(s){return !s.fighting;});
+   if(release.length)out.push(['free',{ids:release.map(function(s){return s.id;})}]);
    M.siegeTarget=0;M.siegeLosses=0;M.siegePrev=0;M.siegeStart=0;M.attackAfter=t+3;
    return;
   }
-  if(M.siegeTarget!==targetId){M.siegeTarget=targetId;M.siegeStart=attackers.length;M.siegePrev=attackers.length;M.siegeLosses=0;}
-  if(typeof M.siegePrev==='number'&&attackers.length<M.siegePrev)M.siegeLosses=(M.siegeLosses||0)+M.siegePrev-attackers.length;
-  M.siegePrev=attackers.length;
+  if(M.siegeTarget!==targetId){M.siegeTarget=targetId;M.siegeStart=attackers.length||attackUnits.length;M.siegePrev=attackers.length||attackUnits.length;M.siegeLosses=0;}
+  var siegeCount=attackers.length||attackUnits.length;
+  if(typeof M.siegePrev==='number'&&siegeCount<M.siegePrev)M.siegeLosses=(M.siegeLosses||0)+M.siegePrev-siegeCount;
+  M.siegePrev=siegeCount;
   var cap=target.type==='castle'?10:target.type==='tower'?6:target.type==='guard'?3:1;
   var danger=0,td=door(target);
   for(var foe of foes)if(dist(foe,td)<24)danger+=power(foe);
   var need=danger*1.4+(target.manned?cap*6*1.25:0)+12;
   var lossLimit=Math.max(4,Math.ceil((M.siegeStart||attackers.length)*.35));
   if((M.siegeLosses||0)>=lossLimit){
-   out.push(['march',{ids:attackers.map(function(s){return s.id;}),tx:Math.round(hx),ty:Math.round(hy),form:'block',am:false,loose:true}]);
+   out.push(['march',{ids:attackUnits.map(function(s){return s.id;}),tx:Math.round(hx),ty:Math.round(hy),form:'block',am:false,loose:true}]);
    out.push(['note',{text:'v248 siege break: losses '+M.siegeLosses+', retreating to rebuild the field group.'}]);
    M.siegeTarget=0;M.siegeLosses=0;M.siegePrev=0;M.siegeStart=0;M.attackAfter=t+180;
    return;
@@ -450,7 +465,7 @@ function army(view,M,out){
   var support=banners.slice().sort(function(a,b){return dist(a,d)-dist(b,d);}).slice(0,Math.min(banners.length,Math.floor(group.length/10)));
   var ids=group.concat(support).map(function(s){return s.id;});
   out.push(['attack',{ids:ids,b:target.id}]);
-  M.siegeTarget=target.id;M.siegeStart=group.length+support.length;M.siegePrev=group.length+support.length;M.siegeLosses=0;M.reinforceAt=t+30;
+  M.siegeTarget=target.id;M.siegeStart=group.length;M.siegePrev=group.length;M.siegeLosses=0;M.reinforceAt=t+30;
   return;
  }
 
