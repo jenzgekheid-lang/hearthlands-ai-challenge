@@ -252,3 +252,44 @@ This replaces the previous two-post, wait-for-visibility plan:
 - This is static validation, not a tournament result. The latest published scheduled report still tests input commit \`d91d2c3\` on game version 245. Do not claim a win improvement until a later report names this new input commit.
 - Only \`input/scheduled/script.js\` and \`input/scheduled/notes.md\` are intended to change. No challenge kit, output, or actual Hearthlands game files are modified.
 
+
+
+## 22 Nov 2026 — v248 pioneer-first economy and release-after-capture warfare
+
+### Safety trigger and corrected report reading
+
+The last three genuine scheduled reports (19, 20 and 21 November) all recorded **0 wins out of 8**. The three-report safety threshold is met, so the previous v247 plan has been replaced at the strategy level.
+
+The 21 November v247 report is more nuanced than the pre-report notes above: it recorded **11 buildings taken and 157 kills against 152**, but still no wins. The main problem was not an inability to fight at all; it was failing to turn local captures into elimination before the 60-minute limit.
+
+The report exposed several distinct failures:
+
+- **Resource deadlock:** on the 4242 Gold map the AI finished with only 10 soldiers, no coal or iron mines, and no geologist. Three guards did not reach a mountain. Removing the pioneer had removed the only reliable way to claim a short neutral corridor when the mountain was outside the initial military border.
+- **Population and logistics collapse:** on 31 Gold the army peaked at 44 soldiers around minute 30, then fell to 16 by minute 60 after 37 losses. Carriers fell to 2 and 119 goods were waiting. Six houses were not enough to replace the population lost in battle.
+- **Poor conversion of captures:** on 777 Gold the army reached 46 soldiers, but first saw the opponent only around minute 38 and took one tower. Other games took several guards but did not continue through the remaining military buildings and HQ.
+- **Weak home defence:** on 31 Blue the HQ fell at 27:47 while the opponent still had military buildings, so the game did not end in our favour.
+- **Garrisons could not recover:** the previous script set archers to zero in every guard and tower. It also treated held soldiers as available field troops. The game rules say that soldiers with an attack or march order are held, and military buildings only call free, unheld soldiers.
+- **A real command/view mismatch:** the old script checked town.prio to decide whether to issue military priority. For a finished military building the command sets its internal hot flag; town.prio is not that flag. This caused repeated priority orders (1,558 in one reported game) instead of a one-time setting.
+
+### New strategy: pioneer corridor, compact garrisons, and a repeatable conquest cycle
+
+This replaces the v247 forward-post/large-expedition plan:
+
+1. **Use the starting shovel for a pioneer first.** Delay the forester until the toolsmith can supply another shovel. Choose a visible, walkable neutral land tile directly adjacent to our owned border and point the pioneer toward the nearest known mountain (or the map centre until one is known). This keeps each claim reachable and avoids the old long-distance claims that failed because they were not next to our border.
+2. **Recruit geology as soon as the corridor reaches mountain.** Send one geologist to the nearest unsearched patch. Do not let the quarry take the opening pick before the geologist has it. Build one quarry when there is a spare pick and stone is running low; start with one coal mine and one iron mine on distinct valid sites.
+3. **Keep the military footprint small and actually staffed.** Use two guards as the core, with a single tower only after the barracks and army are established. A guard wants one melee fighter and one archer; a tower wants two of each. The script now sets those mixed garrisons instead of zero archers, and turns priority on once per building using memory rather than checking the unrelated town.prio field.
+4. **Release troops after an operation.** Attack orders hold soldiers. When the target disappears from the enemy list (capture or destruction), send free to the held attackers. Also free held, idle soldiers before forming the next group. Reconnaissance and retreat marches use loose:true, so completed scouts can be called into nearby posts instead of remaining permanently held.
+5. **Replace casualties instead of capping housing at six.** Build a small house when the bed/population gap remains after subtracting settlers already on the way, or when the carrier/settler/weapons advisor signals a real shortage. Allow up to ten small houses, one at a time, so deaths do not permanently shrink the workforce.
+6. **Reduce economic sprawl.** Keep one woodcutter, sawmill, fisher and hunter; add forestry after a replacement shovel exists. Build the metal chain before gold or armor. Bread production is conditional on coal-mine food shortage. Keep the number of unfinished sites to two early and three later, so goods are not scattered across many incomplete buildings.
+7. **Use a deliberate assault sequence.** Attack empty military buildings first, then manned guards/towers with a melee-heavy group sized for the target, and the HQ only after other military objectives are gone. Keep one siege active, reinforce only when the remaining free force is sufficient, retreat after sustained losses, then release the returning group and continue to the next target. When no target is visible, send one loose attack-move scouting column; do not launch another probe past a known defended objective that the current force cannot take.
+8. **Respect the v248 placement rules.** The script header now matches kit v248. All generated building sites still pass through canPlace, which includes the new far-slope check, and ordinary buildings are spaced farther apart to preserve walking corridors.
+
+### Validation and scope
+
+- JavaScript parse/compile check: passed.
+- Seven targeted mock checks passed across the validation runs: opening pioneer recruitment; choosing an adjacent neutral pioneer target; freeing held idle troops; attacking a manned guard with a sufficient melee force; issuing military priority only once; using loose:true for an attack-move probe; and refusing to probe past a known defended target.
+- Forbidden API scan: clean (no random calls, timers, network, filesystem, Node/process APIs, eval, Function, Math.hypot, Math.sin or Math.cos).
+- This is static and mock validation, **not** an arena result. The latest published tournament report still tests the v247 input from 21 November. The v248 rewrite has not yet been tournament-tested; do not claim a win improvement until a report names the new input commit.
+- Only input/scheduled/script.js and input/scheduled/notes.md are changed. No kit, output, or actual Hearthlands game files are modified.
+
+Script commits: 5c893a78dfd98707ce06e7d0f5eba7c2659b2cf5 (v248 strategic rewrite) and 0ca7e63ddacf7df3edc5bd656505528423b7c4d5 (mine-food, siege sizing, and probe hardening).
