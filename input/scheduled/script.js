@@ -239,7 +239,8 @@ function economy(view,M,out){
  var populationGap=Math.max(0,beds-population-bedsComing);
  var peopleShort=carriers<7||idleC<3||tip('carriers')||tip('settlers')||tip('weapons');
  var homesNeeded=done('saw')>0&&!pendingHouse&&bedsComing<8&&has('house')<10&&(populationGap>=8||peopleShort);
- var mineFood=done('fisher')>0||done('hunter')>0||done('bakery')>0||st('fish')>3||st('meat')>3;
+ var coalFoodReady=done('fisher')>0||done('bakery')>0||st('fish')>3;
+ var ironFoodReady=done('hunter')>0||done('fisher')>0||done('bakery')>0||st('meat')>3||st('fish')>3;
  var coalFoodShort=hasStatus('coalmine','needs bread')||hasStatus('coalmine','needs fish')||
   hasStatus('coalmine','waiting for food')||(done('coalmine')>0&&st('fish')<5&&st('bread')<4);
  var ironFoodShort=hasStatus('ironmine','needs meat')||hasStatus('ironmine','needs fish')||
@@ -258,9 +259,9 @@ function economy(view,M,out){
  add('hunter',1,3,3,done('saw')>0&&S.hunter);
  add('house',10,3,3,homesNeeded);
  add('guard',2,2,3,done('guard')>0&&staffedPosts>=1&&t>180);
- add('coalmine',1,3,5,ore('coal')&&mineFood);
- add('ironmine',1,3,5,ore('ironore')&&(done('hunter')>0||done('fisher')>0||done('bakery')>0||st('meat')>3||st('fish')>3));
- add('quarry',1,3,3,geos.length>0&&spare('pick')>0&&(st('stone')<24||t>600));
+ add('quarry',1,3,3,geos.length>0&&spare('pick')>0&&(st('stone')<30||t>600));
+ add('coalmine',1,3,5,ore('coal')&&coalFoodReady);
+ add('ironmine',1,3,5,ore('ironore')&&ironFoodReady);
  add('smelter',1,4,5,done('coalmine')>0&&done('ironmine')>0);
  add('smith',1,4,5,done('smelter')>0);
  add('weaponsmith',1,5,7,done('smith')>0);
@@ -439,7 +440,8 @@ function army(view,M,out){
   var need=enemyPower*1.4+(target.manned?cap*6*1.25:0)+12;
   var minCount=target.type==='hq'?16:target.manned?(target.type==='castle'?24:target.type==='tower'?16:12):8;
   var minMelee=target.type==='hq'?8:target.manned?(target.type==='castle'?16:target.type==='tower'?10:7):4;
-  var maxGroup=Math.min(32,Math.max(0,fighters.length-2));
+  var capGroup=target.type==='guard'?18:target.type==='tower'?24:32;
+  var maxGroup=Math.min(capGroup,Math.max(0,fighters.length-2));
   var group=melee.slice().sort(function(a,b){return dist(a,d)-dist(b,d);}).slice(0,maxGroup);
   if(group.length<maxGroup)group=group.concat(bows.slice().sort(function(a,b){return dist(a,d)-dist(b,d);}).slice(0,maxGroup-group.length));
   var meleeN=0,strength=0;
@@ -448,14 +450,14 @@ function army(view,M,out){
   var support=banners.slice().sort(function(a,b){return dist(a,d)-dist(b,d);}).slice(0,Math.min(banners.length,Math.floor(group.length/10)));
   var ids=group.concat(support).map(function(s){return s.id;});
   out.push(['attack',{ids:ids,b:target.id}]);
-  M.siegeTarget=target.id;M.siegeStart=group.length;M.siegePrev=group.length+support.length;M.siegeLosses=0;M.reinforceAt=t+30;
+  M.siegeTarget=target.id;M.siegeStart=group.length+support.length;M.siegePrev=group.length+support.length;M.siegeLosses=0;M.reinforceAt=t+30;
   return;
  }
 
  // No visible military objective: send one loose attack-move column to find the opponent.
  // loose:true is deliberate: after the march, posts may call these soldiers if they need garrisons.
  var activeProbe=mine.some(function(s){return s.order&&s.order.k==='attack-move';});
- if(!activeProbe&&fighters.length>=10&&(M.probeAt||0)<=t){
+ if(!targets.length&&!activeProbe&&fighters.length>=10&&(M.probeAt||0)<=t){
   var targetP=null,best=1e18;
   if(map.w&&map.h&&map.known&&map.owner){
    for(var y=0;y<map.h;y++)for(var x=0;x<map.w;x++){
