@@ -4,10 +4,10 @@ Generated with tools/kit-version.js; read VERSION and this file before editing a
 
 ## v249
 
-v249-67c367942935: kit changed
+v249-0e16313ef661: kit changed
 
 ```diff
-Kit v248-0f5895007139 -> v249-67c367942935: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
+Kit v248-0f5895007139 -> v249-0e16313ef661: kit changed (kit (AI_SCRIPT_CHALLENGE.md))
 
 ### kit (AI_SCRIPT_CHALLENGE.md)
 @@ line 37 @@
@@ -27,6 +27,40 @@ Kit v248-0f5895007139 -> v249-67c367942935: kit changed (kit (AI_SCRIPT_CHALLENG
 +             door'). Nothing to order for it.
     gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
           tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
+@@ line 285 @@
+    - Land: buildings may only stand on your own land. A military building pushes your border out (guard 14, tower 20,
+      castle 26 tiles) only once a soldier is inside. A lookout tower (look) uncovers the map 24 tiles around; no land.
++   - The start army (23 Nov): the headquarters holds its guard plus 6 free swordsmen and 3 free bowmen; more come only
++     from the barracks. Small tower, big tower and castle each keep 1, 2 or 3 swordsmen always on guard, so before your
++     barracks trains more, at most 6 small towers get their guard. A new military building wants 0 archers (archers
++     {b, d} raises it), so the 3 start bowmen stand idle until you ask; any one soldier inside, a bowman too, makes the
++     building push your border out, also while it still waits for its swordsman (status 'Waiting for a swordsman: ...').
++   - Where the enemy is (two players): the two headquarters stand on the same row, mirrored across the map's middle:
++     the enemy's is near (view.map.w - your x, your y). You only see his buildings once your land or a unit sees them:
++     send one free soldier (patrol on) or an explorer towards never-seen tiles (view.map.known) to find them.
+    - Water is never owned (v241): circles and building rings claim land only, so a border ends at the shore and can
+      reach land across a lake. A fisher or water hut uses water within its range that touches (4 sides) land you own;
+@@ line 312 @@
+  - profession {role, d}: d 1 retrains an idle carrier, d -1 makes one a carrier again. role is one of: explorer (takes 1
+    plank; walks where you send him and uncovers the map), geologist (takes a pickaxe; searches the mountain where you
+-   send him), pioneer (takes a shovel; claims land nobody owns, tile by tile, where you send him outside your border),
++   send him), pioneer (takes a shovel; claims land nobody owns, tile by tile, where you send him outside your border:
++   1.5 game seconds of work per tile plus a short walk, up to about 40 tiles a game minute, each one a free tile that
++   touches your land within 8 tiles of the spot; then he stands idle (busy false) until you send him again),
+    digger (a shovel), builder (a hammer). It needs that tool lying spare, an idle carrier, and more than 2 carriers.
+    Careful: a profession order that could not be done is NOT in view.refused, unless the switch scriptInfo is on (then it is,
+@@ line 330 @@
+    commands above. Instead of a step d, workRange, archers, fighters, weaponKeep, toolKeep, vaultKeep, armyTarget, armyArmor and armyReserve also take
+    set: an exact number (kept within the same limits; armyTarget by set has no top of 40).
+- - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 10 minutes.
++ - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 720 game
++   seconds (12 minutes of view.t), but what a geologist found stays known: spots for a mine (ask) still find it.
++   A mine never runs dry at once: as its deposit wears it finds less (status 'Deposit thinning: ...', then 'Deposit worn
++   out: finding little ...'), and a worn-out mine still stands and still counts in your town. A quarry, fisher or water
++   hut with nothing left in its range says 'No stone in range ...' (or fish, shore water). Count only the working ones
++   when you decide whether to build another.
+  - THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, game, ore, oreNames, grounds, at(x,y)}.
+    Each layer is a Uint8Array with one value per tile, index y*w+x, as far as your fog of war allows: known 0 = never
 ```
 
 ## v248
@@ -693,6 +727,7 @@ Initial version in this history.
 
 
 
+
 ## v238
 
 v238-931dca2c2334: kit changed
@@ -716,11 +751,13 @@ Initial version in this history.
 
 
 
+
 ## v237
 
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 
 
