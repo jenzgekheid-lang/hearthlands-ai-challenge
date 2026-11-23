@@ -44,7 +44,7 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
                         is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
-  switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair, backslope} true|false, the same every turn: which optional mechanics this game has.
+  switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair, backslope, behind} true|false, the same every turn: which optional mechanics this game has.
             Since version 244 (19 Nov 2026) every switch is on everywhere: the live game, the arena, tournaments and
             the lab all play with all of them on, armor and bannermen included (scripts written before then met
             banner and armor off in the arena). Still read view.switches: a test game can switch one off.
@@ -60,7 +60,10 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
             minus the time waited (1 minute = 10 tiles); off: in building order. Nothing to order for it. backslope (22 Nov
             2026): hill sides facing away from the camera (toward -x,-y) are gentle on new maps, and a site whose ground
             rises toward +x,+y by more than 3 height steps (more for bigger sites) is refused: 'Too steep: the far side of
-            a hill'. Nothing to order for it.
+            a hill'. Nothing to order for it. behind (22 Nov 2026): a band of tiles up-left of each built
+            building (toward -x,-y; 2-4 deep by type, 0 for mines and yards) can't be walked or stood on, except doors
+            and the 2 tiles in front of a door; a site whose door would lie in a band is refused ('Nobody can walk to the
+            door'). Nothing to order for it.
   gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
         tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
         land owner's pile (a pile is not in this list).
@@ -313,7 +316,7 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     higher of 80% and what the gold gives him), plus up to 40% from the gold
     kept in your VAULTS (type vault, 3x3, 3 planks + 4 stone) while a bannerman covers him: full strength takes 4 bars
     per soldier outside towers (soldiers in military buildings, bannermen and the headquarters guard don't count). Gold anywhere else does not count. Carriers
-    bring gold to a vault until it holds its 'keep' setting (0-40, at the start 40; your town list shows keep and
+    bring gold to a vault until it holds its 'keep' setting (0-40, at the start 0: raise it yourself; your town list shows keep and
     inputs.gold); gold never comes out of a vault again. vaultKeep {b, d} changes it (or set: an exact number). When an
     enemy takes the land under a finished vault, the vault and its gold become theirs (it is not burned). view.gold is
     what the vault gold gives a covered soldier outside your land now (0.6-1).
