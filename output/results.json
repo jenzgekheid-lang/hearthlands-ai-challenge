@@ -1,9 +1,9 @@
 {
   "scheduled": {
-    "date": "2026-11-22",
-    "commit": "6ba46c5",
-    "version": 249,
-    "lastPlayedVersion": 249,
+    "date": "2026-11-23",
+    "commit": "873cd3c",
+    "version": 251,
+    "lastPlayedVersion": 251,
     "status": "played",
     "brokenOn": null,
     "errors": 0,

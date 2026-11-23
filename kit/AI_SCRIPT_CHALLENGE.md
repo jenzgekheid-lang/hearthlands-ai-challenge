@@ -300,6 +300,12 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     barracks trains more, at most 6 small towers get their guard. A new military building wants 0 archers (archers
     {b, d} raises it), so the 3 start bowmen stand idle until you ask; any one soldier inside, a bowman too, makes the
     building push your border out, also while it still waits for its swordsman (status 'Waiting for a swordsman: ...').
+  - The start goods and people (23 Nov): piles around headquarters hold 24 planks, 18 stone, 4 logs, 6 fish and the
+    only tools you get until a toolsmith works: 5 pickaxes, 3 hammers, 2 axes, 2 shovels, 1 saw, 1 fishing rod, 2
+    scythes (plus 2 bows with the hunter's cabin). The people: 2 diggers, 2 builders and 6 carriers. Every worker who
+    needs a tool takes one from these (a geologist or miner a pickaxe, a toolsmith or builder a hammer, a forester or
+    digger a shovel): spend them on extra builders or geologists first and the toolsmith or the first mines can wait for
+    ever ('Needs a worker with ...'). Keep a hammer for the toolsmith and pickaxes for the first coal and iron mines.
   - Where the enemy is (two players): the two headquarters stand on the same row, mirrored across the map's middle:
     the enemy's is near (view.map.w - your x, your y). You only see his buildings once your land or a unit sees them:
     send one free soldier (patrol on) or an explorer towards never-seen tiles (view.map.known) to find them.
