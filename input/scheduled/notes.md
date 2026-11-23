@@ -337,3 +337,14 @@ The current kit is version 251. Placement uses ask results plus canPlace recheck
 
 This is a new v251 strategy, not yet tournament-tested. The next genuine arena report must verify that the quarry finishes, ore is discovered, both mines and the metal chain operate, the barracks grows beyond the 10-soldier starting force, the scout reveals the opponent, and captures turn into wins. Do not make another speculative adjustment before that report.
 
+### 2026-11-23 pre-arena hardening
+
+After the full strategy reset, I tightened three implementation details before the first v251 tournament run:
+
+- A solo scout now makes only the two planned waypoints; it does not keep reissuing the same enemy-side move every three minutes. A larger attack-move column is still allowed later when the field army is strong enough.
+- The second waypoint is ten tiles from the mirrored HQ, inside the documented 12-tile soldier sight range.
+- Siege retreat now triggers after two losses for a small group (or 35% for larger groups), rather than allowing a four- or five-soldier raid to lose nearly the entire group first.
+- If a second geologist is recruited, it skips mountain coordinates already assigned to the first geologist.
+
+The revised script parses cleanly, passes the forbidden-API scan, and a targeted mock confirms that a completed two-stage scout does not issue another solo march. These are safety hardenings to the v251 strategy, not another strategic pivot.
+

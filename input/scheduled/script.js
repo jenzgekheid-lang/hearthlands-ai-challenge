@@ -65,6 +65,12 @@ function economy(view,M,out){
   var uq=null,best=1e18;
   for(var u of unsearched){
    var key=u.x+':'+u.y;if(M.geoBad[key]>t)continue;
+   var reservedGeo=false;
+   for(var otherGeo of geos)if(otherGeo.id!==g.id){
+    var otherTarget=M.geoTarget[otherGeo.id]||otherGeo.to;
+    if(otherTarget){var ox=u.x-otherTarget.x,oy=u.y-otherTarget.y;if(ox*ox+oy*oy<64)reservedGeo=true;}
+   }
+   if(reservedGeo)continue;
    var ix=u.y*(map.w||240)+u.x;
    if(map.known&&map.known[ix]===0)continue;
    if(map.grounds&&map.ter&&map.grounds[map.ter[ix]]&&!map.grounds[map.ter[ix]].mine)continue;
@@ -305,7 +311,7 @@ function army(view,M,out){
   var danger=0,td=door(target);
   for(var foe of foes)if(dist(foe,td)<24)danger+=power(foe);
   var need=danger*1.4+(target.manned?cap*6*1.25:0)+12;
-  var lossLimit=Math.max(4,Math.ceil((M.siegeStart||attackers.length)*.35));
+  var lossLimit=Math.max(2,Math.ceil((M.siegeStart||attackers.length)*.35));
   if((M.siegeLosses||0)>=lossLimit){
    out.push(['march',{ids:attackUnits.map(function(s){return s.id;}),tx:Math.round(hx),ty:Math.round(hy),
     form:'block',am:false,loose:true}]);
@@ -373,12 +379,12 @@ function army(view,M,out){
   }
  }
  var scoutBusy=mine.some(function(s){return s.id===M.scoutId&&(s.order||s.moving);});
- if(!targets.length&&!scoutBusy&&t>=120&&(M.scoutAt||0)<=t&&fighters.length>=6&&map.w){
+ if(!targets.length&&(M.scoutStage||0)<2&&!scoutBusy&&t>=120&&(M.scoutAt||0)<=t&&fighters.length>=6&&map.w){
   var scout=free.find(function(s){return s.id===M.scoutId;})||free.find(function(s){return s.kind==='bow';})||
    free.find(function(s){return s.kind==='sword';});
   if(scout){
    var enemyX=map.w-hx,stage=M.scoutStage||0;
-   var tx=stage===0?Math.floor(map.w/2):Math.round(enemyX-(enemyX>hx?14:-14));
+   var tx=stage===0?Math.floor(map.w/2):Math.round(enemyX-(enemyX>hx?10:-10));
    tx=Math.max(2,Math.min(map.w-3,tx));
    out.push(['march',{ids:[scout.id],tx:tx,ty:Math.round(hy),form:'line',am:false,loose:true}]);
    M.scoutId=scout.id;M.scoutStage=Math.min(2,stage+1);M.scoutAt=t+180;return;
