@@ -293,3 +293,47 @@ This replaces the v247 forward-post/large-expedition plan:
 - Only input/scheduled/script.js and input/scheduled/notes.md are changed. No kit, output, or actual Hearthlands game files are modified.
 
 Script commits: 5c893a78dfd98707ce06e7d0f5eba7c2659b2cf5 (v248 strategic rewrite), 0ca7e63ddacf7df3edc5bd656505528423b7c4d5 (mine-food, siege sizing, and probe hardening), and 682eaf92bf835c99b95075edc0e6350dbecc3f18 (home defence during active sieges and banner-safe casualty tracking).
+
+## 2026-11-23 — v251 strategic reset: resource-first builder + HQ-mirror scouting
+
+### Trigger and report evidence
+
+The three latest scheduled full-game reports (20, 21 and 22 November) all remained at **0 wins**. The 21 November run did take 11 buildings and record 157 kills, so combat contact improved, but it still did not convert into a win. The 22 November v248 run then regressed to a complete economic and military stall.
+
+The 22 November report (2026-11-22-6ba46c5.md, game version 249) shows the failure clearly across all eight games:
+
+- Scheduled remained at 6–7 buildings and exactly 10 soldiers for the full 60 minutes; the NPC reached 35–55 soldiers and 70–81 buildings on most maps.
+- No coal mine, iron mine, smelter, toolsmith, weaponsmith or barracks was completed.
+- The build queue placed saw, guard, fisher, hunter and one or two houses before quarry. By minute 15 only 1–2 stone remained, so the quarry's 3-stone cost could no longer be paid. The only renewable stone source was never started.
+- The v248 script then placed a lookout site at minute 10; on several maps it remained unfinished for the rest of the game waiting for materials.
+- Pioneers repeatedly issued claim orders into cut-off routes (24–36 path failures in the affected games); explorers also path-failed (37 in one game). No useful frontier or resource access resulted.
+- The army's no-target scout required at least 10 free fighters. After the first guard's garrison, the script had only 8 free soldiers, so that threshold was unreachable: no scout, no enemy contact, no attack and no capture.
+
+### Strategic switch
+
+This abandons the v248 pioneer-first / forward-lookout plan. The new plan is a compact, economy-first builder based on the challenge kit's own full-game builder pattern, with an early soldier scout:
+
+1. **Opening order is now wood → quarry → saw.** Quarry is second, before optional food, housing or military sites can consume the starting stone. A forester follows the core chain; housing is added one house at a time only when carriers, idle workers or the advisor show a real shortage.
+2. **No pioneer, explorer or lookout tower.** The old specialist path loops and the material-starved lookout site are removed. One geologist searches known unsearched mountain tiles only after the quarry is operating. If a sent target remains unsearched after the geologist becomes idle, that coordinate is cooled down for ten minutes and another tile is tried.
+3. **Use the v249 start army deliberately.** The HQ starts with six free swordsmen and three free bowmen. Early guards request one bow and zero swords: the v249 rule explicitly allows a bowman alone to push territory while the post waits for its swordsman. This claims land without stripping the six starting swords from the field.
+4. **Scout by known map geometry, not by blind frontier search.** One free bowman moves in two stages toward the mirrored enemy HQ (map.w - ownHQ.x), using a loose plain march. This avoids the impossible ten-fighter threshold and avoids another explorer path loop.
+5. **Build a real production chain.** Food-backed coal and iron mines lead to smelter, toolsmith, weaponsmith and barracks. Carrier shortages trigger measured housing; worn deposits and low stone/log stocks trigger replacements rather than unconditional expansion.
+6. **Raid exposed workshops before defended posts.** Empty enemy guards are eligible for a small, protected capture group; manned guards and towers require larger mixed forces. If no military target is safely attackable, a 6–8 soldier raid may target an exposed barracks, weaponsmith, smelter or mine. HQ remains last. Captured attackers are released; siege losses trigger retreat; four soldiers remain reserved for home defence.
+
+The current kit is version 251. Placement uses ask results plus canPlace rechecks so the v249 behind-bands and backslope rules are respected. The script keeps deterministic, seeded-game-safe behaviour: no random calls, timers, network access or external APIs.
+
+### Validation performed in the script runner
+
+- JavaScript parse: passed.
+- Opening-order mock: wood first, quarry second.
+- HQ-mirror scout mock: one loose, non-fighting bowman dispatched at the reachable midpoint.
+- Empty-guard attack mock: an eligible group is sent while retaining the home reserve.
+- Geologist path-recovery mock: after a sent tile remains unsearched and the unit becomes idle, that tile is skipped and the next target is chosen.
+- Bow-garrison mock: one starting bow is sent into an empty post while four field soldiers are preserved.
+- No pioneer/explorer recruitment remains; command count stays below the 50-command turn limit.
+- Forbidden API scan: clean.
+
+### Evaluation status
+
+This is a new v251 strategy, not yet tournament-tested. The next genuine arena report must verify that the quarry finishes, ore is discovered, both mines and the metal chain operate, the barracks grows beyond the 10-soldier starting force, the scout reveals the opponent, and captures turn into wins. Do not make another speculative adjustment before that report.
+
