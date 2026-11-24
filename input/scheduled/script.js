@@ -1,423 +1,407 @@
-// ChatGPT scheduled — v251 resource-first builder, HQ-mirror scouting, and measured conquest.
-// Abandon the pioneer corridor: secure stone and renewable production first, use the free start army to find the enemy,
-// then grow a carrier-supported field army and raid exposed workshops before committing to defended military targets.
-// Game version: 251
+// ChatGPT scheduled — v253 lean-core economy, automatic garrisons, and siege-first conquest.
+// Replace the sprawling multi-guard builder with one reliable production chain, a small workforce,
+// a single forward guard, and an army command path that cannot be starved by repeated settings.
+// Game version: 253
 function think(view){
  if(!view||view.over)return [];
  var M=memory.plan||(memory.plan={}),out=[];
  M.sentThisTurn={};
- if(view.economy&&!view.armyOnly)economy(view,M,out);
  army(view,M,out);
+ if(view.economy&&!view.armyOnly)economy(view,M,out);
  return out.slice(0,50);
 }
-function economy(view,M,out){
- var E=view.economy||{},map=view.map||{},S=view.switches||{},t=view.t||0,me=view.me;
- var town=E.town||[],stock=E.stock||{},people=E.people||{},idle=E.idle||{},units=E.units||[];
- var carriers=people.carrier||0,idleC=idle.carrier||0,spots=E.spots||{};
- var count={},built={},pending={},siteN=0,bedsComing=0,pendingHouse=false;
- for(var b of town){
-  count[b.type]=(count[b.type]||0)+1;
-  if(b.built)built[b.type]=(built[b.type]||0)+1;
-  else{
-   siteN++;if(/^house/.test(b.type))pendingHouse=true;
-   for(var it in (b.cost||{}))if(Object.prototype.hasOwnProperty.call(b.cost,it))
-    pending[it]=(pending[it]||0)+Math.max(0,(b.cost[it]||0)-((b.delivered||{})[it]||0));
-  }
-  bedsComing+=b.coming||0;
- }
- function has(type){return count[type]||0;}
- function done(type){return built[type]||0;}
- function st(it){return stock[it]||0;}
- function spare(it){return st(it)-(pending[it]||0);}
- function tip(k){return (E.tips||[]).some(function(z){return z.k===k;});}
- function hasStatus(type,needle){
-  for(var z of town)if(z.type===type&&(z.status||'').toLowerCase().indexOf(needle.toLowerCase())>=0)return true;
-  return false;
- }
- function ore(kind){for(var o of (E.ore||[]))if(o.ore===kind)return true;return false;}
- var hq=null;
- for(var hb of (view.buildings||[]))if(hb.owner===me&&hb.type==='hq'){hq=hb;break;}
- var home=hq?{x:hq.x+(hq.w||5)/2,y:hq.y+(hq.h||4)/2}:{x:(map.w||240)/2,y:(map.h||240)/2};
- var ownBuildings=(view.buildings||[]).filter(function(x){return x.owner===me;});
- var border=ownBuildings.filter(function(x){return x.built!==false&&(x.type==='guard'||x.type==='tower'||x.type==='castle');});
- var totalSoldiers=(view.soldiers||[]).length;
- for(var ob of ownBuildings)if(ob.military||['hq','guard','tower','castle'].indexOf(ob.type)>=0)totalSoldiers+=(ob.troops||[]).length;
- var postsStaffed=border.every(function(p){return (p.troops||[]).length>0;});
- M.spots=M.spots||{};M.geoBad=M.geoBad||{};M.geoTarget=M.geoTarget||{};
- for(var sk in spots)if(Object.prototype.hasOwnProperty.call(spots,sk))M.spots[sk]=spots[sk];
- for(var rr of (view.refused||[]))if(rr.order==='place'&&rr.args)
-  M.rejected={type:rr.args.type,x:rr.args.x,y:rr.args.y,until:t+90};
-
- // Five starting picks cover the quarry, geology and first mines. No pioneer or explorer.
- var geos=units.filter(function(u){return u.role==='geologist';}),unsearched=E.unsearched||[];
- var maxGeos=done('smith')>0?2:1;
- if(done('quarry')>0&&unsearched.length>0&&geos.length<maxGeos&&st('pick')>0&&carriers>5&&idleC>2&&(M.geoAt||0)<=t){
-  out.push(['profession',{role:'geologist',d:1}]);M.geoAt=t+60;
- }
- for(var g of geos){
-  var sent=M.geoTarget[g.id];
-  if(sent&&!g.busy&&!g.moving&&t-sent.at>8){
-   var still=unsearched.some(function(u){return u.x===sent.x&&u.y===sent.y;});
-   if(still)M.geoBad[sent.x+':'+sent.y]=t+600;
-   delete M.geoTarget[g.id];sent=null;
-  }
-  if(g.busy||g.moving||(sent&&t-sent.at<=8))continue;
-  var uq=null,best=1e18;
-  for(var u of unsearched){
-   var key=u.x+':'+u.y;if(M.geoBad[key]>t)continue;
-   var reservedGeo=false;
-   for(var otherGeo of geos)if(otherGeo.id!==g.id){
-    var otherTarget=M.geoTarget[otherGeo.id]||otherGeo.to;
-    if(otherTarget){var ox=u.x-otherTarget.x,oy=u.y-otherTarget.y;if(ox*ox+oy*oy<64)reservedGeo=true;}
-   }
-   if(reservedGeo)continue;
-   var ix=u.y*(map.w||240)+u.x;
-   if(map.known&&map.known[ix]===0)continue;
-   if(map.grounds&&map.ter&&map.grounds[map.ter[ix]]&&!map.grounds[map.ter[ix]].mine)continue;
-   if(map.occupied&&map.occupied[ix])continue;
-   var dx=u.x-g.x,dy=u.y-g.y,dd=typeof u.d==='number'?u.d:dx*dx+dy*dy;
-   if(dd<best){best=dd;uq=u;}
-  }
-  if(uq&&(M.geoUnitAt||0)<=t){
-   out.push(['sendUnit',{u:g.id,tx:uq.x,ty:uq.y}]);
-   M.geoTarget[g.id]={x:uq.x,y:uq.y,at:t};M.geoUnitAt=t+20;
-  }
- }
- var peopleShort=carriers<9||idleC<3||(E.homeless||0)>0||tip('settlers')||tip('carriers')||tip('weapons');
- var homesNeeded=peopleShort&&bedsComing<6&&!pendingHouse&&has('house')<8;
- var woodDry=hasStatus('wood','no grown trees')||hasStatus('wood','waiting for trees')||
-  (t>900&&st('log')<4&&done('forest')===0);
- var coalDry=hasStatus('coalmine','deposit worn out')||hasStatus('coalmine','deposit thinning');
- var ironDry=hasStatus('ironmine','deposit worn out')||hasStatus('ironmine','deposit thinning');
- var coalFoodShort=done('coalmine')>0&&(hasStatus('coalmine','waiting for food')||
-  hasStatus('coalmine','needs bread')||hasStatus('coalmine','needs fish')||(st('fish')<5&&st('bread')<4));
- var ironFoodShort=done('ironmine')>0&&(hasStatus('ironmine','waiting for food')||
-  hasStatus('ironmine','needs meat')||hasStatus('ironmine','needs fish')||(st('meat')<4&&st('fish')<4));
- var fishLow=st('fish')<10&&(coalFoodShort||ironFoodShort||done('goldmine')>0);
- var meatLow=st('meat')<6&&ironFoodShort;
- var coalStable=done('coalmine')>=2||st('coal')>=12;
- var mineFood=done('fisher')>0||done('hunter')>0||done('bakery')>0;
- var want=[],wanted={};
- function add(type,max,plank,stone,ok){
-  if(ok&&has(type)<max&&!wanted[type]&&spare('plank')>=plank&&spare('stone')>=stone){
-   want.push(type);wanted[type]=1;
-  }
- }
- // New opening: wood -> quarry -> saw. The v248 queue spent the starting stone before the quarry.
- add('wood',1,2,2,true);
- add('quarry',1,2,3,true);
- add('saw',1,3,4,done('wood')>0);
- add('house',8,3,3,homesNeeded&&done('saw')>0);
- add('forest',1,3,1,done('wood')>0);
- add('guard',1,2,3,t>90);
- add('fisher',1,3,2,done('saw')>0&&S.dock);
- add('hunter',1,3,2,done('saw')>0&&S.hunter);
- add('guard',2,2,3,done('guard')>0&&postsStaffed&&t>420&&
-  (tip('land')||tip('ore')||!ore('coal')||!ore('ironore'))&&carriers>8);
- add('guard',3,2,3,done('guard')>=2&&postsStaffed&&t>1200&&totalSoldiers>=14&&carriers>12&&
-  (tip('land')||!ore('coal')||!ore('ironore')));
- add('coalmine',1,4,1,ore('coal')&&mineFood);
- add('ironmine',1,4,1,ore('ironore')&&mineFood);
- add('smelter',1,4,6,done('coalmine')>0&&done('ironmine')>0);
- add('smith',1,3,5,done('smelter')>0);
- add('weaponsmith',1,5,7,done('smith')>0);
- add('barracks',1,4,5,done('weaponsmith')>0);
- var breadNow=done('coalmine')>0&&done('bakery')===0&&(coalFoodShort||st('fish')<10||t>900);
- if(breadNow){
-  add('waterhut',1,3,4,true);add('farm',1,6,6,done('waterhut')>0);
-  add('mill',1,3,3,done('farm')>0);add('bakery',1,4,5,done('mill')>0&&done('waterhut')>0);
- }
- add('coalmine',2,4,1,ore('coal')&&coalDry&&st('coal')<12);
- add('ironmine',2,4,1,ore('ironore')&&ironDry&&st('ironore')<12);
- add('quarry',3,2,3,done('quarry')>0&&st('stone')<14&&has('quarry')<3);
- add('wood',2,2,2,done('saw')>0&&done('forest')>0&&st('log')<12&&carriers>=8);
- add('saw',2,3,4,done('smith')>0&&st('plank')<18&&st('log')>4);
- add('forest',2,3,1,woodDry&&has('forest')<2);
- if(fishLow)add('fisher',2,3,2,S.dock&&has('fisher')<2);
- if(meatLow)add('hunter',2,3,2,S.hunter&&has('hunter')<2);
- add('tower',1,5,5,done('barracks')>0&&totalSoldiers>=24&&t>900&&border.length<4&&tip('land'));
- add('goldmine',1,5,1,ore('goldore')&&done('smith')>0&&mineFood&&coalStable);
- add('goldsmelter',1,4,6,done('goldmine')>0&&coalStable);
- add('vault',1,3,4,S.vault&&S.banner&&done('goldsmelter')>0);
- add('armorer',1,4,5,S.armor&&done('barracks')>0&&done('smelter')>0&&st('iron')>=8&&totalSoldiers>=20);
- var askList=[],askSeen={};
- for(var ai=0;ai<want.length&&askList.length<6;ai++){
-  var typ=want[(Math.floor(t/12)+ai)%Math.max(1,want.length)];
-  if(!askSeen[typ]){askList.push(typ);askSeen[typ]=1;}
- }
- if(!askList.length)askList=['wood','quarry','guard','coalmine','ironmine','forest'];
- if(t>=(M.askAt||0)){out.push(['ask',{spots:askList}]);M.askAt=t+12;}
- function isResource(type){
-  return ['wood','forest','quarry','fisher','hunter','waterhut','farm','coalmine','ironmine','goldmine','stonemine'].indexOf(type)>=0;
- }
- function findSpot(type){
-  var list=M.spots[type]||[],best=null,bestScore=-1e18;
-  for(var sp of list){
-   if(M.rejected&&M.rejected.until>t&&M.rejected.type===type&&M.rejected.x===sp.x&&M.rejected.y===sp.y)continue;
-   if(typeof sp.n==='number'&&sp.n<=0)continue;
-   if(type==='coalmine'||type==='ironmine'||type==='goldmine'){
-    var tooNear=false;
-    for(var old of town)if(old.type===type){
-     var mx=sp.x+1.5-(old.x+1.5),my=sp.y+1.5-(old.y+1.5);
-     if(mx*mx+my*my<12*12)tooNear=true;
-    }
-    if(tooNear)continue;
-   }
-   if(typeof canPlace==='function'&&!canPlace(type,sp.x,sp.y))continue;
-   var score=typeof sp.n==='number'?sp.n:0;
-   if(type==='guard'||type==='tower'||type==='castle'){
-    var cx=sp.x+1.5,cy=sp.y+1.5;
-    score+=((cx-home.x)*(map.w/2-home.x)+(cy-home.y)*(map.h/2-home.y))*.0008;
-   }
-   if(score>bestScore){bestScore=score;best=sp;}
-  }
-  if(best||isResource(type)||typeof canPlace!=='function')return best;
-  var bases=[home];
-  for(var op of border)bases.push({x:op.x+(op.w||3)/2,y:op.y+(op.h||3)/2});
-  var size=type==='tower'?5:type==='castle'?8:3,bestP=null,bestD=1e18;
-  for(var base of bases){
-   for(var dy=-18;dy<=18;dy+=2)for(var dx=-18;dx<=18;dx+=2){
-    var x=Math.floor(base.x+dx),y=Math.floor(base.y+dy);
-    if(x<1||y<1||x>=(map.w||240)-size-1||y>=(map.h||240)-size-1)continue;
-    if(M.rejected&&M.rejected.until>t&&M.rejected.type===type&&M.rejected.x===x&&M.rejected.y===y)continue;
-    if(!canPlace(type,x,y))continue;
-    var d=Math.abs(dx)+Math.abs(dy);
-    if(d<bestD){bestD=d;bestP={x:x,y:y};}
-   }
-  }
-  return bestP;
- }
- var siteLimit=t<360?2:3;
- if(siteN<siteLimit&&(typeof M.lastPlaceAt!=='number'||t-M.lastPlaceAt>=2)){
-  for(var next of want){
-   var pos=findSpot(next);if(!pos)continue;
-   out.push(['place',{type:next,x:pos.x,y:pos.y}]);M.lastPlaceAt=t;M.spots[next]=[];break;
-  }
- }
- // Bow-only outposts claim land without spending the six starting swords.
- var afterBarracks=done('barracks')>0;
- for(var gb of border){
-  var wf=afterBarracks?(gb.type==='guard'?1:gb.type==='tower'?2:3):0;
-  var wa=afterBarracks?(gb.type==='guard'?1:gb.type==='tower'?2:3):1;
-  if(gb.fighters!==wf)out.push(['fighters',{b:gb.id,set:wf}]);
-  if(gb.archers!==wa)out.push(['archers',{b:gb.id,set:wa}]);
- }
- var priorityTypes=['wood','quarry','saw','forest','fisher','hunter','waterhut','farm','mill','bakery',
-  'coalmine','ironmine','goldmine','smelter','goldsmelter','smith','weaponsmith','barracks','armorer','guard','tower','castle'];
- for(var pb of town)if(priorityTypes.indexOf(pb.type)>=0&&!pb.prio)out.push(['priority',{b:pb.id,on:true}]);
- var A=E.army||{},reserve=totalSoldiers>=30&&postsStaffed?6:4;
- if(A.reserve!==reserve)out.push(['armyReserve',{set:reserve}]);
- var freeForPosts=(view.soldiers||[]).filter(function(s){
-  return !s.order&&!s.defends&&!s.fighting&&!s.moving&&!s.held&&!M.sentThisTurn[s.id];
- });
- for(var post of border)if(!(post.troops||[]).length&&freeForPosts.length>4){
-  var ix=-1;for(var fi=0;fi<freeForPosts.length;fi++)if(freeForPosts[fi].kind==='bow'){ix=fi;break;}
-  if(ix>=0){
-   var archer=freeForPosts.splice(ix,1)[0];
-   out.push(['sendIn',{ids:[archer.id],b:post.id}]);M.sentThisTurn[archer.id]=1;
-  }
- }
- if(done('smith')>0){
-  for(var k=0;k<(E.toolPlan||[]).length;k++){
-   var tp=E.toolPlan[k],keep=tp.tool==='pick'?2:1;
-   if((tp.keep||0)!==keep)out.push(['toolKeep',{k:k,set:keep}]);
-  }
- }
- if(done('barracks')>0){
-  var stable=done('smelter')>0&&done('weaponsmith')>0&&done('coalmine')>0&&done('ironmine')>0&&carriers>=10;
-  var targets=stable?{sword:20,spear:12,bow:16}:{sword:10,spear:6,bow:8},at=A.target||{};
-  for(var kind of ['sword','spear','bow'])if(at[kind]!==targets[kind])
-   out.push(['armyTarget',{kind:kind,set:targets[kind]}]);
-  var bannerTarget=S.banner&&done('goldsmelter')>0?(stable?4:2):0;
-  if(S.banner&&at.banner!==bannerTarget)out.push(['armyTarget',{kind:'banner',set:bannerTarget}]);
-  var keepList=A.keep||[];
-  for(var wi=0;wi<keepList.length&&wi<3;wi++)if(keepList[wi]&&(keepList[wi].keep||0)>0)
-   out.push(['weaponKeep',{k:wi,set:0}]);
-  if(S.armor&&done('armorer')>0){
-   var arm=A.armor||{};
-   if((arm.bow||0)!==1&&totalSoldiers>=20)out.push(['armyArmor',{kind:'bow',set:1}]);
-   if((arm.sword||0)!==1&&totalSoldiers>=42&&st('iron')>=20)out.push(['armyArmor',{kind:'sword',set:1}]);
-  }
- }
- for(var ab of town){
-  if(S.armor&&S.gear&&ab.type==='armorer'&&ab.built&&!ab.repair)out.push(['armorRepair',{b:ab.id,on:true}]);
-  if(S.vault&&ab.type==='vault'&&ab.built&&ab.keep!==24)out.push(['vaultKeep',{b:ab.id,set:24}]);
- }
- if(t>0&&t%600<2&&M.noteAt!==t){
-  out.push(['note',{text:'v251 builder: houses '+has('house')+', quarry '+has('quarry')+', forest '+has('forest')+
-   ', guards '+border.length+'/'+border.filter(function(p){return (p.troops||[]).length>0;}).length+
-   ', mines '+has('coalmine')+'/'+has('ironmine')+', carriers '+carriers+' idle '+idleC+
-   ', soldiers '+totalSoldiers+', ore C/I '+(ore('coal')?1:0)+'/'+(ore('ironore')?1:0)+'.'}]);
-  M.noteAt=t;
- }
-}
 function army(view,M,out){
- var t=view.t||0,me=view.me,mine=view.soldiers||[],bld=view.buildings||[],enemy=view.enemy||{},map=view.map||{};
- var foes=enemy.soldiers||[],eb=enemy.buildings||[];
+ var t=view.t||0,mine=view.soldiers||[],enemy=view.enemy||{},eb=enemy.buildings||[],foes=enemy.soldiers||[];
+ var map=view.map||{},me=view.me,bld=view.buildings||[];
  function dist(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);}
  function door(b){return b.door||{x:b.x+(b.w||3)/2,y:b.y+(b.h||3)/2};}
+ function isMil(b){return !!b.military||b.type==='hq'||b.type==='guard'||b.type==='tower'||b.type==='castle';}
  function power(s){
-  var hp=s.hp||s.maxHp||10,str=s.str==null?0.6:s.str/100,kind=s.kind==='bow'?0.5:s.kind==='banner'?0:1;
-  return hp*str*kind*(1+0.12*(s.arm||0)+0.06*(s.rank||0));
+  var hp=s.hp||s.maxHp||10,str=typeof s.str==='number'?s.str/100:.6;
+  var kind=s.kind==='bow'?.55:s.kind==='banner'?0:1;
+  return hp*str*kind*(1+.12*(s.arm||0)+.06*(s.rank||0));
  }
- function isMil(b){return !!b.military||['guard','tower','castle','hq'].indexOf(b.type)>=0;}
- var free=mine.filter(function(s){
-  return !s.order&&!s.defends&&!s.fighting&&!s.moving&&!s.held&&!M.sentThisTurn[s.id];
- });
- var fighters=free.filter(function(s){return s.kind!=='banner'&&s.hp>=(s.maxHp||10)*.65;});
- var melee=fighters.filter(function(s){return s.kind!=='bow';});
- var bows=fighters.filter(function(s){return s.kind==='bow';});
- var banners=free.filter(function(s){return s.kind==='banner';});
  var ownHQ=null;
  for(var h of bld)if(h.owner===me&&h.type==='hq'){ownHQ=h;break;}
- var hx=ownHQ?ownHQ.x+(ownHQ.w||5)/2:(map.w?map.w/2:120);
- var hy=ownHQ?ownHQ.y+(ownHQ.h||4)/2:(map.h?map.h/2:120);
- var refusedAttack=false;
- for(var r of (view.refused||[]))if(r.order==='attack')refusedAttack=true;
- if(refusedAttack)M.attackAfter=t+90;
- var attackUnits=mine.filter(function(s){return s.order&&s.order.k==='attack';});
- var attackers=attackUnits.filter(function(s){return s.kind!=='banner';});
- if(attackUnits.length){
-  var heldDuringSiege=mine.filter(function(s){return s.held&&!s.order&&!s.defends&&!s.fighting&&!s.moving;});
-  if(heldDuringSiege.length){out.push(['free',{ids:heldDuringSiege.map(function(s){return s.id;})}]);return;}
-  var siegeThreat=null,siegeThreatD=22;
-  for(var sf of foes)for(var so of bld)if(so.owner===me){
-   var sd=dist(sf,{x:so.x+(so.w||3)/2,y:so.y+(so.h||3)/2});
-   if(sd<siegeThreatD){siegeThreatD=sd;siegeThreat=sf;}
+ var hx=ownHQ?ownHQ.x+(ownHQ.w||5)/2:(map.w||240)/2;
+ var hy=ownHQ?ownHQ.y+(ownHQ.h||4)/2:(map.h||240)/2;
+ var ownMil=bld.filter(function(b){return b.owner===me&&isMil(b);});
+ var free=mine.filter(function(s){
+  return !s.order&&!s.defends&&!s.fighting&&!s.moving&&!s.held;
+ });
+ var fighters=free.filter(function(s){return s.kind!=='banner'&&s.hp>=(s.maxHp||10)*.6;});
+ var melee=fighters.filter(function(s){return s.kind!=='bow';});
+ var bows=fighters.filter(function(s){return s.kind==='bow';});
+ var refused=false;
+ for(var r of (view.refused||[]))if(r.order==='attack')refused=true;
+ if(refused){M.attackAfter=t+90;M.siege=null;}
+
+ // Defend the HQ or a nearby military post before continuing a siege or starting another attack.
+ var threat=null,threatD=18;
+ for(var f of foes)for(var own of ownMil){
+  var od=dist(f,{x:own.x+(own.w||3)/2,y:own.y+(own.h||3)/2});
+  if(od<threatD){threatD=od;threat=f;}
+ }
+ if(threat&&fighters.length>=8&&(M.defendAt||0)<=t){
+  var defenders=fighters.slice().sort(function(a,b){return dist(a,threat)-dist(b,threat);})
+   .slice(0,Math.min(6,Math.max(0,fighters.length-4)));
+  if(defenders.length>=4){
+   out.push(['march',{ids:defenders.map(function(s){return s.id;}),tx:Math.round(threat.x),ty:Math.round(threat.y),
+    form:'block',am:true,loose:true}]);
+   M.defendAt=t+45;return;
   }
-  if(siegeThreat&&(M.defendAt||0)<=t&&fighters.length>=6){
-   var siegeDefenders=fighters.slice().sort(function(a,b){return dist(a,siegeThreat)-dist(b,siegeThreat);})
-    .slice(0,Math.max(0,fighters.length-4));
-   if(siegeDefenders.length>=4){
-    out.push(['march',{ids:siegeDefenders.map(function(s){return s.id;}),tx:Math.round(siegeThreat.x),
-     ty:Math.round(siegeThreat.y),form:'block',am:true,loose:true}]);M.defendAt=t+30;return;
-   }
+ }
+
+ // Track only the soldiers assigned to the current siege. Never free every held idle soldier:
+ // a soldier may be moving into a garrison, and a blanket free order cancels that.
+ if(M.siege&&M.siege.ids){
+  var live=[];
+  for(var sid of M.siege.ids)for(var ss of mine)if(ss.id===sid){live.push(ss);break;}
+  var target=null,ours=false;
+  for(var x of eb)if(x.id===M.siege.id){target=x;break;}
+  for(var ob of bld)if(ob.id===M.siege.id&&ob.owner===me){ours=true;break;}
+  if(!target||ours){
+   var release=[];
+   for(var ls of live)if(!ls.fighting)release.push(ls.id);
+   if(release.length)out.push(['free',{ids:release}]);
+   M.siege=null;M.attackAfter=t+8;return;
   }
-  var targetId=attackUnits[0].order.b,target=null;
-  for(var eb0 of eb)if(eb0.id===targetId){target=eb0;break;}
-  if(!target){
-   var release=attackUnits.filter(function(s){return !s.fighting;});
-   if(release.length)out.push(['free',{ids:release.map(function(s){return s.id;})}]);
-   M.siegeTarget=0;M.siegeLosses=0;M.siegePrev=0;M.siegeStart=0;M.attackAfter=t+3;return;
+  if(target.remembered&&typeof target.seenAt==='number'&&t-target.seenAt>240){
+   var stale=[];for(var stl of live)if(!stl.fighting)stale.push(stl.id);
+   if(stale.length)out.push(['march',{ids:stale,tx:Math.round(hx),ty:Math.round(hy),form:'block',am:false,loose:true}]);
+   M.siege=null;M.attackAfter=t+120;return;
   }
-  if(M.siegeTarget!==targetId){
-   M.siegeTarget=targetId;M.siegeStart=attackers.length||attackUnits.length;
-   M.siegePrev=attackers.length||attackUnits.length;M.siegeLosses=0;
-  }
-  var siegeCount=attackers.length||attackUnits.length;
-  if(typeof M.siegePrev==='number'&&siegeCount<M.siegePrev)M.siegeLosses=(M.siegeLosses||0)+M.siegePrev-siegeCount;
-  M.siegePrev=siegeCount;
-  var cap=target.type==='castle'?10:target.type==='tower'?6:target.type==='guard'?3:target.type==='hq'?10:1;
-  var danger=0,td=door(target);
-  for(var foe of foes)if(dist(foe,td)<24)danger+=power(foe);
-  var need=danger*1.4+(target.manned?cap*6*1.25:0)+12;
-  var lossLimit=Math.max(2,Math.ceil((M.siegeStart||attackers.length)*.35));
-  if((M.siegeLosses||0)>=lossLimit){
-   out.push(['march',{ids:attackUnits.map(function(s){return s.id;}),tx:Math.round(hx),ty:Math.round(hy),
+  var fightersAlive=0;
+  for(var la of live)if(la.kind!=='banner')fightersAlive++;
+  if(typeof M.siege.last==='number'&&fightersAlive<M.siege.last)
+   M.siege.losses=(M.siege.losses||0)+M.siege.last-fightersAlive;
+  M.siege.last=fightersAlive;
+  var lossLimit=Math.max(2,Math.ceil((M.siege.start||8)*.35));
+  if((M.siege.losses||0)>=lossLimit){
+   var retreat=[];
+   for(var rs of live)if(!rs.fighting)retreat.push(rs.id);
+   if(retreat.length)out.push(['march',{ids:retreat,tx:Math.round(hx),ty:Math.round(hy),
     form:'block',am:false,loose:true}]);
-   out.push(['note',{text:'v251 siege break: losses '+M.siegeLosses+', retreating to rebuild the field group.'}]);
-   M.siegeTarget=0;M.siegeLosses=0;M.siegePrev=0;M.siegeStart=0;M.attackAfter=t+180;return;
-  }
-  if((M.reinforceAt||0)<=t&&fighters.length>=6){
-   var extra=melee.slice().sort(function(a,b){return dist(a,td)-dist(b,td);})
-    .slice(0,Math.max(0,fighters.length-4));
-   if(extra.length<4)extra=extra.concat(bows.slice(0,Math.max(0,4-extra.length)));
-   var ep=0;for(var es of extra)ep+=power(es);
-   if(extra.length>=4&&ep>=need*.55){
-    out.push(['attack',{ids:extra.map(function(s){return s.id;}),b:targetId}]);M.reinforceAt=t+30;
-   }
+   M.siege=null;M.attackAfter=t+150;
+   out.push(['note',{text:'v253 siege break: retreating after '+(M.siege.losses||0)+' field losses.'}]);
+   return;
   }
   return;
  }
- var heldIdle=mine.filter(function(s){return s.held&&!s.order&&!s.defends&&!s.fighting&&!s.moving;});
- if(heldIdle.length){out.push(['free',{ids:heldIdle.map(function(s){return s.id;})}]);return;}
- var reserve=fighters.length>=24?6:4,threat=null,threatD=22;
- for(var f of foes)for(var own of bld)if(own.owner===me){
-  var td2=dist(f,{x:own.x+(own.w||3)/2,y:own.y+(own.h||3)/2});
-  if(td2<threatD){threatD=td2;threat=f;}
- }
- if(threat&&(M.defendAt||0)<=t&&fighters.length>=8){
-  var defenders=fighters.slice().sort(function(a,b){return dist(a,threat)-dist(b,threat);})
-   .slice(0,Math.max(0,fighters.length-reserve));
-  if(defenders.length>=4){
-   out.push(['march',{ids:defenders.map(function(s){return s.id;}),tx:Math.round(threat.x),
-    ty:Math.round(threat.y),form:'block',am:true,loose:true}]);M.defendAt=t+30;return;
-  }
- }
+
  var targets=eb.filter(function(b){
-  return isMil(b)&&(!b.remembered||typeof b.seenAt!=='number'||t-b.seenAt<600);
+  return isMil(b)&&b.built!==false&&(!b.remembered||typeof b.seenAt!=='number'||t-b.seenAt<240);
  });
  targets.sort(function(a,b){
-  var ah=a.type==='hq'?2:a.manned?1:0,bh=b.type==='hq'?2:b.manned?1:0;
-  if(ah!==bh)return ah-bh;
+  function rank(x){if(x.type==='hq')return 4;if(x.type==='castle')return x.manned?3:1;
+   if(x.type==='tower')return x.manned?2:0;return x.manned?2:0;}
+  var ar=rank(a),br=rank(b);
+  if(ar!==br)return ar-br;
   return dist({x:hx,y:hy},door(a))-dist({x:hx,y:hy},door(b));
  });
- var canAttack=t>=(M.attackAfter||0);
- if(canAttack){
+ if(t>=(M.attackAfter||0)){
   for(var target1 of targets){
    if(target1.type==='hq'&&targets.some(function(x){return x.type!=='hq';}))continue;
    var d=door(target1),enemyPower=0;
    for(var e of foes)if(dist(e,d)<24)enemyPower+=power(e);
    var cap=target1.type==='castle'?10:target1.type==='tower'?6:target1.type==='guard'?3:10;
-   var need=enemyPower*1.4+(target1.manned?cap*6*1.25:0)+12;
-   var minCount=target1.type==='hq'?24:target1.manned?(target1.type==='castle'?24:target1.type==='tower'?18:12):
+   var need=enemyPower*1.25+(target1.manned?cap*5.5:0)+8;
+   var minCount=target1.type==='hq'?(target1.manned?22:16):
+    target1.manned?(target1.type==='castle'?20:target1.type==='tower'?14:9):
     (target1.type==='castle'?8:target1.type==='tower'?6:4);
-   var minMelee=target1.type==='hq'?12:target1.manned?(target1.type==='castle'?14:target1.type==='tower'?10:7):
-    (target1.type==='castle'?4:target1.type==='tower'?3:2);
-   var capGroup=target1.type==='guard'?18:target1.type==='tower'?24:32;
-   var maxGroup=Math.min(capGroup,Math.max(0,fighters.length-reserve));
+   var minMelee=target1.type==='hq'?12:target1.manned?(target1.type==='castle'?12:target1.type==='tower'?8:5):2;
+   var reserve=fighters.length>=20?6:4;
+   var maxGroup=Math.min(24,Math.max(0,fighters.length-reserve));
    var group=melee.slice().sort(function(a,b){return dist(a,d)-dist(b,d);}).slice(0,maxGroup);
    if(group.length<maxGroup)
     group=group.concat(bows.slice().sort(function(a,b){return dist(a,d)-dist(b,d);}).slice(0,maxGroup-group.length));
    var meleeN=0,strength=0;
    for(var q of group){if(q.kind!=='bow')meleeN++;strength+=power(q);}
-   if(group.length<minCount||meleeN<minMelee||strength<need*1.2)continue;
-   var support=banners.slice().sort(function(a,b){return dist(a,d)-dist(b,d);})
-    .slice(0,Math.min(banners.length,Math.floor(group.length/10)));
-   out.push(['attack',{ids:group.concat(support).map(function(s){return s.id;}),b:target1.id}]);
-   M.siegeTarget=target1.id;M.siegeStart=group.length;M.siegePrev=group.length;M.siegeLosses=0;M.reinforceAt=t+30;return;
+   if(group.length<minCount||meleeN<minMelee||strength<need)continue;
+   var ids=group.map(function(s){return s.id;});
+   out.push(['attack',{ids:ids,b:target1.id}]);
+   M.siege={id:target1.id,ids:ids,start:group.length,last:group.length,losses:0,started:t};
+   M.attackAfter=t+30;return;
   }
  }
- var scoutBusy=mine.some(function(s){return s.id===M.scoutId&&(s.order||s.moving);});
- if(!targets.length&&(M.scoutStage||0)<2&&!scoutBusy&&t>=120&&(M.scoutAt||0)<=t&&fighters.length>=6&&map.w){
-  var scout=free.find(function(s){return s.id===M.scoutId;})||free.find(function(s){return s.kind==='bow';})||
-   free.find(function(s){return s.kind==='sword';});
+
+ // If no military target is currently known, use one loose swordsman for two-stage reconnaissance.
+ // A sword is chosen deliberately: the first guard needs a free bowman for its archer slot.
+ var scoutBusy=false;
+ if(M.scoutId)for(var sc of mine)if(sc.id===M.scoutId&&(sc.order||sc.moving||sc.held))scoutBusy=true;
+ if(!targets.length&&(M.scoutStage||0)<2&&!scoutBusy&&t>=90&&(M.scoutAt||0)<=t&&map.w){
+  var scout=null;
+  for(var reuse of free)if(reuse.id===M.scoutId&&reuse.kind==='sword'){scout=reuse;break;}
+  if(!scout)for(var sw of free)if(sw.kind==='sword'){scout=sw;break;}
   if(scout){
    var enemyX=map.w-hx,stage=M.scoutStage||0;
    var tx=stage===0?Math.floor(map.w/2):Math.round(enemyX-(enemyX>hx?10:-10));
    tx=Math.max(2,Math.min(map.w-3,tx));
    out.push(['march',{ids:[scout.id],tx:tx,ty:Math.round(hy),form:'line',am:false,loose:true}]);
-   M.scoutId=scout.id;M.scoutStage=Math.min(2,stage+1);M.scoutAt=t+180;return;
+   M.scoutId=scout.id;M.scoutStage=stage+1;M.scoutAt=t+180;return;
   }
  }
+
+ // If the enemy's military line is not visible yet, a small loose column probes the mirrored HQ.
+ if(!targets.length&&(M.scoutStage||0)>=2&&fighters.length>=12&&(M.probeAt||0)<=t&&map.w){
+  var enemyX2=map.w-hx;
+  var probe=fighters.slice().sort(function(a,b){return dist(a,{x:enemyX2,y:hy})-dist(b,{x:enemyX2,y:hy});})
+   .slice(0,Math.min(10,fighters.length-4));
+  if(probe.length>=8){
+   out.push(['march',{ids:probe.map(function(s){return s.id;}),tx:Math.round(enemyX2),ty:Math.round(hy),
+    form:'block',am:true,loose:true}]);
+   M.probeAt=t+360;return;
+  }
+ }
+
+ // Exposed workshops are secondary targets only when no military building is currently known.
  var raids=eb.filter(function(b){
-  return b.type!=='hq'&&!isMil(b)&&b.built!==false&&(!b.remembered||typeof b.seenAt!=='number'||t-b.seenAt<600);
+  return b.type!=='hq'&&!isMil(b)&&b.built!==false&&(!b.remembered||typeof b.seenAt!=='number'||t-b.seenAt<180);
  });
- var raidRank={barracks:0,weaponsmith:1,smelter:2,smith:3,coalmine:4,ironmine:5,wood:6,saw:7,quarry:8,house:9};
+ var raidRank={barracks:0,weaponsmith:1,smelter:2,smith:3,coalmine:4,ironmine:5,wood:6,saw:7,quarry:8};
  raids.sort(function(a,b){
   var ar=raidRank[a.type]===undefined?20:raidRank[a.type],br=raidRank[b.type]===undefined?20:raidRank[b.type];
   return ar-br||dist({x:hx,y:hy},door(a))-dist({x:hx,y:hy},door(b));
  });
- if(canAttack&&fighters.length>=10){
+ if(!targets.length&&fighters.length>=12&&(M.attackAfter||0)<=t){
   for(var raid of raids){
-   var rd=door(raid),dangerRaid=0;
-   for(var re of foes)if(dist(re,rd)<22)dangerRaid+=power(re);
+   var rd=door(raid),danger=0;
+   for(var re of foes)if(dist(re,rd)<22)danger+=power(re);
    var raidGroup=fighters.slice().sort(function(a,b){return dist(a,rd)-dist(b,rd);})
-    .slice(0,Math.min(8,Math.max(0,fighters.length-reserve)));
+    .slice(0,Math.min(8,Math.max(0,fighters.length-4)));
    var raidPower=0;for(var rq of raidGroup)raidPower+=power(rq);
-   if(raidGroup.length>=6&&raidPower>dangerRaid*1.5+8){
-    out.push(['attack',{ids:raidGroup.map(function(s){return s.id;}),b:raid.id}]);
-    M.siegeTarget=raid.id;M.siegeStart=raidGroup.length;M.siegePrev=raidGroup.length;M.siegeLosses=0;M.reinforceAt=t+30;
-    out.push(['note',{text:'v251 raid: '+raid.type+' with '+raidGroup.length+' field soldiers.'}]);return;
+   if(raidGroup.length>=6&&raidPower>danger*1.4+8){
+    var raidIds=raidGroup.map(function(s){return s.id;});
+    out.push(['attack',{ids:raidIds,b:raid.id}]);
+    M.siege={id:raid.id,ids:raidIds,start:raidIds.length,last:raidIds.length,losses:0,started:t};
+    M.attackAfter=t+30;return;
    }
   }
  }
- if(!targets.length&&(M.scoutStage||0)>=2&&fighters.length>=18&&(M.probeAt||0)<=t&&map.w){
-  var ex=map.w-hx,probe=fighters.slice().sort(function(a,b){return dist(a,{x:ex,y:hy})-dist(b,{x:ex,y:hy});})
-   .slice(0,Math.min(12,fighters.length-reserve));
-  if(probe.length>=10){
-   out.push(['march',{ids:probe.map(function(s){return s.id;}),tx:Math.round(ex),ty:Math.round(hy),
-    form:'block',am:true,loose:true}]);M.probeAt=t+360;
+}
+function economy(view,M,out){
+ var E=view.economy||{},map=view.map||{},S=view.switches||{},t=view.t||0,me=view.me;
+ var town=E.town||[],stock=E.stock||{},people=E.people||{},idle=E.idle||{},units=E.units||[];
+ var carriers=people.carrier||0,idleC=idle.carrier||0,spots=E.spots||{},land=E.land||{};
+ var count={},built={},siteN=0,bedsComing=0;
+ for(var b of town){
+  count[b.type]=(count[b.type]||0)+1;
+  if(b.built)built[b.type]=(built[b.type]||0)+1;
+  else siteN++;
+  bedsComing+=b.coming||0;
+ }
+ function has(type){return count[type]||0;}
+ function done(type){return built[type]||0;}
+ function st(it){return stock[it]||0;}
+ function tip(k){return (E.tips||[]).some(function(z){return z.k===k;});}
+ function status(type,needle){
+  for(var z of town)if(z.type===type&&(z.status||'').toLowerCase().indexOf(needle.toLowerCase())>=0)return true;
+  return false;
+ }
+ function ore(kind){for(var o of (E.ore||[]))if(o.ore===kind)return true;return false;}
+ M.spots=M.spots||{};M.pendingPlace=M.pendingPlace||{};M.rejected=M.rejected||{};
+ M.prioSent=M.prioSent||{};M.garrisonSent=M.garrisonSent||{};M.toolSent=M.toolSent||{};
+ for(var sk in spots)if(Object.prototype.hasOwnProperty.call(spots,sk))M.spots[sk]=spots[sk];
+ for(var rr of (view.refused||[])){
+  if(rr.order==='place'&&rr.args){
+   delete M.pendingPlace[rr.args.type];
+   M.rejected[rr.args.type+':'+rr.args.x+':'+rr.args.y]=t+90;
   }
+  if(rr.args&&rr.order==='priority')delete M.prioSent[rr.args.b];
+  if(rr.args&&(rr.order==='fighters'||rr.order==='archers'))delete M.garrisonSent[rr.args.b];
+  if(rr.args&&rr.order==='armyTarget'&&M.targetSent)delete M.targetSent[rr.args.kind];
+  if(rr.order==='armyReserve')M.reserveSent=null;
+  if(rr.args&&rr.order==='toolKeep')delete M.toolSent[rr.args.k];
+  if(rr.order==='vaultKeep')M.vaultSent=null;
+ }
+ for(var pp in M.pendingPlace)if(Object.prototype.hasOwnProperty.call(M.pendingPlace,pp)){
+  if(has(pp)>0||t-M.pendingPlace[pp]>150)delete M.pendingPlace[pp];
+ }
+ var ownBuildings=(view.buildings||[]).filter(function(x){return x.owner===me;});
+ var hq=null;
+ for(var hb of ownBuildings)if(hb.type==='hq'){hq=hb;break;}
+ var home=hq?{x:hq.x+(hq.w||5)/2,y:hq.y+(hq.h||4)/2}:{x:(map.w||240)/2,y:(map.h||240)/2};
+ var totalSoldiers=(view.soldiers||[]).length;
+ for(var ob of ownBuildings)if(ob.military||['hq','guard','tower','castle'].indexOf(ob.type)>=0)
+  totalSoldiers+=(ob.troops||[]).length;
+
+ // Geology is triggered by owned mountain land, not only by a non-empty unsearched array.
+ // Some maps expose the mountain count before the coordinate list is populated.
+ var geos=units.filter(function(u){return u.role==='geologist';});
+ var unsearched=Array.isArray(E.unsearched)?E.unsearched:[];
+ var mountainCount=land.mountain||0,unsearchedCount=land.unsearched||0;
+ if(done('quarry')>0&&done('saw')>0&&done('house')>0&&geos.length<1&&
+  (unsearched.length>0||mountainCount>0||unsearchedCount>0||tip('ore'))&&
+  st('pick')>0&&carriers>3&&idleC>0&&(M.geoRecruitAt||0)<=t){
+  out.push(['profession',{role:'geologist',d:1}]);M.geoRecruitAt=t+60;
+ }
+ M.geoBad=M.geoBad||{};M.geoDone=M.geoDone||{};M.geoTarget=M.geoTarget||{};
+ for(var g of geos){
+  var sent=M.geoTarget[g.id];
+  if(sent&&!g.busy&&!g.moving&&t-sent.at>15){
+   var still=unsearched.some(function(u){return u.x===sent.x&&u.y===sent.y;});
+   if(still)M.geoBad[sent.x+':'+sent.y]=t+600;
+   else M.geoDone[sent.x+':'+sent.y]=true;
+   delete M.geoTarget[g.id];sent=null;
+  }
+  if(g.busy||g.moving||(sent&&t-sent.at<=15))continue;
+  var target=null,best=1e18;
+  for(var u of unsearched){
+   var key=u.x+':'+u.y;if((M.geoBad[key]||0)>t)continue;
+   var dx=u.x-g.x,dy=u.y-g.y,dd=typeof u.d==='number'?u.d:dx*dx+dy*dy;
+   if(dd<best){best=dd;target=u;}
+  }
+  if(!target&&(unsearchedCount>0||mountainCount>0)&&map.ter&&map.grounds&&map.w){
+   for(var iy=0;iy<(map.h||240);iy+=1)for(var ix=0;ix<map.w;ix+=1){
+    var idx=iy*map.w+ix;
+    if(map.known&&map.known[idx]===0)continue;
+    var ground=map.grounds[map.ter[idx]];
+    if(!ground||!ground.mine)continue;
+    var key2=ix+':'+iy;if(M.geoDone[key2]||(M.geoBad[key2]||0)>t)continue;
+    var gx=ix-g.x,gy=iy-g.y,gd=gx*gx+gy*gy;
+    if(gd<best){best=gd;target={x:ix,y:iy};}
+   }
+  }
+  if(target&&(M.geoUnitAt||0)<=t){
+   out.push(['sendUnit',{u:g.id,tx:target.x,ty:target.y}]);
+   M.geoTarget[g.id]={x:target.x,y:target.y,at:t};M.geoUnitAt=t+20;
+  }
+ }
+
+ // Strict, lean build plan: one copy of each essential workplace. A house comes before
+ // the fourth workplace; no hunter, early forester, second quarry, or second guard sprawl.
+ var wants=[];
+ function add(type,ok,max){
+  max=max||1;
+  if(ok&&has(type)<max&&!M.pendingPlace[type]&&wants.indexOf(type)<0)wants.push(type);
+ }
+ var population=E.population||0,beds=E.beds||0,homeless=E.homeless||0;
+ var freeBeds=beds-population;
+ var houseNeed=has('house')<4&&!M.pendingPlace.house&&bedsComing<4&&
+  (has('house')===0&&done('saw')>0||homeless>0||freeBeds<5||
+   (carriers<6&&idleC<2&&freeBeds<10));
+ add('wood',true,1);
+ add('quarry',done('wood')>0,1);
+ add('saw',done('quarry')>0,1);
+ add('house',houseNeed,4);
+ add('guard',done('house')>0&&has('house')>=1,1);
+ add('fisher',done('house')>0&&done('guard')>0&&carriers>=4&&idleC>=1,1);
+ add('coalmine',done('fisher')>0&&ore('coal')&&carriers>=4,1);
+ add('ironmine',done('fisher')>0&&ore('ironore')&&carriers>=4,1);
+ add('smelter',done('coalmine')>0&&done('ironmine')>0&&carriers>=5,1);
+ add('smith',done('smelter')>0&&carriers>=5,1);
+ add('weaponsmith',done('smith')>0&&carriers>=5,1);
+ add('barracks',done('weaponsmith')>0&&carriers>=5,1);
+ var mineFoodShort=done('coalmine')>0&&(status('coalmine','waiting for food')||status('coalmine','needs bread')||
+  status('coalmine','needs fish')||st('fish')<4);
+ var ironFoodShort=done('ironmine')>0&&(status('ironmine','waiting for food')||status('ironmine','needs meat')||
+  status('ironmine','needs fish')||st('fish')<4);
+ if(mineFoodShort||ironFoodShort)add('fisher',carriers>=8&&st('fish')<5,2);
+ if(status('wood','no grown trees in range')&&st('log')<8)add('wood',carriers>=8,2);
+ if(status('quarry','no stone in range')&&st('stone')<8)add('quarry',carriers>=8,2);
+ if(status('coalmine','deposit worn out')&&st('coal')<10)add('coalmine',carriers>=8,2);
+ if(status('ironmine','deposit worn out')&&st('ironore')<10)add('ironmine',carriers>=8,2);
+ add('guard',done('guard')>=1&&has('guard')===1&&t>600&&carriers>=8&&
+  (tip('land')||tip('ore')||mountainCount<4),2);
+ add('goldmine',done('barracks')>0&&ore('goldore')&&done('fisher')>0&&carriers>=9,1);
+ add('goldsmelter',done('goldmine')>0&&done('coalmine')>0,1);
+ add('vault',S.vault&&done('goldsmelter')>0,1);
+
+ var askList=[];
+ for(var ai=0;ai<wants.length&&askList.length<6;ai++)if(askList.indexOf(wants[ai])<0)askList.push(wants[ai]);
+ if(!askList.length)askList=['wood','quarry','saw','house','guard','fisher'];
+ if(t>=(M.askAt||0)){out.push(['ask',{spots:askList}]);M.askAt=t+20;}
+
+ function isResource(type){
+  return ['wood','quarry','fisher','hunter','forest','coalmine','ironmine','goldmine','stonemine'].indexOf(type)>=0;
+ }
+ function findSpot(type){
+  var list=M.spots[type]||[],best=null,bestScore=-1e18;
+  for(var sp of list){
+   var rk=type+':'+sp.x+':'+sp.y;
+   if((M.rejected[rk]||0)>t)continue;
+   if(typeof sp.n==='number'&&sp.n<=0)continue;
+   if(typeof canPlace==='function'&&!canPlace(type,sp.x,sp.y))continue;
+   var score=typeof sp.n==='number'?sp.n:0;
+   if(type==='guard'){
+    var cx=sp.x+1.5,cy=sp.y+1.5;
+    score+=((cx-home.x)*(map.w/2-home.x)+(cy-home.y)*(map.h/2-home.y))*.001;
+   }
+   if(score>bestScore){bestScore=score;best=sp;}
+  }
+  if(best||isResource(type)||typeof canPlace!=='function')return best;
+  var size=type==='tower'?5:type==='castle'?8:3,bestP=null,bestD=1e18;
+  var bases=[home];
+  for(var ob2 of ownBuildings)if(ob2.type==='guard'||ob2.type==='tower')
+   bases.push({x:ob2.x+(ob2.w||3)/2,y:ob2.y+(ob2.h||3)/2});
+  for(var base of bases)for(var dy=-16;dy<=16;dy+=2)for(var dx=-16;dx<=16;dx+=2){
+   var x=Math.floor(base.x+dx),y=Math.floor(base.y+dy);
+   if(x<1||y<1||x>=(map.w||240)-size-1||y>=(map.h||240)-size-1)continue;
+   if((M.rejected[type+':'+x+':'+y]||0)>t)continue;
+   if(!canPlace(type,x,y))continue;
+   var d=Math.abs(dx)+Math.abs(dy);
+   if(d<bestD){bestD=d;bestP={x:x,y:y};}
+  }
+  return bestP;
+ }
+
+ // Keep at most two live sites. Never place the same type twice while its first site is pending.
+ var siteLimit=done('house')>0?2:1,pendingN=0;
+ for(var pendType in M.pendingPlace)if(Object.prototype.hasOwnProperty.call(M.pendingPlace,pendType))pendingN++;
+ if(siteN+pendingN<siteLimit&&(M.lastPlaceAt||0)<=t){
+  for(var next of wants){
+   if(M.pendingPlace[next])continue;
+   var pos=findSpot(next);if(!pos)continue;
+   out.push(['place',{type:next,x:pos.x,y:pos.y}]);
+   M.pendingPlace[next]=t;M.lastPlaceAt=t+18;M.spots[next]=[];
+   break;
+  }
+ }
+
+ // Use the economy town view for garrison settings; view.buildings does not expose fighters/archers.
+ // A guard's permanent sword remains, and one bowman is requested to push territory.
+ for(var pb of town)if(pb.type==='guard'&&pb.built){
+  var gs=M.garrisonSent[pb.id]||{f:false,a:false};
+  if(!gs.f&&pb.fighters!==0){out.push(['fighters',{b:pb.id,set:0}]);gs.f=true;}
+  if(!gs.a&&pb.archers!==1){out.push(['archers',{b:pb.id,set:1}]);gs.a=true;}
+  M.garrisonSent[pb.id]=gs;
+ }
+
+ // Prioritize only the small core, and issue each setting once per building id.
+ var priorityTypes=['guard','quarry','saw','fisher','coalmine','ironmine','smelter','smith','weaponsmith','barracks','goldmine','goldsmelter'];
+ for(var pb2 of town)if(pb2.built&&priorityTypes.indexOf(pb2.type)>=0&&!M.prioSent[pb2.id]){
+  if(pb2.prio!==true)out.push(['priority',{b:pb2.id,on:true}]);
+  M.prioSent[pb2.id]=true;
+ }
+
+ var A=E.army||{},reserve=totalSoldiers>=20?6:4;
+ if(A.reserve!==reserve&&M.reserveSent!==reserve){out.push(['armyReserve',{set:reserve}]);M.reserveSent=reserve;}
+ if(done('barracks')>0){
+  var stable=done('smelter')>0&&done('weaponsmith')>0&&done('coalmine')>0&&done('ironmine')>0&&carriers>=9;
+  var targets=stable?{sword:20,spear:12,bow:10}:{sword:14,spear:6,bow:6};
+  var at=A.target||{};
+  M.targetSent=M.targetSent||{};
+  for(var kind of ['sword','spear','bow'])if(at[kind]!==targets[kind]&&M.targetSent[kind]!==targets[kind]){
+   out.push(['armyTarget',{kind:kind,set:targets[kind]}]);M.targetSent[kind]=targets[kind];
+  }
+  if(S.banner&&done('goldsmelter')>0&&st('gold')>=2&&at.banner!==2&&(!M.targetSent||M.targetSent.banner!==2)){
+   out.push(['armyTarget',{kind:'banner',set:2}]);M.targetSent=M.targetSent||{};M.targetSent.banner=2;
+  }
+ }
+ for(var vb of town)if(S.vault&&vb.type==='vault'&&vb.built&&M.vaultSent!==vb.id){
+  out.push(['vaultKeep',{b:vb.id,set:20}]);M.vaultSent=vb.id;
+ }
+ for(var tpIndex=0;tpIndex<(E.toolPlan||[]).length;tpIndex++){
+  var tp=(E.toolPlan||[])[tpIndex],keep=tp.tool==='pick'?2:tp.tool==='hammer'?1:tp.tool==='saw'?1:
+   tp.tool==='axe'?1:tp.tool==='rod'?1:tp.tool==='shovel'?1:0;
+  if(tp.keep!==keep&&M.toolSent[tpIndex]!==keep){
+   out.push(['toolKeep',{k:tpIndex,set:keep}]);M.toolSent[tpIndex]=keep;
+  }
+ }
+ if(t>0&&t-(M.noteAt||0)>=600){
+  out.push(['note',{text:'v253 lean core: houses '+has('house')+', guard '+has('guard')+
+   ', mines '+has('coalmine')+'/'+has('ironmine')+', workers '+(people.worker||0)+
+   ', carriers '+carriers+' idle '+idleC+', soldiers '+totalSoldiers+', sites '+siteN+'.'}]);
+  M.noteAt=t;
  }
 }
