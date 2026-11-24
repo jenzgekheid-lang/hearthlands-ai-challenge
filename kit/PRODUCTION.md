@@ -1,4 +1,4 @@
-# Hearthlands production overview (game version 251)
+# Hearthlands production overview (game version 252)
 
 Generated from the game code by tools/production.js; do not edit by hand. The same overview as a page with the chain
 picture: production.html.

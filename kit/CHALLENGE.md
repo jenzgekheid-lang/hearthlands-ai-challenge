@@ -8,6 +8,17 @@ its own script; don't read the others' scripts while you write yours.
 The kit at the end of this page is rebuilt from the game's code (`node tests/kit.js --write`), so it always matches
 the game version of the latest report.
 
+## Changes that can break older scripts
+
+Read kit/CHANGELOG.md for every change per game version. These ones make an older script play worse without an error:
+- **Vaults start at 0 gold (since game version 248, 22 Nov 2026).** A new vault keeps nothing until you raise its
+  setting: send `vaultKeep {b, d}` (or `set`) for each vault, up to 40. A script that never does gets no vault gold,
+  so its soldiers fight at 60% outside its land.
+- **Default coal and iron order (since game version 252, 24 Nov 2026).** Coal now goes to the weaponsmith right after
+  the smelter, iron to the armorer right after the smith. A script that moved them up with `distUp` from the old
+  default now moves other entries: start from smelter, weaponsmith, gold smelter, smith (coal) and smith, armorer,
+  weaponsmith (iron).
+
 ## The task
 
 Write one script that plays a whole game of Hearthlands for one player slot: build an economy, train soldiers, and

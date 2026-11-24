@@ -2,12 +2,38 @@
 
 Generated with tools/kit-version.js; read VERSION and this file before editing a script.
 
-## v251
+## v252
 
-v251-86271d451b8e: kit changed
+v252-9b6f73b92453: kit changed
 
 ```diff
-Kit v250-0e16313ef661 -> v251-86271d451b8e: kit changed (kit (AI_SCRIPT_CHALLENGE.md), GAME_SUMMARY.md)
+Kit v251-85772af1bc4d -> v252-9b6f73b92453: kit changed (challenge brief)
+
+### challenge brief
+@@ line 7 @@
+  the game version of the latest report.
+  
++ ## Changes that can break older scripts
++ 
++ Read kit/CHANGELOG.md for every change per game version. These ones make an older script play worse without an error:
++ - **Vaults start at 0 gold (since game version 248, 22 Nov 2026).** A new vault keeps nothing until you raise its
++   setting: send `vaultKeep {b, d}` (or `set`) for each vault, up to 40. A script that never does gets no vault gold,
++   so its soldiers fight at 60% outside its land.
++ - **Default coal and iron order (since game version 252, 24 Nov 2026).** Coal now goes to the weaponsmith right after
++   the smelter, iron to the armorer right after the smith. A script that moved them up with `distUp` from the old
++   default now moves other entries: start from smelter, weaponsmith, gold smelter, smith (coal) and smith, armorer,
++   weaponsmith (iron).
++ 
+  ## The task
+  
+```
+
+## v251
+
+v251-85772af1bc4d: kit changed
+
+```diff
+Kit v250-0e16313ef661 -> v251-85772af1bc4d: kit changed (kit (AI_SCRIPT_CHALLENGE.md), GAME_SUMMARY.md)
 
 ### kit (AI_SCRIPT_CHALLENGE.md)
 @@ line 293 @@
@@ -19,6 +45,22 @@ Kit v250-0e16313ef661 -> v251-86271d451b8e: kit changed (kit (AI_SCRIPT_CHALLENG
 +     needs a tool takes one from these (a geologist or miner a pickaxe, a toolsmith or builder a hammer, a forester or
 +     digger a shovel): spend them on extra builders or geologists first and the toolsmith or the first mines can wait for
 +     ever ('Needs a worker with ...'). Keep a hammer for the toolsmith and pickaxes for the first coal and iron mines.
++   - Lessons (23 Nov 2026, #96: where towns lock up for good, found by the lab's open player; each is how the game works):
++     1. Workers come from carriers. Staffing stops while you have 2 carriers or fewer (status 'Waiting for a free
++        settler'), so with the 6 start carriers only 4 workplaces get a worker before your first house brings settlers
++        (house 10, house2 20). Food huts (fisher, hunter, waterhut) are workplaces too: place a house before the 5th.
++     2. Until a stonecutter (quarry) works, the 18 start stone is all your stone; until a sawmill works, the 24 start
++        planks are all your planks. Keep 2 planks + 3 stone for the first quarry and 3 planks + 4 stone for the first
++        sawmill; a town that spends them first never gets stone or planks again.
++     3. A forester and a digger each take a shovel, and you start with 2: keep one for the first forester.
++     4. A site whose status starts with 'No way' (no way to the site for diggers or builders) is not built while there
++        is no way; demolish {b} it and place it elsewhere. A site that waits many minutes for one thing is worth the
++        same look.
++     5. A woodcutter with no grown trees in range says 'No grown trees in range' and makes no logs; a quarry with no
++        rocks 'No stone in range'. Replace it where view.economy.spots finds trees or rocks (or plant with a forester).
++     6. A mine where no geologist found its ore mines nothing ('Deposit worn out: finding little ...'). A step of your
++        plan that can't be done yet (no ore known, no room, no tool) should wait without stopping the other steps: a
++        script that stops at such a step builds nothing more.
     - Where the enemy is (two players): the two headquarters stand on the same row, mirrored across the map's middle:
       the enemy's is near (view.map.w - your x, your y). You only see his buildings once your land or a unit sees them:
 
@@ -639,156 +681,14 @@ Kit v243-16d36a9732c0 -> v244-0ead3337d9c8: kit changed (kit (AI_SCRIPT_CHALLENG
 
 v243-16d36a9732c0: kit changed
 
-```diff
-Kit v242-dacc13112912 -> v243-16d36a9732c0: kit changed (kit (AI_SCRIPT_CHALLENGE.md), buildings.js, GAME_SUMMARY.md)
-
-### kit (AI_SCRIPT_CHALLENGE.md)
-@@ line 37 @@
-                          may be gone, or manned differently, by now ] },
-    over: null or {winners},
--   switches: {vault, banner, armor, vet, gear} true|false, the same every turn: which optional mechanics this game has.
-+   switches: {vault, banner, armor, vet, gear, dock, hunter} true|false, the same every turn: which optional mechanics this game has.
-              Off: the vault (gold in stock counts instead, 1 bar per soldier), bannermen (no banners; gold counts for
-              every soldier away from home) or armor (no armorer; everyone's arm stays 0). Fields keep their shape.
-@@ line 43 @@
-              Orders for a switched-off mechanic (placing its building, vaultKeep, armyArmor, a banner armyTarget or
-              weaponKeep, armorRepair) are refused with why 'switched off: <id>'. vet: veterans (ranks and xp; needs
--             banner); off: every rank and xp is 0.
-+             banner); off: every rank and xp is 0. dock: the fisher's dock (see Water below); off: a fisher stands
-+             anywhere by water. hunter: the hunter's cabin and game in forest (see Hunting below); off: no game
-+             (map.game all 0), no hunter, meat only from the slaughterhouse, and mine foods as before.
-    gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
-          tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
-@@ line 215 @@
-      unsearched: [ {x, y, d} mountain on your land no geologist has searched, nearest first ],
-      spots: { type: [ {x, y, d, n} ] } answers to last turn's ['ask', {spots: [types]}]: places where that building
--       may stand now, best first (n = trees/rocks/fish water/free grass/known ore in reach, or new land for military).
-+       may stand now, best first (n = trees/rocks/fish water/game/free grass/known ore in reach, or new land for military).
-        Ask for at most 6 types a turn; you get at most 8 places for each, all on your own land }
-  - HOW A TOWN WORKS. The data files buildings.js and items.js that come with this kit (in the AI challenge they lie
-@@ line 273 @@
-      reach land across a lake. A fisher or water hut uses water within its range that touches (4 sides) land you own;
-      two sides may fish the same lake.
-+   - The fisher's dock (switches.dock, v243): a fisher needs a dock of 2 water tiles in a row out of its south side
-+     (from its south-east corner column, so the door's tile stays land), else its east side, else its west side (both
-+     from its middle row), never north; every dock tile must be water no other dock holds. The game picks the first
-+     side that fits. The dock is part of the building (map.occupied 1 on its tiles). The fisher fishes water with fish
-+     within 6 tiles of the dock's end (no land rule there), walking out along the dock (2 s more per fish). A spot
-+     without such water simply has no fisher: canPlace and buildable say so ('Needs a dock: ...').
-+   - Hunting (switches.hunter, v243): game (map.game, animals per tile, seen now only) lives only in forest: a tile is
-+     forest while 6 or more grown trees stand in the 5x5 square around it (on ground where trees grow). Every forest
-+     tile starts with 2; a forest tile with fewer gets one back with chance 1/240 a second; a tile that stops being
-+     forest (trees felled) loses its game at once. The hunter's cabin (hunter: 3x3, planks 3 stone 2, range 14) needs
-+     a bow (the weapon); a finished cabin without its hunter is served before any bowman: the barracks asks for no bows
-+     while one waits. The hunter walks to a tile of game on your land within range, shoots (3 s) and brings 1 meat.
-+     Games start with 2 bows more. With the switch on meat feeds coal mines (after bread and fish) and iron mines
-+     (first, as always); gold mines no longer take meat (fish, then bread).
-    - Gold (army plan, test version): outside your land a soldier fights at 60% strength (a bowman at 80% at least: the
-      higher of 80% and what the gold gives him), plus up to 40% from the gold
-@@ line 302 @@
-    set: an exact number (kept within the same limits; armyTarget by set has no top of 40).
-  - Mines may stand anywhere on the mountain; signs (view.economy.ore) show where the ore is. Signs go after 10 minutes.
-- - THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, ore, oreNames, grounds, at(x,y)}.
-+ - THE MAP (full game): view.map = {w, h, known, ter, tree, stone, owner, height, occupied, fish, game, ore, oreNames, grounds, at(x,y)}.
-    Each layer is a Uint8Array with one value per tile, index y*w+x, as far as your fog of war allows: known 0 = never
-    seen (all other layers 0 there), 1 = seen before (as it was then, height included), 2 = seen now (your own land always). ter = the
-    kind of ground, an index into grounds (today 0 grass, 1 water, 2 mountain, 3 sand; unseen tiles read 0); tree 2 grown, 1 young; stone = rocks left; owner = side (0 nobody; always 0 on water: water is never owned, v241); occupied 1 = something
--   stands there (seen now only); fish = fish left in that water (seen now only); ore 0 not searched by a geologist,
-+   stands there (seen now only; also a fisher's dock over water); fish = fish left in that water (seen now only); game = animals
-+   on that tile (seen now only; always 0 while switches.hunter is off); ore 0 not searched by a geologist,
-    1 searched: nothing, 2+ = oreNames[ore-1]. oreNames is a plain list (since 201), the same for every value of ore:
-    ['none', 'coal', 'ironore', 'goldore', 'stone'], so oreNames.indexOf(kind) + 1 gives the ore value.
-@@ line 315 @@
-    never fixed numbers ("not water and not mountain" is not the same as "grass"). map.at(x,y) gives one tile as an
-    object with the same names, but two of them in words: {known, ter: the ground's name ('grass', 'water', 'mountain', ...), tree, stone, owner,
--   height, occupied, fish, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
-+   height, occupied, fish, game, ore: an ore name, 'none' (searched: nothing) or null (not searched)}; null outside the map.
-    Decide yourself where to build and where to expand: the map is all you need.
-  - canPlace(type, x, y): true when a building of that type may stand with its top-left corner on tile x, y right now
-    (whole tiles; the game's own rules: on your land, flat enough, free of trees, rocks and other buildings, room around
-    it, a free tile in front of the door, mines fully on the mountain, military buildings out of enemy arrow range).
--   Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, vault 3x3, weaponsmith 3x3 east, armorer 3x3 east, barracks 3x3 (door south unless east).
-+   Instant and free: call it as often as you like. Sizes (w x h tiles, door side): wood 3x3, forest 3x3, saw 3x3 east, fisher 3x3, hunter 3x3, waterhut 3x3, farm 4x3, mill 3x3, bakery 3x3 east, pigfarm 3x3, butcher 3x3, coalmine 3x3, ironmine 3x3, stonemine 3x3, goldmine 3x3, goldsmelter 3x3, smelter 3x3, smith 3x3 east, quarry 3x3, house 3x3, house2 5x4, house3 6x5, store 3x3, look 2x2, guard 3x3, tower 5x4, castle 8x7, vault 3x3, weaponsmith 3x3 east, armorer 3x3 east, barracks 3x3 (door south unless east).
-    x grows to the east, y to the south.
-  - view.refused: last turn's orders the game refused, as {order, args, why} (for place: the reason, like 'Too steep';
-
-### buildings.js
-@@ line 3 @@
-  // Footprints since version 147 (art plan step 2b): about 70% of the old area (most 4x3 -> 3x3). door:'side' = the house
-  // is turned a quarter and its door is on the east edge (state.js doorAt); otherwise the door faces the camera (south).
-+ // (#36, v243) the fisher's dock (switch dock): len tiles of water out of the hut's south, east or west side; he fishes
-+ // water within reach of the dock's end, and walking out along the dock and back adds walk seconds (build/placement.js
-+ // dockFor, jobs/gatherers.js). Start values: the sweep tunes reach and walk.
-+ const DOCK = { len:2, reach:6, walk:2 };
-+ // (#37, v243) game for the hunter (switch hunter; world/nature.js): a tile is forest while at least `trees` grown trees
-+ // stand in the (2r+1)x(2r+1) square around it; only forest tiles hold game (at most max, every forest tile starts full)
-+ // and get an animal back with chance `back` a second; a tile that stops being forest loses its game. Start values.
-+ const GAME = { trees:6, r:2, back:1/240, max:2 };
-  export const DEF = {
-    hq:    {n:'Headquarters', s:5, h:4, cost:{}, r:18, roof:'#8a3b2e'},
-@@ line 8 @@
-    forest:{n:'Forester', s:3, h:3, cost:{plank:3,stone:1}, tool:'shovel', range:10, roof:'#4f7a36', desc:'Plants new trees nearby'},
-    saw:   {n:'Sawmill', s:3, h:3, door:'side', cost:{plank:3,stone:4}, tool:'saw', inputs:{log:8}, recipe:{in:{log:1}, out:'plank', time:7.5, verb:'Sawing planks'}, roof:'#a5562f', desc:'Turns logs into planks'},
--   fisher:{n:'Fisher', s:3, h:3, cost:{plank:3,stone:2}, tool:'rod', range:12, roof:'#4d6f86', desc:'Catches fish in water next to your land, within its range. Fish slowly come back'},
-+   fisher:{n:'Fisher', s:3, h:3, cost:{plank:3,stone:2}, tool:'rod', range:12, dock:DOCK, roof:'#4d6f86', desc:'Catches fish in water next to your land, within its range. Fish slowly come back'},
-+   hunter:{n:'Hunter', rule:'hunter' /* (#37, v243) only with the switch on */, s:3, h:3, cost:{plank:3,stone:2}, tool:'bow', range:14, game:GAME, roof:'#6b5a32', desc:'Hunts game where trees stand together (forest), within its range, and brings meat. Needs a bow: hunters get bows before bowmen. Game slowly comes back in forest; where the forest is cut, it is gone'},
-    waterhut:{n:'Water hut', s:3, h:3, cost:{plank:3,stone:4}, worker:true, water:true, range:10, roof:'#3f6f99', desc:'Fills buckets at water next to your land, within its range. Water belongs to nobody: build it by a lake or the sea'},
-    farm:  {n:'Grain farm', s:4, h:3, cost:{plank:6,stone:6}, tool:'scythe', range:8, roof:'#b8963e', desc:'Sows fields on open green land nearby and harvests the grain'},
-@@ line 15 @@
-    pigfarm:{n:'Pig farm', s:3, h:3, cost:{plank:6,stone:6}, worker:true, inputs:{grain:6,water:6}, recipe:{in:{grain:1,water:1}, out:'pig', time:13.5, verb:'Raising a pig'}, roof:'#c98a7a', desc:'Grain + water raise pigs'},
-    butcher:{n:'Slaughterhouse', s:3, h:3, cost:{plank:4,stone:4}, tool:'axe', inputs:{pig:6}, recipe:{in:{pig:1}, out:'meat', time:4.5, verb:'Butchering'}, roof:'#8e3b36', desc:'Turns pigs into meat'},
--   coalmine:{n:'Coal mine', s:3, h:3, cost:{plank:4,stone:1}, tool:'pick', mine:'coal', foods:['bread','fish'], inputs:{bread:4,fish:4}, roof:'#3a3633', desc:'Build anywhere on the mountain; signs of a geologist show where the coal is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
-+   coalmine:{n:'Coal mine', s:3, h:3, cost:{plank:4,stone:1}, tool:'pick', mine:'coal', foods:['bread','fish'], inputs:{bread:4,fish:4}, foodsH:['bread','fish','meat'], inputsH:{bread:4,fish:4,meat:4}, roof:'#3a3633', desc:'Build anywhere on the mountain; signs of a geologist show where the coal is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
-    ironmine:{n:'Iron mine', s:3, h:3, cost:{plank:4,stone:1}, tool:'pick', mine:'ironore', foods:['meat','fish'], inputs:{meat:4,fish:4}, roof:'#7a4632', desc:'Build anywhere on the mountain; signs of a geologist show where the iron ore is. Eats meat; fish only while no meat is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
-    stonemine:{n:'Stone mine', s:3, h:3, cost:{plank:5}, tool:'pick', mine:'stone', foods:['bread','fish'], inputs:{bread:4,fish:4}, roof:'#77736a', desc:'Build anywhere on the mountain; signs of a geologist show where the stone is. Eats bread; fish only while no bread is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
--   goldmine:{n:'Gold mine', s:3, h:3, cost:{plank:5,stone:1}, tool:'pick', mine:'goldore', foods:['fish','bread','meat'], inputs:{fish:4,bread:2,meat:2}, roof:'#8a7130', desc:'Build anywhere on the mountain; signs of a geologist show where the gold ore is. Eats fish; bread or meat only while no fish is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
-+   goldmine:{n:'Gold mine', s:3, h:3, cost:{plank:5,stone:1}, tool:'pick', mine:'goldore', foods:['fish','bread','meat'], inputs:{fish:4,bread:2,meat:2}, foodsH:['fish','bread'], inputsH:{fish:4,bread:2}, roof:'#8a7130', desc:'Build anywhere on the mountain; signs of a geologist show where the gold ore is. Eats fish; bread or meat only while no fish is in stock. 1 meal = up to 10 trips, not every trip finds ore'},
-    goldsmelter:{n:'Gold smelter', s:3, h:3, cost:{plank:4,stone:6}, tool:'hammer', inputs:{coal:6,goldore:6}, recipe:{in:{coal:1,goldore:1}, out:'gold', time:7.5, verb:'Smelting gold'}, roof:'#7a5a22', desc:'Coal + gold ore make gold. Gold kept in a vault makes soldiers stronger outside your land'},
-    smelter:{n:'Iron smelter', s:3, h:3, cost:{plank:4,stone:6}, tool:'hammer', inputs:{coal:6,ironore:6}, recipe:{in:{coal:1,ironore:1}, out:'iron', time:7.5, verb:'Smelting iron'}, roof:'#6b3a2a', desc:'Coal + iron ore make iron'},
-@@ line 52 @@
-  // Tilted-view look (version 148, art plan step 2c; drawing only): [width, depth, height] of the house body relative to
-  // its footprint's standard box, fixed per type (Jens: varied sizes look natural; height 1.7 = two storeys)
-- export const LOOK = { wood:[1,.9,1], forest:[.9,.88,1], saw:[1.1,.95,1], fisher:[.85,.85,.95], waterhut:[.8,.85,.95],
-+ export const LOOK = { wood:[1,.9,1], forest:[.9,.88,1], saw:[1.1,.95,1], fisher:[.85,.85,.95], hunter:[.85,.85,.95], waterhut:[.8,.85,.95],
-    farm:[1.15,.9,1], mill:[.78,.8,1.7], bakery:[1,.95,1.05], pigfarm:[1.15,.88,.9], butcher:[.95,.9,1], goldsmelter:[1,1,1.1],
-    smelter:[1,1,1.1], smith:[1,.9,1], quarry:[.9,.9,1], house:[.9,.88,1], house2:[1,.95,1.7], house3:[1.05,1,1.7],
-    weaponsmith:[1.05,.9,1], armorer:[1,.9,1], barracks:[1.1,1,1.05], look:[1,1,1] };
-- export const BUILD_GROUPS = [['Basics',['wood','quarry','saw','forest','store']],['Houses',['house','house2','house3']],['Land',['look']],['Food',['fisher','waterhut','farm','mill','bakery','pigfarm','butcher']],['Mining and metal',['stonemine','coalmine','ironmine','smelter','smith','goldmine','goldsmelter','vault']],['Army',['guard','tower','castle','weaponsmith','armorer','barracks']]];
-+ export const BUILD_GROUPS = [['Basics',['wood','quarry','saw','forest','store']],['Houses',['house','house2','house3']],['Land',['look']],['Food',['fisher','hunter','waterhut','farm','mill','bakery','pigfarm','butcher']],['Mining and metal',['stonemine','coalmine','ironmine','smelter','smith','goldmine','goldsmelter','vault']],['Army',['guard','tower','castle','weaponsmith','armorer','barracks']]];
-  export const BUILD_ORDER = BUILD_GROUPS.flatMap(g=>g[1]);
-  // Short texts for the Build tab (Jens, 12 Nov: 'way smaller and simple'). The full desc above stays for the game summary
-@@ line 63 @@
-    wood:'Fells trees for logs', quarry:'Cuts stone', saw:'Logs into planks', forest:'Plants trees', store:'Stores goods',
-    house:'10 settlers', house2:'20 settlers', house3:'50 settlers', look:'Uncovers the fog',
--   fisher:'Catches fish', waterhut:'Gathers water', farm:'Grows grain', mill:'Grain into flour', bakery:'Bakes bread',
-+   fisher:'Catches fish', hunter:'Hunts for meat', waterhut:'Gathers water', farm:'Grows grain', mill:'Grain into flour', bakery:'Bakes bread',
-    pigfarm:'Raises pigs', butcher:'Pigs into meat',
-    stonemine:'Mines stone', coalmine:'Mines coal', ironmine:'Mines iron ore', smelter:'Makes iron', smith:'Makes tools',
-
-### GAME_SUMMARY.md
-@@ line 67 @@
-  | Sawmill | `saw` | 3 plank, 4 stone | saw | log | plank (from log) | Turns logs into planks |
-  | Fisher | `fisher` | 3 plank, 2 stone | rod | — | — | Catches fish in water next to your land, within its range. Fish slowly come back |
-+ | Hunter | `hunter` | 3 plank, 2 stone | bow | — | — | Hunts game where trees stand together (forest), within its range, and brings meat. Needs a bow: hunters get bows before bowmen. Game slowly comes back in forest; where the forest is cut, it is gone |
-  | Water hut | `waterhut` | 3 plank, 4 stone | — | — | — | Fills buckets at water next to your land, within its range. Water belongs to nobody: build it by a lake or the sea |
-  | Grain farm | `farm` | 6 plank, 6 stone | scythe | — | — | Sows fields on open green land nearby and harvests the grain |
-@@ line 110 @@
-  - Water belongs to nobody: only land is claimed, so a border ends at the shore (and may go on across a lake). A fisher
-    or water hut uses water within its range that touches your land; two sides may fish the same lake.
-+ - Two optional mechanics, off by default for now (v243, switches `dock` and `hunter`): with the dock, a fisher needs
-+   a 2-tile dock over water out of his south, east or west side and fishes within 6 tiles of its end; with the hunter,
-+   game lives in forest (6+ grown trees in the 5x5 around a tile, 2 per tile, slowly coming back, gone where the trees
-+   are cut), a hunter's cabin with a bow (hunters before bowmen; 2 bows at the start) brings meat, and meat feeds coal
-+   and iron mines but no longer gold mines.
-  
-  ## Military
-```
+Initial version in this history.
 
 ## v242
 
 v242-dacc13112912: same
 
 Initial version in this history.
+
 
 ## v241
 
@@ -855,6 +755,7 @@ Kit v240-df98a7fbbb8c -> v241-dacc13112912: kit changed (kit (AI_SCRIPT_CHALLENG
 
 
 
+
 ## v240
 
 v240-df98a7fbbb8c: same
@@ -865,11 +766,13 @@ Initial version in this history.
 
 
 
+
 ## v239
 
 v239-df98a7fbbb8c: kit changed
 
 Initial version in this history.
+
 
 
 
@@ -926,11 +829,13 @@ Initial version in this history.
 
 
 
+
 ## v237
 
 v237-cfe0e812b6af: same
 
 Initial version in this history.
+
 
 
 

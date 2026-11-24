@@ -306,6 +306,22 @@ IN A FULL GAME (an NPC container playing a whole town; the arena has no economy)
     needs a tool takes one from these (a geologist or miner a pickaxe, a toolsmith or builder a hammer, a forester or
     digger a shovel): spend them on extra builders or geologists first and the toolsmith or the first mines can wait for
     ever ('Needs a worker with ...'). Keep a hammer for the toolsmith and pickaxes for the first coal and iron mines.
+  - Lessons (23 Nov 2026, #96: where towns lock up for good, found by the lab's open player; each is how the game works):
+    1. Workers come from carriers. Staffing stops while you have 2 carriers or fewer (status 'Waiting for a free
+       settler'), so with the 6 start carriers only 4 workplaces get a worker before your first house brings settlers
+       (house 10, house2 20). Food huts (fisher, hunter, waterhut) are workplaces too: place a house before the 5th.
+    2. Until a stonecutter (quarry) works, the 18 start stone is all your stone; until a sawmill works, the 24 start
+       planks are all your planks. Keep 2 planks + 3 stone for the first quarry and 3 planks + 4 stone for the first
+       sawmill; a town that spends them first never gets stone or planks again.
+    3. A forester and a digger each take a shovel, and you start with 2: keep one for the first forester.
+    4. A site whose status starts with 'No way' (no way to the site for diggers or builders) is not built while there
+       is no way; demolish {b} it and place it elsewhere. A site that waits many minutes for one thing is worth the
+       same look.
+    5. A woodcutter with no grown trees in range says 'No grown trees in range' and makes no logs; a quarry with no
+       rocks 'No stone in range'. Replace it where view.economy.spots finds trees or rocks (or plant with a forester).
+    6. A mine where no geologist found its ore mines nothing ('Deposit worn out: finding little ...'). A step of your
+       plan that can't be done yet (no ore known, no room, no tool) should wait without stopping the other steps: a
+       script that stops at such a step builds nothing more.
   - Where the enemy is (two players): the two headquarters stand on the same row, mirrored across the map's middle:
     the enemy's is near (view.map.w - your x, your y). You only see his buildings once your land or a unit sees them:
     send one free soldier (patrol on) or an explorer towards never-seen tiles (view.map.known) to find them.
