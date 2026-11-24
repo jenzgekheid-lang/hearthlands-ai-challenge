@@ -348,3 +348,47 @@ After the full strategy reset, I tightened three implementation details before t
 
 The revised script parses cleanly, passes the forbidden-API scan, and a targeted mock confirms that a completed two-stage scout does not issue another solo march. These are safety hardenings to the v251 strategy, not another strategic pivot.
 
+
+
+## 2026-11-24 — v253 lean-core and siege-first strategic reset
+
+### Safety trigger
+
+The three latest scheduled tournament reports (21, 22 and 23 November) all remained at **0 wins out of 8 games**. The latest published report tested the v251 script. This crosses the requested three-report threshold, so this is a strategy-level replacement, not another small adjustment.
+
+### What the v251 report actually showed
+
+- Across the eight games, the report recorded 16 buildings taken by scheduled, 24 enemy kills against 27 of ours, 0 gold against 370, and 8 stuck scheduled towns against 2 NPC towns.
+- On two map-31 starts, scheduled finished with only 5 outside soldiers, no bowmen outside, no coal or iron mine, no smelter and no barracks. The towns stopped building around minutes 8–9.
+- On the stronger map-777 Gold start, the economy did reach the industrial chain by about minute 9 and grew to 22 soldiers by minute 30. It captured 16 buildings and killed 17, but lost 19 soldiers and still did not eliminate the remaining military buildings and HQ. By the end it had 6 guards, 3 quarries, 2 woodcutters, 2 sawmills, 2 foresters, 2 iron mines, 2 smelters and many optional food buildings; only 2 carriers remained and 132 goods were waiting to be carried.
+- The same map issued 7,240 fighters orders, 7,240 archers orders and 5,399 priority orders. The weaker map-31 runs issued roughly 3,300 each of fighters and archers. The command stream was being flooded with settings that should have been one-time changes.
+- Early order logs showed sendIn followed shortly by free. The old army routine swept up every held, idle soldier, so it could cancel a soldier that had just been sent toward a garrison. Its garrison check also required a post to have no troops at all, which missed the archer slot when the permanent swordsman was already inside.
+
+### Root causes and strategic switch
+
+The previous plan tried to solve the problem by adding more guards, producers and expansion steps. The report shows that this created a bloated workforce and, worse, prevented the army code from receiving commands.
+
+This version switches to a **lean-core economy with automatic garrisons and one deliberate siege at a time**:
+
+1. **Controlled opening:** woodcutter → quarry → sawmill → first house. The house is deliberately in place before the fourth workplace, respecting the kit's six-starting-carrier limit and its warning that staffing stops at two carriers or fewer.
+2. **One initial forward guard:** set its economy-town garrison settings once to fighters=0, archers=1. The permanent sword remains; the priority order lets the game call a free bowman automatically. The scout uses a sword, so it does not steal the bow needed by the post. No manual sendIn/blanket-free cycle.
+3. **Geology after the first house:** recruit one geologist only after the quarry, sawmill and first house exist. Trigger from owned mountain/unsearched counts as well as the coordinate list, and fall back to known mountain tiles when the list is empty. This avoids spending a starting carrier and pick before the first house has begun bringing settlers.
+4. **A compact production line:** one fisher feeds the first coal and iron mines; then one smelter, toolsmith, weaponsmith and barracks. No early hunter, forester, second quarry, second woodcutter or duplicate smelter. A second copy is allowed only after an actual depletion/food signal and a carrier surplus.
+5. **Strict placement control:** one unfinished site before the first house and at most two afterward; pending placements are remembered so the same type cannot be placed repeatedly while its site is not yet visible. Every candidate is rechecked with canPlace, including the v253 bandpass restriction.
+6. **Idempotent settings:** fighters, archers, priority, armyReserve, armyTarget, toolKeep and vaultKeep are remembered per building/setting. Garrison settings are read from view.economy.town, where the kit documents them, not from view.buildings, which only exposes troop kinds.
+7. **Army-first command budget:** the army routine runs before economy orders. It tracks only the current siege group, releases those soldiers after their target is captured, retreats after roughly 35% field losses, and never frees every held idle soldier. It keeps a 4–6 soldier reserve, scouts with one loose swordsman, attacks empty military posts first, then defended posts, and the HQ last. Exposed workshops are secondary raids only when no military target is known.
+8. **Late gold if the map supports it:** when gold ore is actually discovered and the main barracks chain is working, build one gold mine, gold smelter and vault; set the vault to keep 20. Banners are targeted only when the gold chain is running. This addresses the report's 0-versus-370 gold gap without burdening the opening.
+9. **v252 distribution compatibility:** no old distUp coal/iron reordering is used, because the kit changed the default delivery order in v252. The script header is updated to the current kit version, v253.
+
+### Validation performed
+
+- node --check passed for the complete replacement script.
+- Custom mock checks passed for: one opening placement with no duplicate on the next turn; geologist waiting until the first house and recruiting after it; garrison and priority settings issued once despite unchanged/missing view fields; no manual sendIn or blanket free; attack of an exposed empty guard; no duplicate attack while a siege is active; release of only the tracked attackers after capture.
+- A stress mock with six existing guards produced 39 commands on its first configuration turn and 0 on the next; it stayed below the 50-command limit and did not repeat fighters, archers or priority.
+- Static scan found no Math.random, Math.hypot, trigonometric calls, timers, eval, Function constructor or network fetches.
+
+### Scope and test status
+
+Only input/scheduled/script.js and this input/scheduled/notes.md file may be changed. No challenge-kit, tournament-output or actual Hearthlands game files were changed.
+
+The v253 replacement has passed syntax and mock validation only. It has **not** yet played a new arena tournament; no win improvement is claimed until a genuine report evaluates this commit.
