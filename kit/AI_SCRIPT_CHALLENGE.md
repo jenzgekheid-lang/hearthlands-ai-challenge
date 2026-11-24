@@ -44,7 +44,7 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
                         is given as you last saw it, with remembered: true and seenAt (the game second you saw it): it
                         may be gone, or manned differently, by now ] },
   over: null or {winners},
-  switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair, backslope, behind} true|false, the same every turn: which optional mechanics this game has.
+  switches: {vault, banner, armor, vet, gear, dock, hunter, carryfair, backslope, behind, bandpass} true|false, the same every turn: which optional mechanics this game has.
             Since version 244 (19 Nov 2026) every switch is on everywhere: the live game, the arena, tournaments and
             the lab all play with all of them on, armor and bannermen included (scripts written before then met
             banner and armor off in the arena). Still read view.switches: a test game can switch one off.
@@ -63,7 +63,10 @@ THE VIEW (what your side may know; positions in map tiles, x to the east, y to t
             a hill'. Nothing to order for it. behind (22 Nov 2026): a band of tiles up-left of each built
             building (toward -x,-y; 2-4 deep by type, 0 for mines and yards) can't be walked or stood on, except doors
             and the 2 tiles in front of a door; a site whose door would lie in a band is refused ('Nobody can walk to the
-            door'). Nothing to order for it.
+            door'). Nothing to order for it. bandpass (24 Nov 2026, needs behind): a site is refused when the band
+            its finished building would get would cut the walkable ground around it in two, looked at within 4 tiles of
+            the band ('This would block the way past'): at least one way past every building stays open. Nothing to
+            order for it.
   gear: [{it, x, y}] weapons ('sword', 'spear', 'bow') and broken armor ('brokenarmor') lying where soldiers fell, on
         tiles you see now (switches.gear; empty while it is off). Once on someone's land they become goods on that
         land owner's pile (a pile is not in this list).
