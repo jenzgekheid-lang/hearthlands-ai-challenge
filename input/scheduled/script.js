@@ -209,7 +209,7 @@ function economy(view,M,out){
  function spare(it,n){return st(it)>=(n+(pendingCost[it]||0));}
  M.pendingPlace=M.pendingPlace||{};M.rejected=M.rejected||{};M.spots=M.spots||{};
  M.prioSent=M.prioSent||{};M.garrisonSent=M.garrisonSent||{};M.toolSent=M.toolSent||{};
- M.targetSent=M.targetSent||{};M.vaultSent=M.vaultSent||{};M.geoSent=M.geoSent||{};
+ M.targetSent=M.targetSent||{};M.vaultSent=M.vaultSent||{};M.geoSent=M.geoSent||{};M.armorSent=M.armorSent||{};M.repairSent=M.repairSent||{};
  for(var sk in spots)if(Object.prototype.hasOwnProperty.call(spots,sk))M.spots[sk]=spots[sk];
  for(var rr of (view.refused||[])){
   if(rr.order==='place'&&rr.args){
@@ -224,6 +224,7 @@ function economy(view,M,out){
   if(rr.order==='vaultKeep'&&rr.args)delete M.vaultSent[rr.args.b];
   if(rr.order==='armyReserve')M.reserveSent=null;
   if(rr.args&&rr.order==='armyArmor')delete M.armorSent[rr.args.kind];
+  if(rr.args&&rr.order==='armorRepair')delete M.repairSent[rr.args.b];
  }
  for(var pp in M.pendingPlace)if(Object.prototype.hasOwnProperty.call(M.pendingPlace,pp)){
   var pend=M.pendingPlace[pp];
