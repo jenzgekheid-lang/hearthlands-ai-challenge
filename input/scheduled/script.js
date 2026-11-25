@@ -34,12 +34,13 @@ function army(view,M,out){
  
  // Release only soldiers from a siege that has ended; never sweep up unrelated held soldiers.
  if(M.releaseIds&&M.releaseIds.length){
-  var keepRelease=[];
+  var keepRelease=[],releaseNow=[];
   for(var rid of M.releaseIds){
    var rsold=null;for(var sr of mine)if(sr.id===rid){rsold=sr;break;}
-   if(rsold&&!rsold.fighting&&!rsold.defends)out.push(['free',{ids:[rid]}]);
+   if(rsold&&!rsold.fighting&&!rsold.defends)releaseNow.push(rid);
    else if(rsold)keepRelease.push(rid);
   }
+  if(releaseNow.length)out.push(['free',{ids:releaseNow}]);
   M.releaseIds=keepRelease;
  }
  
