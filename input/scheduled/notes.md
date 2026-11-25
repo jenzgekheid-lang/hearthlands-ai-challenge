@@ -392,3 +392,61 @@ This version switches to a **lean-core economy with automatic garrisons and one 
 Only input/scheduled/script.js and this input/scheduled/notes.md file may be changed. No challenge-kit, tournament-output or actual Hearthlands game files were changed.
 
 The v253 replacement has passed syntax and mock validation only. It has **not** yet played a new arena tournament; no win improvement is claimed until a genuine report evaluates this commit.
+
+
+## 2026-11-25 — v254 adaptive builder strategy reset
+
+### Safety trigger and latest evidence
+
+The 21–23 November reports recorded 0 wins out of 8 and triggered the v253 lean-core reset. The first published evaluation of v253 (25 November, game version 253; input commit 9a06438) also recorded **0 wins, 0 losses and 8 undecided**. The latest sequence therefore remains flat at zero wins, so this is another strategy-level change rather than a small tuning pass.
+
+The 25 November report is `output/scheduled/2026-11-25-9a06438.md`. Its aggregate results:
+
+- Scheduled took 7 buildings, killed 32 enemy soldiers and finished with 0 gold; the NPC killed 61 and finished with 192 gold.
+- 7 of 8 scheduled towns were marked STUCK, compared with 1 NPC town.
+- Seven games never completed the mine → smelter → smith → weaponsmith → barracks chain. They generally stopped at 9 soldiers and 10–11 buildings.
+- The exception was Map 777 (Gold): it completed coal and iron mines by minutes 5–6, smelter and smith by minute 7, and barracks/weaponsmith by minute 9. It reached 22 soldiers and took 6 buildings, but still ended undecided after 24 of its soldiers fell and with no gold.
+- The opposite side on Map 777 reached its first coal mine only at minute 32 and its barracks at minute 36; it ended with 14 soldiers and 31 fallen.
+- Most failed games had 41–42 idle carriers and 24–32 goods waiting. They had already built four small houses by about minute 4, despite having no carrier shortage.
+- Geologists were repeatedly sent to search, with 13–37 `failed: nothing left to search there` outcomes in the examples. No coal or iron sign was found in the seven stalled towns.
+- The two-stage scout did make contact at about minute 5. Scouting was not the primary bottleneck; the town failed to turn that early contact into a working army.
+
+### Root causes
+
+1. **Housing was not actually shortage-driven.** The v253 `freeBeds < 5` condition treated a nearly full bed count as a reason to add another house, even while carriers were plentiful. This produced 40 extra settlers, 41–42 idle carriers and more goods waiting than the workforce could usefully convert.
+2. **The garrison setting was backwards for the opening.** v253 requested `fighters=0, archers=1`. The game log still showed a post waiting for a swordsman and no soldier on the way. The new plan keeps one fighter in each small guard and leaves the starting bowmen available until the barracks exists.
+3. **The industrial plan was too brittle.** After one fisher, every useful production step depended on the geologist revealing the exact coal and iron signs. If geology stalled, the script had almost nothing else to build. The full-game builder example in the current kit has a wider, conditional production plan and keeps other steps progressing.
+4. **Geology used unnecessary custom target recovery.** The previous script mixed the canonical `E.unsearched` list with a manual map scan and its own target cooldowns. The new version follows the kit's canonical nearest-first unsearched list, sends only an idle geologist, avoids overlapping destinations, and cools down a tile only when it remains unsearched after the unit becomes idle.
+5. **Military placement could fall back to the nearest legal tile.** That did not guarantee useful new territory or mountain access. The new military placement scorer weighs unowned land and mountain tiles around each candidate, and additional posts are gated on existing posts being staffed.
+6. **The lean-core plan stopped too early.** It intentionally omitted several food and renewable-resource branches, then waited indefinitely when ore was not known. The new plan is based on the kit's full-game builder pattern, with measured food, water, forestry, quarry, mine, metal, weapon and housing branches.
+
+### Strategic switch
+
+This abandons the v253 **lean-core / one-fisher / ore-gated** plan. The new strategy is an **adaptive full-game builder with a controlled military frontier**:
+
+1. **Protect the starting materials:** woodcutter → quarry → sawmill → first small house. The first house is gated behind the sawmill, so it cannot consume the stone and planks reserved for the renewable core.
+2. **Grow only when people are needed:** add housing when carriers fall below 9, idle carriers below 3, settlers/carrier/weapon advisor tips appear, or people are homeless. A nearly full bed count by itself no longer causes a house.
+3. **Use the kit's geologist loop:** recruit after quarry and first house, use only `E.unsearched` mountain coordinates that the map marks mineable, and send only idle geologists. A second geologist is allowed after the toolsmith exists.
+4. **Build an adaptive production chain:** fisher and hunter support the first coal/iron mines; smelter, toolsmith, weaponsmith and barracks follow when their dependencies exist. Water, farm, mill, bakery, pigfarm and butcher remain available as conditional branches rather than being omitted from the strategy. Additional producers are built only for actual stock, food or depletion pressure.
+5. **Expand with purpose:** retain one swordsman in each guard, keep archers out of guards before the barracks, and build new guards/towers only after existing posts are staffed. Candidate sites are scored for unowned land and mountain access; the nearest-legal-site fallback is removed for military buildings.
+6. **Adopt the kit builder's mature military progression:** initial targets 10 swords / 4 spears / 6 bows, then 18 / 8 / 12 when the production chain is stable; reserve 4–6 soldiers; attack one target at a time, empty military posts first, HQ last; use banners and vault gold when available, and add bow armor only after the armorer works.
+7. **Keep command state idempotent:** garrison, priority, army target, reserve, tool, armor and vault settings are remembered. Pending placements store the pre-placement count, so an existing building of the same type cannot clear a new placement reservation.
+8. **Keep siege release narrow:** only the tracked siege group is released after capture, batched into one command. Unrelated held soldiers and garrison movements are left alone.
+
+The script keeps deterministic behavior: no random calls, no trigonometry, no timers, no network access and no generated randomness. The header remains game version 253 because that is the current kit version; v254 is the strategy revision, not a game-version claim.
+
+### Validation performed
+
+- JavaScript source compiled successfully in an isolated V8 parser.
+- Static forbidden-API scan: clean (no `Math.random`, `Math.hypot`, trigonometric calls, timers, `eval`, `Function` constructor or network fetch).
+- Opening mock: wood → quarry → saw → house, with no house placed before the sawmill.
+- Pending-placement mock: no duplicate placement while a site is still arriving in the town view.
+- Geologist mocks: recruitment waits for quarry + house; an idle geologist is sent to the canonical mineable unsearched coordinate; a moving geologist receives no duplicate send.
+- Garrison mock: one fighter and zero early archers are configured once; unchanged next-turn state produces no duplicate settings.
+- Combat mock: an eligible group attacks an empty guard; after capture, only the tracked siege group is released in one batched `free` command.
+- Refused armor/repair setting mock: no memory-state exception.
+- No full tournament has yet tested v254. Do not claim a win improvement until a new arena report evaluates this commit.
+
+### Scope
+
+Only `input/scheduled/script.js` and `input/scheduled/notes.md` may be changed. No kit, report, results, challenge-runner or actual Hearthlands game files are to be edited.
