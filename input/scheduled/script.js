@@ -311,8 +311,8 @@ function economy(view,M,out){
  add('pigfarm',1,6,6,has('farm')>0&&has('waterhut')>0);
  add('butcher',1,4,4,has('pigfarm')>0);
  add('house2',2,5,6,homes&&has('house')>0&&t>1200);
- add('house',4,3,3,homes);
- add('house3',1,10,12,homes&&t>2400);
+ add('house',4,3,3,homes&&has('saw')>0);
+ add('house3',1,10,12,homes&&t>2400&&has('saw')>0);
  
  var coalFood=done('fisher')>0||done('bakery')>0;
  var ironFood=done('fisher')>0||done('butcher')>0||(S.hunter&&done('hunter')>0);
