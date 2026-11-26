@@ -450,3 +450,54 @@ The script keeps deterministic behavior: no random calls, no trigonometry, no ti
 ### Scope
 
 Only `input/scheduled/script.js` and `input/scheduled/notes.md` may be changed. No kit, report, results, challenge-runner or actual Hearthlands game files are to be edited.
+
+
+## 26 Nov 2026 — v255 NPC-paced resource rush and one-sword border anchors
+
+### Safety trigger and authoritative result
+
+The three-report no-improvement condition is met: the three most recent published full-game scheduled results remain at **0 wins**. The newest available result is the 25 November run. The authoritative \`output/scheduled/latest.md\` and \`output/scheduled/2026-11-25-f0f90c4.md\` both identify input commit \`f0f90c4\`, game version 253, and **0 wins, 0 losses, 8 undecided**. Its aggregate war summary is **0 buildings taken, 0 kills, 8 stuck towns**, with 0 gold for scheduled against 325 for the NPC.
+
+Correction to the preceding v254 notes: the earlier \`9a06438\` / 7-building / 32-kill figures are not the result for the latest v254 input commit. Do not use those figures to assess v254. The latest \`f0f90c4\` report is the relevant evaluation.
+
+### What the v254 report actually showed
+
+- Seven games never reached a working mine-to-barracks chain. The one stronger map reached coal and iron mines, smelter and toolsmith by about minute 9, but still never placed a weaponsmith or barracks.
+- The stronger map ended with 17 idle carriers and 110 goods waiting to be carried, while it had built four woodcutters and three foresters. The foresters spent most of their time reporting no free ground to plant.
+- Other games added water, farm, mill, bakery, pig farm and butcher before any weapons chain existed. The butcher then waited for an axe for the rest of the game.
+- Guards repeatedly reported “Waiting for a swordsman”; the latest report still showed a post waiting for a swordsman. The script had set a four-soldier field reserve from the opening and left the guard's extra fighter setting at its default.
+- The geologist loop used a custom terrain filter and a short target cooldown. Logs showed repeated “nothing left to search there” failures, while some maps had only one to three mountain tiles inside the border.
+- The non-resource placement fallback searched only a small radius around the HQ. The expanding collection of optional buildings crowded that area before the weaponsmith and barracks were placed.
+- Army targets were not raised until a barracks was already built, so the weaponsmith had no early demand to prepare the weapon stock while the barracks site was being completed.
+
+### Strategic switch: NPC-paced military rush
+
+This abandons the v254 adaptive-builder / broad optional-production approach. The new plan follows the opponent's observed opening tempo, but uses a deliberately small production footprint and explicit garrison policy:
+
+1. **Opening order:** quarry → woodcutter → first guard → sawmill → one medium house → fisher. The quarry is first so the renewable stone supply starts immediately. The first guard claims land before optional food and forestry branches.
+2. **Single-swordsman border anchors:** each small guard is configured for zero additional fighters and zero archers, leaving its permanent guard swordsman as the only required garrison. Guard priority is enabled. The second guard is not placed until the first is staffed.
+3. **No early field reserve:** set \`armyReserve\` to 0 until the barracks is built and every existing guard is staffed. Only then raise the field reserve to 4. This prevents the script from reserving the very swordsmen that the guards need to claim land.
+4. **One medium house, not a house cascade:** build one \`house2\` after the sawmill. Further housing is allowed only when population is at bed capacity and carriers are genuinely scarce or settlers are homeless. A persistent generic settlers tip alone no longer creates another house.
+5. **Canonical geology:** recruit one geologist after quarry and guard are operating, then use the kit's nearest-first \`E.unsearched\` list without a second terrain filter. An outstanding target is not resent every turn; only an idle target that remains unsearched after four minutes is cooled down before trying another tile.
+6. **A strict industrial queue:** first coal and iron mines → smelter → toolsmith → weaponsmith → barracks. No second woodcutter, forester, hunter, farm or water chain may jump ahead of the first weapons chain. Optional producers are added only when a building's status or actual food/stock shortage calls for them.
+7. **Weapons demand begins before the barracks finishes:** as soon as the weaponsmith site exists, set targets to 20 swords, 8 spears and 12 bows. The weaponsmith can therefore build stock while the barracks is being completed, rather than waiting for a later settings command.
+8. **Late upgrades only:** gold mine, gold smelter and vault follow the core army; the vault is set to keep 40. Two bannermen and iron armor are requested only when their production chains can support them.
+9. **Conquest remains deliberate:** scout the centre and mirrored HQ, keep one siege active, capture empty military posts first, require larger mixed forces for defended posts, reserve the HQ for last, and release only the group committed to a completed or abandoned siege.
+
+### Validation performed
+
+- \`node --check\` passed for the complete v255 script.
+- Mock opening check: quarry is the first placement.
+- Mock guard check: the extra fighter slot is set to zero and guard priority is issued once; the unchanged next turn does not repeat either command.
+- Mock geology check: recruit from the canonical unsearched list; an outstanding target is not resent on the next turn.
+- Mock weapons check: sword/spear/bow targets are set when the weaponsmith site exists, before the barracks is built, and are not repeated.
+- Mock combat check: a sufficiently large mixed force attacks an exposed empty guard.
+- Army-only mock check: no economy data is required on army-only turns.
+- Static forbidden-API scan is clean: no random calls, trigonometry, timers, network access, eval or dynamic Function use.
+- These are syntax and targeted mock checks, **not** an arena result. v255 has not yet been tournament-tested.
+
+### Scope and commits
+
+Only \`input/scheduled/script.js\` and \`input/scheduled/notes.md\` are changed. No challenge-kit files, tournament outputs, results, runner files or actual Hearthlands game files are modified.
+
+- Script commit: b4670ab82ea60e6e27583bc81bb4aa51a2c75c32
