@@ -220,26 +220,26 @@ Script commits: `3d57f035ac671b4a637e25c52a14b13a89af33d5` (full rewrite) and `6
 
 The three latest genuine scheduled tournament reports (18, 19 and 20 November) all recorded **0 wins, 0 losses and 8 undecided**. The three-report safety condition is met, so this is a strategy-level change, not another incremental tweak.
 
-The latest report is \`output/scheduled/latest.md\`, game version 245, written for input commit \`d91d2c3\`. It recorded 0 buildings taken, 0 kills, 0 gold against 271 for the NPC, and all eight towns marked stuck. The report shows two different failure modes:
+The latest report is `output/scheduled/latest.md`, game version 245, written for input commit `d91d2c3`. It recorded 0 buildings taken, 0 kills, 0 gold against 271 for the NPC, and all eight towns marked stuck. The report shows two different failure modes:
 
 - Some games reached 26 buildings and 28 soldiers, but land stopped growing at 1,459 tiles after the second guard. The script had no next territorial objective and never attacked or captured anything.
 - Other sides stalled at 14 buildings and 10 soldiers, with no mines or smelter. Three mountain tiles were on the land, but no geologist was recruited.
-- The gold-side games had 5–8 idle carriers and roughly 90–101 goods waiting to be carried. The script kept sending two garrison-setting orders every turn: 3,297 \`fighters\` and 3,297 \`archers\` commands in one game.
+- The gold-side games had 5–8 idle carriers and roughly 90–101 goods waiting to be carried. The script kept sending two garrison-setting orders every turn: 3,297 `fighters` and 3,297 `archers` commands in one game.
 - The previous army waited for a visible military building before acting. It had no attack-move expedition, so the enemy was discovered too late or not at all.
 - The barracks spent up to 100% of its time waiting for iron armor for new spearmen. The previous script requested armor for swords, spears and bows at once, delaying basic recruitment.
 
 ### Kit v247 changes
 
-Reviewed the current main branch and the v246/v247 kit changes. v247 adds the \`carryfair\` carrier allocation rule and a new \`carriers\` advisor tip. The tip identifies a workshop that has waited for goods while those goods are in stock and no carrier is idle, or a prolonged absence of idle carriers. The script uses that signal to request housing only when delivery capacity is genuinely short. The optional \`scriptInfo\` minute snapshot is off by default, so the strategy does not depend on it.
+Reviewed the current main branch and the v246/v247 kit changes. v247 adds the `carryfair` carrier allocation rule and a new `carriers` advisor tip. The tip identifies a workshop that has waited for goods while those goods are in stock and no carrier is idle, or a prolonged absence of idle carriers. The script uses that signal to request housing only when delivery capacity is genuinely short. The optional `scriptInfo` minute snapshot is off by default, so the strategy does not depend on it.
 
 ### New strategy: forward corridor plus expeditionary contact
 
 This replaces the previous two-post, wait-for-visibility plan:
 
-1. **Build the first border post early, then keep expanding.** Use the kit's military spot answers plus bounded \`canPlace\` candidates around the HQ and existing posts. Score each candidate by neutral land, unexplored area, mountain tiles and direction toward the map centre. Keep up to five small guards, add up to two big towers after the frontier is established, and add a castle only after the army is large enough. This replaces the old arbitrary placement near the home ring and the hard stop at two guards.
-2. **Staff posts through priority and the game's automatic garrison system.** Set minimum fighter counts (guard 1, tower 2, castle 3), zero archers, and turn on military-building priority. Stop issuing manual \`sendIn\` orders. Read the actual fighter/archer settings from \`view.economy.town\`; \`view.buildings\` exposes troops, not those settings. This also removes the thousands of duplicate garrison-setting commands.
+1. **Build the first border post early, then keep expanding.** Use the kit's military spot answers plus bounded `canPlace` candidates around the HQ and existing posts. Score each candidate by neutral land, unexplored area, mountain tiles and direction toward the map centre. Keep up to five small guards, add up to two big towers after the frontier is established, and add a castle only after the army is large enough. This replaces the old arbitrary placement near the home ring and the hard stop at two guards.
+2. **Staff posts through priority and the game's automatic garrison system.** Set minimum fighter counts (guard 1, tower 2, castle 3), zero archers, and turn on military-building priority. Stop issuing manual `sendIn` orders. Read the actual fighter/archer settings from `view.economy.town`; `view.buildings` exposes troops, not those settings. This also removes the thousands of duplicate garrison-setting commands.
 3. **Secure geology before the quarry takes the opening pick.** Attempt geologist recruitment as soon as an unsearched mountain is inside our border and a pick is free. Delay the first quarry until the first post is staffed (and, if needed, a second post has pushed the border onto mountain), so the quarry does not take the opening pick before geology can start. Briefly defer it while recruitment is pending, then keep the geologist moving across distinct unsearched tiles. Continue the food-backed coal/iron chain once ore is identified.
-4. **Keep the renewable economy, but respond to the v247 carrier signal.** Retain one woodcutter, sawmill and early forester. Do not add a second forester when the existing one says there is no free ground to plant; expand the border instead. Use the new \`carriers\` tip along with settler/weapons tips to decide when another house is warranted. v247's carryfair handles fairer delivery allocation without extra script commands.
+4. **Keep the renewable economy, but respond to the v247 carrier signal.** Retain one woodcutter, sawmill and early forester. Do not add a second forester when the existing one says there is no free ground to plant; expand the border instead. Use the new `carriers` tip along with settler/weapons tips to decide when another house is warranted. v247's carryfair handles fairer delivery allocation without extra script commands.
 5. **Recruit an unarmored field army first.** Set staged targets up to 44–46 soldiers when both mines and the metal chain are stable. Request bow armor only at first; do not armor all three weapon classes before the barracks has recruited. Add sword armor only after a large force and surplus iron exist. Keep a small reserve for home defence.
 6. **Make contact proactively.** Keep one explorer moving along the visible fog edge toward the map centre. When no enemy building is visible and at least 14 healthy field fighters are available, send a supported 8–12 soldier attack-move expedition toward known enemy land or the central frontier. This is designed to discover and engage the opponent instead of waiting indefinitely for a lookout to reveal a target.
 7. **Attack military objectives once contact is made.** Prefer empty posts, then defended posts, and the HQ last. Estimate nearby visible enemy strength and garrison size, keep six fighters back, reinforce one siege at a time, and retreat after sustained field losses. If a known defended target is too strong, wait for reinforcement rather than sending an attack-move column into its range.
@@ -249,8 +249,8 @@ This replaces the previous two-post, wait-for-visibility plan:
 - JavaScript syntax compilation: passed.
 - Static forbidden-API scan: clean (no random calls, timers, network, filesystem, Node/process APIs, eval, dynamic Function, Math.hypot, Math.sin or Math.cos).
 - The script header is aligned to game version **247**.
-- This is static validation, not a tournament result. The latest published scheduled report still tests input commit \`d91d2c3\` on game version 245. Do not claim a win improvement until a later report names this new input commit.
-- Only \`input/scheduled/script.js\` and \`input/scheduled/notes.md\` are intended to change. No challenge kit, output, or actual Hearthlands game files are modified.
+- This is static validation, not a tournament result. The latest published scheduled report still tests input commit `d91d2c3` on game version 245. Do not claim a win improvement until a later report names this new input commit.
+- Only `input/scheduled/script.js` and `input/scheduled/notes.md` are intended to change. No challenge kit, output, or actual Hearthlands game files are modified.
 
 
 
@@ -456,9 +456,9 @@ Only `input/scheduled/script.js` and `input/scheduled/notes.md` may be changed. 
 
 ### Safety trigger and authoritative result
 
-The three-report no-improvement condition is met: the three most recent published full-game scheduled results remain at **0 wins**. The newest available result is the 25 November run. The authoritative \`output/scheduled/latest.md\` and \`output/scheduled/2026-11-25-f0f90c4.md\` both identify input commit \`f0f90c4\`, game version 253, and **0 wins, 0 losses, 8 undecided**. Its aggregate war summary is **0 buildings taken, 0 kills, 8 stuck towns**, with 0 gold for scheduled against 325 for the NPC.
+The three-report no-improvement condition is met: the three most recent published full-game scheduled results remain at **0 wins**. The newest available result is the 25 November run. The authoritative `output/scheduled/latest.md` and `output/scheduled/2026-11-25-f0f90c4.md` both identify input commit `f0f90c4`, game version 253, and **0 wins, 0 losses, 8 undecided**. Its aggregate war summary is **0 buildings taken, 0 kills, 8 stuck towns**, with 0 gold for scheduled against 325 for the NPC.
 
-Correction to the preceding v254 notes: the earlier \`9a06438\` / 7-building / 32-kill figures are not the result for the latest v254 input commit. Do not use those figures to assess v254. The latest \`f0f90c4\` report is the relevant evaluation.
+Correction to the preceding v254 notes: the earlier `9a06438` / 7-building / 32-kill figures are not the result for the latest v254 input commit. Do not use those figures to assess v254. The latest `f0f90c4` report is the relevant evaluation.
 
 ### What the v254 report actually showed
 
@@ -476,9 +476,9 @@ This abandons the v254 adaptive-builder / broad optional-production approach. Th
 
 1. **Opening order:** quarry → woodcutter → first guard → sawmill → one medium house → fisher. The quarry is first so the renewable stone supply starts immediately. The first guard claims land before optional food and forestry branches.
 2. **Single-swordsman border anchors:** each small guard is configured for zero additional fighters and zero archers, leaving its permanent guard swordsman as the only required garrison. Guard priority is enabled. The second guard is not placed until the first is staffed.
-3. **No early field reserve:** set \`armyReserve\` to 0 until the barracks is built and every existing guard is staffed. Only then raise the field reserve to 4. This prevents the script from reserving the very swordsmen that the guards need to claim land.
-4. **One medium house, not a house cascade:** build one \`house2\` after the sawmill. Further housing is allowed only when population is at bed capacity and carriers are genuinely scarce or settlers are homeless. A persistent generic settlers tip alone no longer creates another house.
-5. **Canonical geology:** recruit one geologist after quarry and guard are operating, then use the kit's nearest-first \`E.unsearched\` list without a second terrain filter. An outstanding target is not resent every turn; only an idle target that remains unsearched after four minutes is cooled down before trying another tile.
+3. **No early field reserve:** set `armyReserve` to 0 until the barracks is built and every existing guard is staffed. Only then raise the field reserve to 4. This prevents the script from reserving the very swordsmen that the guards need to claim land.
+4. **One medium house, not a house cascade:** build one `house2` after the sawmill. Further housing is allowed only when population is at bed capacity and carriers are genuinely scarce or settlers are homeless. A persistent generic settlers tip alone no longer creates another house.
+5. **Canonical geology:** recruit one geologist after quarry and guard are operating, then use the kit's nearest-first `E.unsearched` list without a second terrain filter. An outstanding target is not resent every turn; only an idle target that remains unsearched after four minutes is cooled down before trying another tile.
 6. **A strict industrial queue:** first coal and iron mines → smelter → toolsmith → weaponsmith → barracks. No second woodcutter, forester, hunter, farm or water chain may jump ahead of the first weapons chain. Optional producers are added only when a building's status or actual food/stock shortage calls for them.
 7. **Weapons demand begins before the barracks finishes:** as soon as the weaponsmith site exists, set targets to 20 swords, 8 spears and 12 bows. The weaponsmith can therefore build stock while the barracks is being completed, rather than waiting for a later settings command.
 8. **Late upgrades only:** gold mine, gold smelter and vault follow the core army; the vault is set to keep 40. Two bannermen and iron armor are requested only when their production chains can support them.
@@ -486,7 +486,7 @@ This abandons the v254 adaptive-builder / broad optional-production approach. Th
 
 ### Validation performed
 
-- \`node --check\` passed for the complete v255 script.
+- `node --check` passed for the complete v255 script.
 - Mock opening check: quarry is the first placement.
 - Mock guard check: the extra fighter slot is set to zero and guard priority is issued once; the unchanged next turn does not repeat either command.
 - Mock geology check: recruit from the canonical unsearched list; an outstanding target is not resent on the next turn.
@@ -498,6 +498,6 @@ This abandons the v254 adaptive-builder / broad optional-production approach. Th
 
 ### Scope and commits
 
-Only \`input/scheduled/script.js\` and \`input/scheduled/notes.md\` are changed. No challenge-kit files, tournament outputs, results, runner files or actual Hearthlands game files are modified.
+Only `input/scheduled/script.js` and `input/scheduled/notes.md` are changed. No challenge-kit files, tournament outputs, results, runner files or actual Hearthlands game files are modified.
 
 - Script commit: b4670ab82ea60e6e27583bc81bb4aa51a2c75c32
