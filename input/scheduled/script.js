@@ -238,9 +238,7 @@ function think(view){
   var targetsArmy={sword:trained?18:10,spear:trained?8:4,bow:trained?12:6};
   for(var kind of ['sword','spear','bow'])if(armyTargets[kind]!==targetsArmy[kind])push('armyTarget',{kind:kind,set:targetsArmy[kind]});
   if(S.banner&&done('goldsmelter')>0&&armyTargets.banner!==(trained?3:1))push('armyTarget',{kind:'banner',set:trained?3:1});
-  if(S.armor&&done('armorer')>0&&view.soldiers.length>=12){
-   for(var ak of ['sword','spear','bow'])if(!armorTargets[ak])push('armyArmor',{kind:ak,set:1});
-  }
+  if(S.armor&&done('armorer')>0&&view.soldiers.length>=12&&!armorTargets.bow)push('armyArmor',{kind:'bow',set:1});
  }
  for(var vb of town)if(S.vault&&vb.type==='vault'&&vb.built&&vb.keep!==40)push('vaultKeep',{b:vb.id,set:40});
  for(var ab of town)if(S.armor&&S.gear&&ab.type==='armorer'&&ab.built&&!ab.repair)push('armorRepair',{b:ab.id,on:true});
