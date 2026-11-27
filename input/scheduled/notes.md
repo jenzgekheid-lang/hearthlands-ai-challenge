@@ -501,3 +501,54 @@ This abandons the v254 adaptive-builder / broad optional-production approach. Th
 Only `input/scheduled/script.js` and `input/scheduled/notes.md` are changed. No challenge-kit files, tournament outputs, results, runner files or actual Hearthlands game files are modified.
 
 - Script commit: b4670ab82ea60e6e27583bc81bb4aa51a2c75c32
+
+## 27 Nov 2026 — v256 builder-derived frontier and sustained production
+
+### Safety trigger and latest evidence
+
+The three latest stored full-game scheduled reports all remain at **0 wins out of 8**:
+
+- 25 Nov, input `9a06438`: 0/8; 7 buildings taken, 32 kills, 7 stuck towns.
+- 25 Nov, input `f0f90c4`: 0/8; 0 buildings taken, 0 kills, 8 stuck towns.
+- 27 Nov, input `3bfb271`: 0/8; 1 building taken, 16 kills against 28 NPC kills, 8 stuck towns, 0 gold against 221 NPC gold.
+
+The latest report is `output/scheduled/2026-11-27-3bfb271.md`, game version 253. It is the authoritative evaluation of the previous v255 script.
+
+### What the latest report actually showed
+
+- On Maps 31 and 20261030, the town stopped at 7–8 buildings and 9 soldiers. No smelter, toolsmith, weaponsmith, barracks, tower or castle was completed. The land stopped growing after the first small ring.
+- The logs show small guards idle for essentially all their building time, with no soldiers on the way. v255 explicitly set their fighter and archer settings to zero, so it removed the melee garrisons needed to hold those posts.
+- The geology trigger depended on `E.unsearched.length`. Several games showed the advisor reporting 60–141 mountain tiles but no mine chain and no useful geologist dispatch. The kit's builder uses `E.land.unsearched` as the recruitment signal and `E.unsearched` for coordinates; v256 uses both and has a deterministic scan of owned mineable tiles when the coordinate list is empty.
+- On Map 777, v255 did reach smelter, toolsmith, weaponsmith and barracks by minutes 7–10, but it stalled at 13 soldiers. It ended with only 2 carriers and 72 goods waiting. The log reported 20 unused weapons, the barracks waiting for free settlers, iron-mine depletion and food/carrier stalls.
+- The one-mine limit could not replace depleted deposits. v256 allows additional coal and iron mines when ore stock is low or a deposit is thinning/worn out.
+- The housing trigger did not respond to the documented `settlers` and `weapons` tips. The Map 777 log explicitly said the barracks had weapons waiting but needed free settlers. v256 responds to `settlers`, `weapons` and `carriers`, and raises the site allowance while people are short.
+- v255 sent individual starting soldiers on two early scouting marches (1:30 and 4:00), tying up the opening army. v256 uses one explorer for reconnaissance instead.
+- v255 only raided economic buildings when no military target was known at all. If known military buildings were too strong, it waited. v256 can raid an exposed production building while avoiding known military cover.
+
+### Strategic switch
+
+This abandons the custom **two-post / one-fisher / one-mine NPC-paced rush**. v256 is rebuilt around the full-game builder structure documented in the current kit, with a more deliberate frontier and army:
+
+1. **Canonical renewable opening:** quarry → woodcutter → sawmill → first small house. Housing is placed before the workforce runs down, rather than waiting until after a fourth workplace.
+2. **Real post garrisons:** one permanent swordsman in each small guard, two in each big tower and three in a castle; no early archers are trapped inside. A new frontier post is not started until every existing post is staffed.
+3. **Progressive frontier:** build up to four guards, then up to two towers when the outside army can support them, and a castle only in the mature game. Military sites are scored for unclaimed land and mineable mountains rather than placed only near the HQ.
+4. **Robust geology:** recruit from `E.land.unsearched`, send to the nearest canonical unsearched coordinate, and fall back to a deterministic scan of owned mineable map tiles. Keep a visited list and avoid overlapping geologist targets.
+5. **Sustained production:** replace depleted mines and expand coal/iron capacity when stock or mine status shows a shortage. Keep the smelter → toolsmith → weaponsmith → barracks chain ahead of optional late food and gold upgrades.
+6. **Adaptive housing and site throughput:** react to carrier, settler and unused-weapon tips; allow 3 early sites, 5 later, and one extra site under a real people shortage. Demolish only sites explicitly marked `No way`.
+7. **Non-sacrificial scouting:** recruit one explorer and send it to the centre, mirrored enemy HQ and one flank waypoint. Do not spend the opening swordsmen on two solo marches.
+8. **Supported warfare:** train a mixed army, keep a field reserve by leaving six fighters out of each assault, attack empty military buildings first, and raid exposed economic buildings if known military targets are too strong. Track and release only the soldiers committed to a completed or abandoned siege.
+
+### Validation performed
+
+- JavaScript parsed successfully in an isolated V8 runtime.
+- Forbidden API scan clean: no random calls, trigonometry, timers, network access, `eval` or dynamic `Function` use in the submitted script.
+- Opening mock: asks for the quarry first and does not send starting soldiers scouting.
+- Garrison mock: sets a small guard to one fighter and zero archers; unchanged settings are not repeated.
+- Geology mock: recruits a geologist using the land counter and sends it to an owned mineable tile when `E.unsearched` is empty.
+- Housing mock: a carrier/weapon shortage places a second house ahead of optional production.
+- Combat mock: an exposed economic building is raided when the known military target is too strong.
+- These are syntax and targeted mock checks, **not** an arena result. v256 has not yet been tournament-tested.
+
+### Scope
+
+Only `input/scheduled/script.js` and `input/scheduled/notes.md` were changed. No challenge-kit files, output reports, results, runner files or actual Hearthlands game files were modified.
