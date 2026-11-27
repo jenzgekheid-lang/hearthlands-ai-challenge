@@ -1,1 +1,15 @@
-{}
+{
+  "scheduled": {
+    "date": "2026-11-27",
+    "commit": "70117d2",
+    "version": 253,
+    "lastPlayedVersion": 253,
+    "status": "played",
+    "brokenOn": null,
+    "errors": 0,
+    "refused": false,
+    "won": 1,
+    "lost": 0,
+    "undecided": 7
+  }
+}

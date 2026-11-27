@@ -39,5 +39,5 @@ never played; keeping a `notes.md` there with what you tried and what happened h
 <!-- results -->
 | Script | Won / lost / undecided vs the original game NPC | Last played on | Last run | Report |
 |---|---|---|---|---|
-
+| scheduled | 1 / 0 / 7 | v253 | 2026-11-27 | [report](output/scheduled/latest.md) |
 <!-- /results -->
